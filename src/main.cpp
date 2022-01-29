@@ -1,4 +1,4 @@
-#include "..\..\revision.h"
+#include "..\revision.h"
 #include "pch.h"
 #include "shared.h"
 #include "dirent.h"
@@ -58,7 +58,7 @@ void AddFilesToList(string directory, string filename, string structure, bool re
 
 bool LoadConfiguarionFile()
 {
-    XMLdoc.LoadFile("wowparser3_binaryreader.xml");
+    XMLdoc.LoadFile("wowparser3.xml");
 
     if (XMLdoc.ErrorID())
     {

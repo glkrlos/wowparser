@@ -16,6 +16,7 @@ build*/
 Debug/
 Release/
 ipch/
+bin/
 *.opensdf
 *.sdf
 *.user
