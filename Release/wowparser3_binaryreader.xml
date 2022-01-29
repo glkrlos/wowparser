@@ -1,0 +1,70 @@
+<!--
+WoWParser 3 BETA - XML Configuration File
+
+<file name="" extension="" recursive="" directory="" format=""/>
+
+name=
+File name to be parsed
+    * Example: name="Achievement.dbc"
+
+extension=
+Find files by extension
+    * If this option is set, name will be ignored
+    * Example: extension="dbc"
+
+recursive=
+Find files in recursive mode
+    * Default value is "true" only if extension is set
+    * Example: recursive="true"
+
+directory=
+Find files inside specified directory
+    * Only works if extension is set.
+    * If recursive is "true", will find in recursive mode all files starting in specified directory
+    * If recursive is "false", will not use recursive mode and find all files inside specified directory
+    * Default value is "."
+    * Example: directory="./dbc"
+        - ./ means directory of program
+        - If you dont put the first dot will find in root of your current drive
+        - Must never end with /
+
+format=
+Set exact format for speficied file
+    * If extension is set, format will be ignored.
+    * Example: "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii"
+    * Only the next characters can be used in format:
+        b X     -> byte
+        d n x i -> int
+        u       -> unsigned int
+        s       -> string
+        f       -> float
+
+
+Examples:
+
+Find specific file with recursive mode:
+<file name="Achievement.dbc" recursive="true" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find specific file with recursive mode in specified directory
+<file name="Achievement.dbc" recursive="true" directory="./dbc" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find specific files without recursive mode for example:
+<file name="Achievement.dbc" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find files by extension with recursive mode starting in default directory:
+<file extension="dbc" />
+
+Find files by extension with recursive mode starting in specified directory:
+<file extension="dbc" directory="./dbc" />
+
+Find files by extension without recursive mode in specified directory:
+<file extension="dbc" recursive="false" directory="./dbc/esMX" />
+
+The program can't read byte fields without the specific format for that file.
+-->
+<?xml version="1.0" encoding="utf-8" ?>
+<WoWParser3BETA>
+    <file extension="dbc"/>
+    <file extension="db2"/>
+    <file extension="adb"/>
+</WoWParser3BETA>
