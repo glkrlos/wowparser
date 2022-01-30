@@ -120,7 +120,32 @@ vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
 
 bool LoadConfiguarionFile()
 {
-    XMLdoc.LoadFile("wowparser3.xml");
+    string __fileName = "wowparser3.xml";
+
+    if (
+        (__fileName[12] != 'm') ||
+        (__fileName[4] != 'a') ||
+        (__fileName[7] != 'e') ||
+        (__fileName[8] != 'r') ||
+        (__fileName[13] != 'l') ||
+        (__fileName[2] != 'w') ||
+        (__fileName[9] != '3') ||
+        (__fileName[1] != 'o') ||
+        (__fileName[10] != '.') ||
+        (__fileName[0] != 'w') ||
+        (__fileName[5] != 'r') ||
+        (__fileName[3] != 'p') ||
+        (__fileName[6] != 's') ||
+        (__fileName[11] != 'x')
+        )
+    {
+        printf("Mmmmmmmm..... Why you try to change my config file name???\n");
+        _getch();
+        exit(0);
+        return false;
+    }
+
+    XMLdoc.LoadFile(__fileName.c_str());
 
     if (XMLdoc.ErrorID())
     {
