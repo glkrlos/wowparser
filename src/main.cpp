@@ -3,6 +3,7 @@
 #include "shared.h"
 #include "dirent.h"
 #include "tinyxml2.h"
+#include "dbc_reader.h"
 
 using namespace tinyxml2;
 
@@ -56,6 +57,67 @@ void AddFilesToList(string directory, string filename, string structure, bool re
     closedir(dir);
 }
 
+unsigned int GetFormatedTotalFields(string structure)
+{
+    return structure.empty() ? 0 : structure.size();
+}
+
+unsigned int GetFormatedRecordSize(string structure)
+{
+    unsigned int RecordSize = 0;
+
+    for (unsigned int x = 0; x < structure.size(); x++)
+    {
+        switch (structure[x])
+        {
+            case 'X':   // unk byte
+            case 'b':   // byte
+                RecordSize += 1;
+                break;
+            default:
+                RecordSize += 4;
+                break;
+        }
+    }
+
+    return RecordSize;
+}
+
+vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
+{
+    vector<enumFieldTypes> fieldTypes;
+    for (unsigned int x = 0; x < structure.size(); x++)
+    {
+        switch (structure[x])
+        {
+            case 'X':   // unk byte
+            case 'b':   // byte
+                fieldTypes.push_back(type_BYTE);
+                continue;
+            case 's':   // string
+                fieldTypes.push_back(type_STRING);
+                continue;
+            case 'f':   // float
+                fieldTypes.push_back(type_FLOAT);
+                continue;
+            case 'd':   // int
+            case 'n':   // int
+            case 'x':   // unk int
+            case 'i':   // int
+                fieldTypes.push_back(type_INT);
+                continue;
+            case 'u':   // unsigned int
+                fieldTypes.push_back(type_UINT);
+                continue;
+            default:
+                fieldTypes.push_back(type_NONE);
+                continue;
+        }
+    }
+
+    return fieldTypes;
+}
+
 bool LoadConfiguarionFile()
 {
     XMLdoc.LoadFile("wowparser3.xml");
@@ -84,29 +146,16 @@ bool LoadConfiguarionFile()
         return false;
     }
 
+    // Primero buscamos todo lo que no tenga extension
     for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"))
     {
-        const char *_directoryName = fileElement->Attribute("directory");
-        string DirectoryName = _directoryName ? _directoryName : "";
-        DirectoryName = DirectoryName.empty() ? "." : DirectoryName;
-
         const char *_fileExtension = fileElement->Attribute("extension");
         string FileExtension = _fileExtension ? _fileExtension : "";
         bool Extension = FileExtension.empty() ? false : true;
 
-        bool isRecursive = false;
-        // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-        bool RecursiveIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
-
-        // Si hay extension no nos intereza el nombre ni el formato
+        // No nos intereza si hay extension por ahora
         if (Extension)
-        {
-            if (!RecursiveIsSet)
-                isRecursive = true;
-            
-            AddFilesToList(DirectoryName, "", "", isRecursive, FileExtension);
             continue;
-        }
 
         const char *_fileName = fileElement->Attribute("name");
         string FileName = _fileName ? _fileName : "";
@@ -116,9 +165,44 @@ bool LoadConfiguarionFile()
         if (!Name)
             continue;
 
+        bool isRecursive = false;
+        // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
+        bool RecursiveIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
+
+        const char *_directoryName = fileElement->Attribute("directory");
+        string DirectoryName = _directoryName ? _directoryName : "";
+        DirectoryName = DirectoryName.empty() ? "." : DirectoryName;
+
         const char *_fileFormat = fileElement->Attribute("format");
         string FileFormat = _fileFormat ? _fileFormat : "";
+
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
+    }
+
+    // Primtero establecemos el apuntador a donde se encuentra <file
+    fileElement = rootElement->FirstChildElement("file");
+    // Ahora solo checamos todos los attributos que tengan extension establecida
+    for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"))
+    {
+        const char *_fileExtension = fileElement->Attribute("extension");
+        string FileExtension = _fileExtension ? _fileExtension : "";
+        bool Extension = FileExtension.empty() ? false : true;
+
+        if (!Extension)
+            continue;
+
+        bool isRecursive = false;
+        // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
+        bool RecursiveIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
+
+        const char *_directoryName = fileElement->Attribute("directory");
+        string DirectoryName = _directoryName ? _directoryName : "";
+        DirectoryName = DirectoryName.empty() ? "." : DirectoryName;
+
+        if (!RecursiveIsSet)
+           isRecursive = true;
+
+        AddFilesToList(DirectoryName, "", "", isRecursive, FileExtension);
     }
 
     return true;
@@ -142,6 +226,12 @@ int main(int argc, char *arg[])
 
     for (map<string, string>::iterator FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
+        vector<enumFieldTypes> FormatedFieldTypes = GetFormatedFieldTypes(FileName->second);
+        unsigned int FormatedTotalFields = GetFormatedTotalFields(FileName->second);
+        unsigned int FormatedRecordSize = GetFormatedRecordSize(FileName->second);
+
+        DBCReader dbcReader(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize);
+        dbcReader.Load();
     }
 
     printf("\n\nWoWParser Version 3.0 BETA (Revision: %s)\tHash: %s\n", _REVISION, _HASH);
