@@ -362,4 +362,3 @@ static void rewinddir(DIR* dirp)
 }
 #endif
 #endif /*DIRENT_H*/
-

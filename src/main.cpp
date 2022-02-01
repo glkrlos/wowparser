@@ -150,7 +150,7 @@ bool LoadConfiguarionFile()
         )
     {
         printf("Mmmmmmmm..... Why you try to change my config file name???\n");
-    getchar();
+        getchar();
         exit(0);
         return false;
     }
