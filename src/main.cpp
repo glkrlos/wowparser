@@ -1,4 +1,4 @@
-// #include "..\revision.h"
+#include "../revision.h"
 #include "pch.h"
 #include "shared.h"
 
@@ -12,9 +12,7 @@
 
 #include "tinyxml2.h"
 #include "dbc_reader.h"
-#define _HASH "HASH"
-#define _REVISION "REVISION"
-#define _DATE "DATE"
+
 using namespace tinyxml2;
 
 map<string, string> fileNames;
@@ -270,7 +268,7 @@ int main(int argc, char *arg[])
     }
 
     printf("\n\nWoWParser Version 3.0 BETA for %s (Revision: %s)\n", _OS, _REVISION);
-    printf("Hash: %s\t\tDate: %s\n", _HASH, _DATE);
+    printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
 
