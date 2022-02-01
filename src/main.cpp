@@ -5,7 +5,7 @@
 #ifdef __linux__
     #include <dirent.h>
     #include "linux/getch.h"
-    #define _OS "Linux"
+    #define _OS "Linux  "
 #else // __WIN32 || __WIN64
     #include "win32/dirent.h"
     #include <conio.h>
@@ -269,7 +269,7 @@ int main(int argc, char *arg[])
         dbcReader.Load();
     }
 
-    printf("\n\nWoWParser Version 3.0 BETA for %s      (Revision: %s)\n", _OS, _REVISION);
+    printf("\n\nWoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
     printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
