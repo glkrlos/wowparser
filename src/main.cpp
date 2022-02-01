@@ -184,9 +184,9 @@ bool LoadConfiguarionFile()
     if (XMLdoc.ErrorID())
     {
         if (XMLdoc.ErrorID() == 3)
-            printf("Configuration file not found.\n");
+            WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
         if (XMLdoc.ErrorID() != 3)
-            printf("Syntax errors in configuration file.\n");
+            WriteLog("LoadConfiguarionFile(): WARNING: Unable to load configuration file. Syntax errors.\n");
 
         return false;
     }
@@ -194,14 +194,14 @@ bool LoadConfiguarionFile()
     XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3BETA");
     if (!rootElement)
     {
-        printf("Invalid configuration file.\n");
+        WriteLog("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
         return false;
     }
 
     XMLElement *fileElement = rootElement->FirstChildElement("file");
     if (!fileElement)
     {
-        printf("Config: No files to find.\n");
+        WriteLog("LoadConfiguarionFile(): WARNING: No files specified.\n");
         return false;
     }
 
@@ -223,7 +223,10 @@ bool LoadConfiguarionFile()
 
         // Si no hay nombre continuamos
         if (!Name)
+        {
+            WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
             continue;
+        }
 
         bool isRecursive = false;
         // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
@@ -238,8 +241,22 @@ bool LoadConfiguarionFile()
 
         if (!IsValidFormat(FileFormat))
         {
-            printf("Warning: %s: File '%u' in config: Contains an invalid format.\n", FileName.c_str(), fileID);
+            WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
+        }
+
+        WriteLog("File %u:'%s'\n", fileID, FileName.c_str());
+        if (isRecursive)
+        {
+            if (!strcmp(DirectoryName.c_str(), "."))
+                DirectoryName += "/";
+            WriteLog("Will be able to find it using recursive mode starting on directory '%s'\n", DirectoryName.c_str());
+        }
+        else
+        {
+            if (!strcmp(DirectoryName.c_str(), "."))
+                DirectoryName += "/";
+            WriteLog("Will be able to find it only in this directory '%s'\n", DirectoryName.c_str());
         }
 
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
@@ -276,6 +293,16 @@ bool LoadConfiguarionFile()
 
 int main(int argc, char *arg[])
 {
+    FILE *logFile;
+    logFile = fopen(WoWParserLogOutPut, "w");
+    if (logFile)
+        fclose(logFile);
+
+    WriteLog("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
+    WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
+    WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
+    WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    WriteLog("======================LOG FILE START======================\n");
     if (!LoadConfiguarionFile())
     {
         AddFilesToList(".", "", "", true, "dbc");
@@ -286,16 +313,38 @@ int main(int argc, char *arg[])
         unsigned int adbFilesLoaded = fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
 
         if (fileNames.empty())
-            printf("No DBC, DB2 and ADB files found using recursive mode.\n");
+            WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
 
+        map<string, string>::iterator FileName = fileNames.begin();
         if (dbcFilesLoaded)
-            printf("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
+        {
+            WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
+            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            {
+                WriteLog("File: %s\n", FileName->first.c_str());
+                FileName++;
+            }
+        }
 
         if (db2FilesLoaded)
-            printf("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
+        {
+            WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
+            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            {
+                WriteLog("File: %s\n", FileName->first.c_str());
+                FileName++;
+            }
+        }
 
         if (adbFilesLoaded)
-            printf("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
+        {
+            WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
+            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            {
+                WriteLog("File: %s\n", FileName->first.c_str());
+                FileName++;
+            }
+        }
     }
     else
         printf("Configuration file loaded, but no files found.\n");
@@ -315,6 +364,7 @@ int main(int argc, char *arg[])
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
 
+    WriteLog("=======================LOG FILE END=======================\n");
     getch();
     return 0;
 }

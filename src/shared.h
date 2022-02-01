@@ -1,15 +1,17 @@
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
+#define WoWParserLogOutPut "binaryreader.log"
+
 enum enumFieldTypes
 {
-    type_NONE = 0,
+    type_NONE   = 0,
     type_STRING = 1,
-    type_FLOAT = 2,
-    type_BYTE = 3,
-    type_INT = 4,
-    type_UINT = 5,
-    type_BOOL = 6,
+    type_FLOAT  = 2,
+    type_BYTE   = 3,
+    type_INT    = 4,
+    type_UINT   = 5,
+    type_BOOL   = 6,
 };
 
 template<typename T> string ToStr(T i)
@@ -17,6 +19,44 @@ template<typename T> string ToStr(T i)
     ostringstream buffer;
     buffer << i;
     return buffer.str();
+}
+
+inline void WriteLog(const char* args, ...)
+{
+    va_list ap;
+    va_start(ap, args);
+    char outstr[4096];
+    vsnprintf(outstr, 4096, args, ap);
+    va_end(ap);
+
+    FILE *logFile = fopen(WoWParserLogOutPut, "a");
+    if (logFile)
+    {
+        time_t rawtime;
+        struct tm * timeinfo;
+        char buffer [80];
+
+        time ( &rawtime );
+        timeinfo = localtime ( &rawtime );
+
+        strftime (buffer,80,"%Y-%m-%d %H:%M:%S",timeinfo);
+
+        fprintf(logFile, "%s %s", buffer, outstr);
+        fclose(logFile);
+    }
+}
+
+inline void WriteLogAndPrint(const char* args, ...)
+{
+    va_list ap;
+    va_start(ap, args);
+    char outstr[4096];
+    vsnprintf(outstr, 4096, args, ap);
+    va_end(ap);
+
+    printf("%s", outstr);
+
+    WriteLog(outstr);
 }
 
 class BasicFileInfo
