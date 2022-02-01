@@ -4,9 +4,12 @@
 
 #ifdef __linux__
     #include <dirent.h>
+    #undef getch
+    #define getch getchar
     #define _OS "Linux"
 #else // __WIN32 || __WIN64
-    #include "dirent.h"
+    #include "win32/dirent.h"
+    #include <conio.h>
     #define _OS "Windows"
 #endif
 
@@ -148,7 +151,7 @@ bool LoadConfiguarionFile()
         )
     {
         printf("Mmmmmmmm..... Why you try to change my config file name???\n");
-        getchar();
+        getch();
         exit(0);
         return false;
     }
@@ -267,11 +270,11 @@ int main(int argc, char *arg[])
         dbcReader.Load();
     }
 
-    printf("\n\nWoWParser Version 3.0 BETA for %s (Revision: %s)\n", _OS, _REVISION);
+    printf("\n\nWoWParser Version 3.0 BETA for %s      (Revision: %s)\n", _OS, _REVISION);
     printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
 
-    getchar();
+    getch();
     return 0;
 }
