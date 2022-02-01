@@ -4,8 +4,7 @@
 
 #ifdef __linux__
     #include <dirent.h>
-    #undef getch
-    #define getch getchar
+    #include "linux/getch.h"
     #define _OS "Linux"
 #else // __WIN32 || __WIN64
     #include "win32/dirent.h"
