@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<WoWParser3BETA>
+    <file extension="dbc" />
+    <file extension="db2" />
+    <file extension="adb" />
+	<file name="example1.csv.dbc" format="usibif" />
+</WoWParser3BETA>
 <!--
 WoWParser 3 BETA - XML Configuration File
 
@@ -62,10 +69,3 @@ Find files by extension without recursive mode in specified directory:
 
 The program can't read byte fields without the specific format for that file.
 -->
-<?xml version="1.0" encoding="utf-8" ?>
-<WoWParser3BETA>
-    <file extension="dbc" />
-    <file extension="db2" />
-    <file extension="adb" />
-	<file name="example1.csv.dbc" format="usibif" />
-</WoWParser3BETA>
