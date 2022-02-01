@@ -93,6 +93,30 @@ unsigned int GetFormatedRecordSize(string structure)
     return RecordSize;
 }
 
+bool IsValidFormat(string structure)
+{
+    for (unsigned int x = 0; x < structure.size(); x++)
+    {
+        switch (structure[x])
+        {
+            case 'X':   // unk byte
+            case 'b':   // byte
+            case 's':   // string
+            case 'f':   // float
+            case 'd':   // int
+            case 'n':   // int
+            case 'x':   // unk int
+            case 'i':   // int
+            case 'u':   // unsigned int
+                break;
+            default:
+                return false;
+        }
+    }
+    
+    return true;
+}
+
 vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
 {
     vector<enumFieldTypes> fieldTypes;
@@ -182,7 +206,8 @@ bool LoadConfiguarionFile()
     }
 
     // Primero buscamos todo lo que no tenga extension
-    for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"))
+    unsigned int fileID = 1;
+    for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
     {
         const char *_fileExtension = fileElement->Attribute("extension");
         string FileExtension = _fileExtension ? _fileExtension : "";
@@ -210,6 +235,12 @@ bool LoadConfiguarionFile()
 
         const char *_fileFormat = fileElement->Attribute("format");
         string FileFormat = _fileFormat ? _fileFormat : "";
+
+        if (!IsValidFormat(FileFormat))
+        {
+            printf("Warning: %s: File '%u' in config: Contains an invalid format.\n", FileName.c_str(), fileID);
+            continue;
+        }
 
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
     }
@@ -248,13 +279,23 @@ int main(int argc, char *arg[])
     if (!LoadConfiguarionFile())
     {
         AddFilesToList(".", "", "", true, "dbc");
+        unsigned int dbcFilesLoaded = fileNames.size();
         AddFilesToList(".", "", "", true, "db2");
+        unsigned int db2FilesLoaded = fileNames.size() > dbcFilesLoaded ? fileNames.size() - dbcFilesLoaded : 0;
         AddFilesToList(".", "", "", true, "adb");
+        unsigned int adbFilesLoaded = fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
 
-        if (!fileNames.empty())
-            printf("Automatic added to list all DBC, DB2, and ADB files using recursive mode.\n");
-        else
+        if (fileNames.empty())
             printf("No DBC, DB2 and ADB files found using recursive mode.\n");
+
+        if (dbcFilesLoaded)
+            printf("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
+
+        if (db2FilesLoaded)
+            printf("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
+
+        if (adbFilesLoaded)
+            printf("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
     }
     else
         printf("Configuration file loaded, but no files found.\n");
