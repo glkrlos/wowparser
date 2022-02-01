@@ -9,7 +9,6 @@
 #include <map>
 #include <fstream>
 #include <vector>
-#include <conio.h>
 #include <sstream>
 
 using namespace std;

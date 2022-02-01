@@ -1,10 +1,20 @@
-#include "..\revision.h"
+// #include "..\revision.h"
 #include "pch.h"
 #include "shared.h"
-#include "dirent.h"
+
+#ifdef __linux__
+    #include <dirent.h>
+    #define _OS "Linux"
+#else // __WIN32 || __WIN64
+    #include "dirent.h"
+    #define _OS "Windows"
+#endif
+
 #include "tinyxml2.h"
 #include "dbc_reader.h"
-
+#define _HASH "HASH"
+#define _REVISION "REVISION"
+#define _DATE "DATE"
 using namespace tinyxml2;
 
 map<string, string> fileNames;
@@ -140,7 +150,7 @@ bool LoadConfiguarionFile()
         )
     {
         printf("Mmmmmmmm..... Why you try to change my config file name???\n");
-        _getch();
+    getchar();
         exit(0);
         return false;
     }
@@ -259,11 +269,11 @@ int main(int argc, char *arg[])
         dbcReader.Load();
     }
 
-    printf("\n\nWoWParser Version 3.0 BETA (Revision: %s)\tHash: %s\n", _REVISION, _HASH);
-    printf("\t\t\t\t\t\tDate: %s\n", _DATE);
+    printf("\n\nWoWParser Version 3.0 BETA for %s (Revision: %s)\n", _OS, _REVISION);
+    printf("Hash: %s\t\tDate: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
 
-    _getch();
+    getchar();
     return 0;
 }
