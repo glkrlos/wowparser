@@ -133,7 +133,7 @@ bool DBCReader::PredictFieldTypes()
                 string floatStringValue = ToStr(floatValue);
                 int isFloat1 = floatStringValue.find("e");
                 int isFloat2 = floatStringValue.find("#");
-                if ((isFloat1 != -1) || (isFloat2 != -1))
+                if (isFloat1 != -1 || isFloat2 != -1)
                 {
                     FieldTypes[currentField] = type_NONE;
                     break;
