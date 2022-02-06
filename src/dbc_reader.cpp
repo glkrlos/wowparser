@@ -126,8 +126,7 @@ bool DBCReader::PredictFieldTypes()
     {
         for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
         {
-            GetRecord(currentRecord);
-            float floatValue = GetFloat(currentField);
+            float floatValue = GetRecord(currentRecord).GetFloat(currentField);
             if (floatValue)
             {
                 string floatStringValue = ToStr(floatValue);
@@ -154,8 +153,7 @@ bool DBCReader::PredictFieldTypes()
 
             for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
             {
-                GetRecord(currentRecord);
-                int intValue = GetInt(currentField);
+                int intValue = GetRecord(currentRecord).GetInt(currentField);
                 if (intValue < 0 || intValue >= int(StringSize) || (intValue > 0 && StringTable[intValue - 1]))
                 {
                     FieldTypes[currentField] = type_NONE;
@@ -175,8 +173,7 @@ bool DBCReader::PredictFieldTypes()
 
         for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
         {
-            GetRecord(currentRecord);
-            int intValue = GetInt(currentField);
+            int intValue = GetRecord(currentRecord).GetInt(currentField);
 
             if (intValue < 0 || intValue > 1)
             {
@@ -196,8 +193,7 @@ bool DBCReader::PredictFieldTypes()
 
         for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
         {
-            GetRecord(currentRecord);
-            int intValue = GetInt(currentField);
+            int intValue = GetRecord(currentRecord).GetInt(currentField);
             if (intValue < 0)
             {
                 FieldTypes[currentField] = type_INT;

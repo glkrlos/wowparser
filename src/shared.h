@@ -76,7 +76,6 @@ class BasicFileInfo
         vector<enumFieldTypes> FieldTypes;
         bool isFormated() { return !FieldTypes.empty(); }
 
-        // Record
         void SetFieldTypesToNONE()
         {
             FieldTypes.clear();
@@ -96,17 +95,25 @@ class BasicFileInfo
                     _fieldsOffset[i] += 4;
             }
         }
-        float GetFloat(unsigned int FieldID) const { return *reinterpret_cast<float*>(Data + _recordOffset + GetOffset(FieldID)); }
-        int GetInt(unsigned int FieldID) const { return *reinterpret_cast<int*>(Data + _recordOffset + GetOffset(FieldID)); }
-        unsigned int GetUInt(unsigned int FieldID) const { return *reinterpret_cast<unsigned int*>(Data + _recordOffset + GetOffset(FieldID)); }
-        unsigned int GetBool(unsigned int FieldID) const { return GetUInt(FieldID); }
-        char GetByte(unsigned int FieldID) const { return *reinterpret_cast<char *>(Data + _recordOffset + GetOffset(FieldID)); }
-        const char *GetString(unsigned int FieldID) const { return reinterpret_cast<char*>(StringTable + GetUInt(FieldID)); }
-        unsigned int GetOffset(unsigned int FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
-        void GetRecord(unsigned int RecordID) { _recordOffset = RecordID * RecordSize; }
+        class Record
+        {
+            public:
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
+                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
+            private:
+                Record(BasicFileInfo &info, unsigned char *data) : _data(data), _info(info) { }
+                unsigned char *_data;
+                BasicFileInfo &_info;
+                friend class BasicFileInfo;
+        };
+        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
+        Record GetRecord(size_t  RecordID) { return Record(*this, Data + RecordID * RecordSize); }
     protected:
         unsigned int *_fieldsOffset;
         unsigned int _recordOffset;
-        // Record
 };
 #endif
