@@ -133,10 +133,13 @@ bool DBCReader::PredictFieldTypes()
                 string floatStringValue = ToStr(floatValue);
                 int isFloat1 = floatStringValue.find("e");
                 int isFloat2 = floatStringValue.find("#");
-                if ((isFloat1 == -1) && (isFloat2 == -1))
-                    FieldTypes[currentField] = type_FLOAT;
-                else
+                if ((isFloat1 != -1) || (isFloat2 != -1))
+                {
                     FieldTypes[currentField] = type_NONE;
+                    break;
+                }
+
+                FieldTypes[currentField] = type_FLOAT;
             }
         }
     }
@@ -153,18 +156,13 @@ bool DBCReader::PredictFieldTypes()
             {
                 GetRecord(currentRecord);
                 int intValue = GetInt(currentField);
-                if ((intValue < 0) || (intValue >= int(StringSize)))
+                if (intValue < 0 || intValue >= int(StringSize) || (intValue > 0 && StringTable[intValue - 1]))
                 {
                     FieldTypes[currentField] = type_NONE;
                     break;
                 }
-                else if ((intValue > 0) && (StringTable[intValue - 1]))
-                {
-                    FieldTypes[currentField] = type_NONE;
-                    break;
-                }
-                else if ((intValue > 0) && !StringTable[intValue - 1])
-                    FieldTypes[currentField] = type_STRING;
+
+                FieldTypes[currentField] = type_STRING;
             }
         }
     }
