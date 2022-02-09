@@ -24,12 +24,12 @@ HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=DBC_Reader,XML_Reader
+Folders=Config_Reader,DBC_Reader,XML_Reader
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=0000000100000000000000000
-UnitCount=7
+UnitCount=9
 
 [Unit1]
 FileName=src\dbc_reader.cpp
@@ -119,4 +119,24 @@ ProductName=wowparser3
 ProductVersion=0.1.1.1
 AutoIncBuildNr=0
 SyncProduct=0
+
+[Unit8]
+FileName=src\config_reader.cpp
+CompileCpp=1
+Folder=Config_Reader
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit9]
+FileName=src\config_reader.h
+CompileCpp=1
+Folder=Config_Reader
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
 
