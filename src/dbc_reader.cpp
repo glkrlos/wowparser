@@ -2,14 +2,15 @@
 
 bool DBCReader::Load()
 {
+    WriteLog("\n");
     input = fopen(FileName, "rb");
     if (!input)
     {
-        // printf("ERROR: Can't open file '%s'.\n", fileName);
+        WriteLog("DBCReader::Load(): Can't open file '%s'.\n", FileName);
         return false;
     }
 
-    // printf("Reading file '%s'...", fileName);
+    WriteLog("DBCReader::Load(): Reading file '%s'...\n", FileName);
 
     fseek(input, 0, SEEK_END);
     FileSize = ftell(input);
@@ -18,7 +19,7 @@ bool DBCReader::Load()
     structDBCHeader DBCHeader;
     if (FileSize < 20 || fread(&DBCHeader, HeaderSize, 1, input) != 1)
     {
-        // printf("FAILED: File size is too small. Are you sure is a DBC file?\n");
+        WriteLog("DBCReader::Load(): FAILED: File size is too small. Are you sure is a DBC file?\n");
         fclose(input);
         return false;
     }
@@ -43,12 +44,12 @@ bool DBCReader::Load()
 
 bool DBCReader::CheckStructure()
 {
-    printf("Loading file '%s'...", FileName);
+    WriteLog("DBCReader::CheckStructure(): Checking structure...\n");
     if (isFormated())
     {
         if (TotalFields != FormatedTotalFields || RecordSize != FormatedRecordSize)
         {
-            printf("FAILED: Formated structure mismatch.\n");
+            WriteLog("DBCReader::CheckStructure(): FAILED: Formated structure mismatch.\n");
             fclose(input);
             return false;
         }
@@ -58,14 +59,14 @@ bool DBCReader::CheckStructure()
     long stringBytes = FileSize - HeaderSize - dataBytes;
     if ((dataBytes != (TotalRecords * RecordSize)) || !StringSize || (stringBytes != StringSize))
     {
-        printf("FAILED: Structure is damaged.\n");
+        WriteLog("DBCReader::CheckStructure(): FAILED: Structure is damaged.\n");
         fclose(input);
         return false;
     }
 
     if (!TotalRecords || !TotalFields || !RecordSize )
     {
-        printf("FAILED: No records/fields found.\n");
+        WriteLog("DBCReader::CheckStructure(): FAILED: No records/fields found.\n");
         fclose(input);
         return false;
     }
@@ -73,7 +74,7 @@ bool DBCReader::CheckStructure()
     Data = new unsigned char[dataBytes];
     if (fread(Data, dataBytes, 1, input) != 1)
     {
-        printf("FAILED: Unable to read records data.\n");
+        WriteLog("DBCReader::CheckStructure(): FAILED: Unable to read records data.\n");
         fclose(input);
         return false;
     }
@@ -81,22 +82,20 @@ bool DBCReader::CheckStructure()
     StringTable = new unsigned char[StringSize];
     if (fread(StringTable, StringSize, 1, input) != 1)
     {
-        printf("FAILED: Unable to read strings data.\n");
+        WriteLog("DBCReader::CheckStructure(): FAILED: Unable to read strings data.\n");
         fclose(input);
         return false;
     }
     fclose(input);
 
-    printf("DONE");
+    WriteLog("DBCReader::CheckStructure(): DONE: All Ok.\n");
 
     if (isFormated())
     {
         SetFieldsOffset();
-        printf(" (Formated)\n");
         return true;
     }
 
-    printf(" (Predicted)\n");
     if (!PredictFieldTypes())
         return false;
 
@@ -105,14 +104,16 @@ bool DBCReader::CheckStructure()
 
 bool DBCReader::PredictFieldTypes()
 {
-    //printf("Predicting field types...");
+    WriteLog("DBCReader::PredictFieldTypes(): Predicting field types...\n");
     if (RecordSize / TotalFields != 4)
     {
         if (RecordSize % 4 != 0)
         {
-            printf("\tFAILED: Not supported byte packed format.\n");
+            WriteLog("DBCReader::PredictFieldTypes(): FAILED: Not supported byte packed format.\n");
             return false;
         }
+
+        WriteLog("DBCReader::PredictFieldTypes(): WARNING: Forcing all fields to 4 bytes (Original Fields are '%u' and now are '%u').\n", TotalFields, RecordSize / 4);
         TotalFields = RecordSize / 4;
     }
 
@@ -225,21 +226,26 @@ bool DBCReader::PredictFieldTypes()
 
     if ((countFloat + countString + countBool + countInt + countUInt) != TotalFields)
     {
-        printf("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
+        WriteLog("DBCReader::PredictFieldTypes(): FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
         return false;
     }
-    //printf("DONE\n");
 
     if (countFloat)
-        printf("Float Fields:\t'%u'\n", countFloat);
+        WriteLog("DBCReader::PredictFieldTypes(): Total float Fields Predicted: '%u'\n", countFloat);
+
     if (countString)
-        printf("String Fields:\t'%u'\n", countString);
+        WriteLog("DBCReader::PredictFieldTypes(): Total string Fields Predicted: '%u'\n", countString);
+
     if (countBool)
-        printf("Bool Fields:\t'%u'\n", countBool);
+        WriteLog("DBCReader::PredictFieldTypes(): Total bool Fields Predicted: '%u'\n", countBool);
+
     if (countInt)
-        printf("Int Fields:\t'%u'\n", countInt);
+        WriteLog("DBCReader::PredictFieldTypes(): Total int Fields Predicted: '%u'\n", countInt);
+
     if (countUInt)
-        printf("Uint Fields:\t'%u'\n", countUInt);
+        WriteLog("DBCReader::PredictFieldTypes(): Total unsigned int Fields Predicted: '%u'\n", countUInt);
+
+    WriteLog("DBCReader::PredictFieldTypes(): DONE: All Ok.\n");
 
     return true;
 }
