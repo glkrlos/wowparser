@@ -1,7 +1,11 @@
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
-#define WoWParserLogOutPut "binaryreader.log"
+#ifdef __WIN32
+    #include <time.h>
+#endif
+
+#define WoWParserLogOutPut "wowparser3.log"
 
 enum enumFieldTypes
 {
