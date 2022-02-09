@@ -5,116 +5,6 @@
 
 #include "dbc_reader.h"
 
-map<string, string> fileNames;
-
-void InsertIfFileNotExist(string file, string structure)
-{
-    map<string, string>::iterator Found = fileNames.find(file);
-    if (Found != fileNames.end())
-        return;
-
-    fileNames.insert(pair<string, string>(file, structure));
-}
-
-void AddFilesToList(string directory, string filename, string structure, bool recursive, string fileExt)
-{
-    DIR *dir = opendir(directory.c_str());
-    struct dirent *ent;
-
-    if (!dir)
-        return;
-
-    while ((ent = readdir(dir)) != NULL)
-    {
-        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
-            continue;
-
-        string dirName = directory + "/" + ent->d_name;
-
-        if (ent->d_type == DT_REG)
-        {
-            if (!fileExt.empty())
-            {
-                string _tempFileName = ent->d_name;
-                int _tempPosExt = _tempFileName.rfind(".");
-                if (_tempPosExt != -1)
-                {
-                    string _tempExt = _tempFileName.substr(_tempPosExt + 1, _tempFileName.size());
-                    if (!strcmp(_tempExt.c_str(), fileExt.c_str()))
-                        InsertIfFileNotExist(dirName, structure);
-                }
-            }
-            else if (ent->d_name == filename)
-                InsertIfFileNotExist(dirName, structure);
-        }
-
-        if (recursive)
-            AddFilesToList(dirName, filename, structure, recursive, fileExt);
-    }
-    closedir(dir);
-}
-
-unsigned int GetFormatedTotalFields(string structure)
-{
-    return structure.empty() ? 0 : structure.size();
-}
-
-unsigned int GetFormatedRecordSize(string structure)
-{
-    unsigned int RecordSize = 0;
-
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
-        {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                RecordSize += 1;
-                break;
-            default:
-                RecordSize += 4;
-                break;
-        }
-    }
-
-    return RecordSize;
-}
-
-vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
-{
-    vector<enumFieldTypes> fieldTypes;
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
-        {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                fieldTypes.push_back(type_BYTE);
-                continue;
-            case 's':   // string
-                fieldTypes.push_back(type_STRING);
-                continue;
-            case 'f':   // float
-                fieldTypes.push_back(type_FLOAT);
-                continue;
-            case 'd':   // int
-            case 'n':   // int
-            case 'x':   // unk int
-            case 'i':   // int
-                fieldTypes.push_back(type_INT);
-                continue;
-            case 'u':   // unsigned int
-                fieldTypes.push_back(type_UINT);
-                continue;
-            default:
-                fieldTypes.push_back(type_NONE);
-                continue;
-        }
-    }
-
-    return fieldTypes;
-}
-
 int main(int argc, char *arg[])
 {
     FILE *logFile;
@@ -132,17 +22,17 @@ int main(int argc, char *arg[])
     Config_Reader Cfg;
     if (!Cfg.LoadConfiguarionFile())
     {
-        AddFilesToList(".", "", "", true, "dbc");
-        unsigned int dbcFilesLoaded = fileNames.size();
-        AddFilesToList(".", "", "", true, "db2");
-        unsigned int db2FilesLoaded = fileNames.size() > dbcFilesLoaded ? fileNames.size() - dbcFilesLoaded : 0;
-        AddFilesToList(".", "", "", true, "adb");
-        unsigned int adbFilesLoaded = fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
+        Cfg.AddFilesToList(".", "", "", true, "dbc");
+        unsigned int dbcFilesLoaded = Cfg.fileNames.size();
+        Cfg.AddFilesToList(".", "", "", true, "db2");
+        unsigned int db2FilesLoaded = Cfg.fileNames.size() > dbcFilesLoaded ? Cfg.fileNames.size() - dbcFilesLoaded : 0;
+        Cfg.AddFilesToList(".", "", "", true, "adb");
+        unsigned int adbFilesLoaded = Cfg.fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? Cfg.fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
 
-        if (fileNames.empty())
+        if (Cfg.fileNames.empty())
             WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
 
-        map<string, string>::iterator FileName = fileNames.begin();
+        map<string, string>::iterator FileName = Cfg.fileNames.begin();
         if (dbcFilesLoaded)
         {
             WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
@@ -175,15 +65,15 @@ int main(int argc, char *arg[])
     }
     else
     {
-        if (fileNames.empty())
+        if (Cfg.fileNames.empty())
             WriteLogAndPrint("Configuration file loaded, but no files found.\n");
     }
 
-    for (map<string, string>::iterator FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
+    for (map<string, string>::iterator FileName = Cfg.fileNames.begin(); FileName != Cfg.fileNames.end(); FileName++)
     {
-        vector<enumFieldTypes> FormatedFieldTypes = GetFormatedFieldTypes(FileName->second);
-        unsigned int FormatedTotalFields = GetFormatedTotalFields(FileName->second);
-        unsigned int FormatedRecordSize = GetFormatedRecordSize(FileName->second);
+        vector<enumFieldTypes> FormatedFieldTypes = Cfg.GetFormatedFieldTypes(FileName->second);
+        unsigned int FormatedTotalFields = Cfg.GetFormatedTotalFields(FileName->second);
+        unsigned int FormatedRecordSize = Cfg.GetFormatedRecordSize(FileName->second);
 
         DBCReader dbcReader(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize);
         dbcReader.Load();
