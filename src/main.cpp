@@ -289,6 +289,7 @@ int main(int argc, char *arg[])
     WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
     WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    WriteLog("\n");
     WriteLog("======================LOG FILE START======================\n");
     if (!LoadConfiguarionFile())
     {
@@ -334,7 +335,10 @@ int main(int argc, char *arg[])
         }
     }
     else
-        printf("Configuration file loaded, but no files found.\n");
+    {
+        if (fileNames.empty())
+            WriteLogAndPrint("Configuration file loaded, but no files found.\n");
+    }
 
     for (map<string, string>::iterator FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
@@ -346,12 +350,13 @@ int main(int argc, char *arg[])
         dbcReader.Load();
     }
 
-    printf("\n\nWoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
+    WriteLog("=======================LOG FILE END=======================\n");
+
+    printf("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
     printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
 
-    WriteLog("=======================LOG FILE END=======================\n");
     getch();
     return 0;
 }
