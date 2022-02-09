@@ -22,4 +22,5 @@ bin/
 *.user
 *.suo
 *.ncb
+*.o
 revision.h
