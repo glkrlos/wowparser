@@ -23,4 +23,5 @@ bin/
 *.suo
 *.ncb
 *.o
+*.layout
 revision.h
