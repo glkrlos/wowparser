@@ -235,16 +235,16 @@ bool LoadConfiguarionFile()
             continue;
         }
 
-        WriteLog("File %u:'%s'\n", fileID, FileName.c_str());
+        WriteLog("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
  
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
         if (isRecursive)
-            WriteLog("Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
+            WriteLog("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
         else
-            WriteLog("Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
+            WriteLog("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
     }
