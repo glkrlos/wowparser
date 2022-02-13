@@ -2,16 +2,13 @@
 #define _LOG_H_
 
 #include "pch.h"
-
+#include <memory>
+#include <stdarg.h>
 #ifdef __WIN32__
     #include <time.h>
 #endif
 
 #define WoWParserLogOutPut "wowparser3.log"
-
-#include <memory>
-
-using namespace std;
 
 template <typename T>
 class CSingleton

@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
+#include "log.h"
 
 struct structDBCHeader
 {

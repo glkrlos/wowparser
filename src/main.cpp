@@ -1,9 +1,9 @@
 #include "../revision.h"
 #include "pch.h"
 #include "shared.h"
-#include "config_reader.h"
-
+#include "config.h"
 #include "dbc_reader.h"
+#include "log.h"
 
 int main(int argc, char *arg[])
 {
@@ -14,7 +14,7 @@ int main(int argc, char *arg[])
     sLog->WriteLog("\n");
     sLog->WriteLog("======================LOG FILE START======================\n");
 
-    Config_Reader Cfg;
+    Config Cfg;
     if (!Cfg.LoadConfiguarionFile())
     {
         Cfg.AddFilesToList(".", "", "", true, "dbc");

@@ -1,16 +1,23 @@
-#ifndef _CONFIG_READER_H_
-#define _CONFIG_READER_H_
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
 
 #include "pch.h"
 #include "shared.h"
 #include "tinyxml2.h"
+#include "log.h"
+
+#ifdef __linux__
+    #include <dirent.h>
+#else // __WIN32 || __WIN64
+    #include "win32/dirent.h"
+#endif
 
 using namespace tinyxml2;
 
-class Config_Reader
+class Config
 {
     public:
-        Config_Reader();
+        Config();
         bool LoadConfiguarionFile();
         void AddFilesToList(string, string, string, bool, string);
         unsigned int GetFormatedRecordSize(string);
@@ -33,5 +40,4 @@ class Config_Reader
     protected:
         XMLDocument XMLdoc;
 };
-
 #endif

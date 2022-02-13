@@ -1,6 +1,6 @@
-#include "config_reader.h"
+#include "config.h"
 
-Config_Reader::Config_Reader()
+Config::Config()
 {
     string __fileName = "wowparser3.xml";
 
@@ -29,7 +29,7 @@ Config_Reader::Config_Reader()
     XMLdoc.LoadFile(__fileName.c_str());
 }
 
-bool Config_Reader::IsValidFormat(string structure)
+bool Config::IsValidFormat(string structure)
 {
     for (unsigned int x = 0; x < structure.size(); x++)
     {
@@ -53,7 +53,7 @@ bool Config_Reader::IsValidFormat(string structure)
     return true;
 }
 
-bool Config_Reader::LoadConfiguarionFile()
+bool Config::LoadConfiguarionFile()
 {
     if (XMLdoc.ErrorID())
     {
@@ -162,7 +162,7 @@ bool Config_Reader::LoadConfiguarionFile()
     return true;
 }
 
-void Config_Reader::AddFilesToList(string directory, string filename, string structure, bool recursive, string fileExt)
+void Config::AddFilesToList(string directory, string filename, string structure, bool recursive, string fileExt)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;
@@ -200,7 +200,7 @@ void Config_Reader::AddFilesToList(string directory, string filename, string str
     closedir(dir);
 }
 
-unsigned int Config_Reader::GetFormatedRecordSize(string structure)
+unsigned int Config::GetFormatedRecordSize(string structure)
 {
     unsigned int RecordSize = 0;
 
@@ -221,7 +221,7 @@ unsigned int Config_Reader::GetFormatedRecordSize(string structure)
     return RecordSize;
 }
 
-vector<enumFieldTypes> Config_Reader::GetFormatedFieldTypes(string structure)
+vector<enumFieldTypes> Config::GetFormatedFieldTypes(string structure)
 {
     vector<enumFieldTypes> fieldTypes;
     for (unsigned int x = 0; x < structure.size(); x++)

@@ -10,7 +10,9 @@ bool DBCReader::Load()
         return false;
     }
 
-    sLog->WriteLog("DBCReader::Load(): Reading file '%s'...", FileName);
+    sLog->WriteLog("%s: Reading file '%s'...", __PRETTY_FUNCTION__, FileName); // __FUNCTION__ __func__ 
+    // #define LogFile(fmt, ...) \
+    // LogFileFunc(__FILE__, __LINE__, fmt, __VA_ARGS__)
 
     fseek(input, 0, SEEK_END);
     FileSize = ftell(input);
