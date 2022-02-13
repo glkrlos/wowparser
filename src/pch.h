@@ -18,6 +18,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <memory>
 
 #include "log.h"
 

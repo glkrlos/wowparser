@@ -1,71 +1,54 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#include "pch.h"
+
 #ifdef __WIN32__
     #include <time.h>
 #endif
 
 #define WoWParserLogOutPut "wowparser3.log"
 
-inline void CreateEmptyLogFile()
+template <typename T>
+class CSingleton
 {
-    FILE *logFile;
-    logFile = fopen(WoWParserLogOutPut, "w");
-    if (logFile)
-        fclose(logFile);
-}
+    public:
+        CSingleton()
+        {
+            printf("cuantas veces se creo CSingleton\n");
+        };
+        ~CSingleton()
+        {
+            printf("cuantas destruimos singleton\n");
+        };
+        static T* Instance()
+        {
+            if (!m_instance.get())
+            {
+                printf("cuantas veces?\n");
+                m_instance = std::auto_ptr<T>(new T);
+            }
 
-inline void WriteLog(const char* args, ...)
+            return m_instance.get();
+        };
+    protected:
+    private:
+        //CSingleton(const CSingleton& source) {};
+        static std::auto_ptr<T> m_instance;
+};
+
+//! static class member initialisation.
+//template <typename T> T* CSingleton<T>::m_instance = NULL;
+template <class T> std::auto_ptr<T> CSingleton<T>::m_instance;
+
+class Log
 {
-    FILE *logFile = fopen(WoWParserLogOutPut, "a");
-    if (!logFile)
-        return;
+    public:
+        Log();
+        void WriteLog(const char* args, ...);
+        void WriteLogNoTime(const char* args, ...);
+        void WriteLogAndPrint(const char* args, ...);
+};
 
-    va_list ap;
-    va_start(ap, args);
-    char outstr[4096];
-    vsnprintf(outstr, 4096, args, ap);
-    va_end(ap);
-
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer [80];
-
-    time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
-
-    strftime (buffer,80,"%Y-%m-%d %H:%M:%S",timeinfo);
-
-    fprintf(logFile, "%s %s", buffer, outstr);
-    fclose(logFile);
-}
-
-inline void WriteLogNoTime(const char* args, ...)
-{
-    FILE *logFile = fopen(WoWParserLogOutPut, "a");
-    if (!logFile)
-        return;
-
-    va_list ap;
-    va_start(ap, args);
-    char outstr[4096];
-    vsnprintf(outstr, 4096, args, ap);
-    va_end(ap);
-
-    fprintf(logFile, "%s", outstr);
-    fclose(logFile);
-}
-
-inline void WriteLogAndPrint(const char* args, ...)
-{
-    va_list ap;
-    va_start(ap, args);
-    char outstr[4096];
-    vsnprintf(outstr, 4096, args, ap);
-    va_end(ap);
-
-    printf("%s", outstr);
-
-    WriteLog(outstr);
-}
+#define sLog CSingleton<Log>::Instance()
 #endif

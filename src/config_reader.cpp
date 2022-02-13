@@ -58,9 +58,9 @@ bool Config_Reader::LoadConfiguarionFile()
     if (XMLdoc.ErrorID())
     {
         if (XMLdoc.ErrorID() == 3)
-            WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
+            sLog->WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
         else
-            WriteLog("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
+            sLog->WriteLog("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
 
         return false;
     }
@@ -68,14 +68,14 @@ bool Config_Reader::LoadConfiguarionFile()
     XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3BETA");
     if (!rootElement)
     {
-        WriteLog("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
+        sLog->WriteLog("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
         return false;
     }
 
     XMLElement *fileElement = rootElement->FirstChildElement("file");
     if (!fileElement)
     {
-        WriteLog("LoadConfiguarionFile(): WARNING: No files specified.\n");
+        sLog->WriteLog("LoadConfiguarionFile(): WARNING: No files specified.\n");
         return false;
     }
 
@@ -98,7 +98,7 @@ bool Config_Reader::LoadConfiguarionFile()
         // Si no hay nombre continuamos
         if (!Name)
         {
-            WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
+            sLog->WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
             continue;
         }
 
@@ -115,20 +115,20 @@ bool Config_Reader::LoadConfiguarionFile()
 
         if (!IsValidFormat(FileFormat))
         {
-            WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
+            sLog->WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
         }
 
-        WriteLog("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
+        sLog->WriteLog("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
  
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
         if (isRecursive)
-            WriteLog("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
+            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
         else
-            WriteLog("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
+            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
     }

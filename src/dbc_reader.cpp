@@ -2,22 +2,22 @@
 
 bool DBCReader::Load()
 {
-    WriteLog("\n");
+    sLog->WriteLog("\n");
     input = fopen(FileName, "rb");
     if (!input)
     {
-        WriteLog("DBCReader::Load(): Can't open file '%s'.\n", FileName);
+        sLog->WriteLog("DBCReader::Load(): Can't open file '%s'.\n", FileName);
         return false;
     }
 
-    WriteLog("DBCReader::Load(): Reading file '%s'...", FileName);
+    sLog->WriteLog("DBCReader::Load(): Reading file '%s'...", FileName);
 
     fseek(input, 0, SEEK_END);
     FileSize = ftell(input);
 
     if (!FileSize)
     {
-        WriteLogNoTime("FAILED: Empty File.\n");
+        sLog->WriteLogNoTime("FAILED: Empty File.\n");
         return false;
     }
 
@@ -26,19 +26,19 @@ bool DBCReader::Load()
     structDBCHeader DBCHeader;
     if (FileSize < 20 || fread(&DBCHeader, HeaderSize, 1, input) != 1)
     {
-        WriteLogNoTime("FAILED: File size is too small. Are you sure is a DBC file?\n");
+        sLog->WriteLogNoTime("FAILED: File size is too small. Are you sure is a DBC file?\n");
         fclose(input);
         return false;
     }
 
     if (DBCHeader.header[0] != 'W' && DBCHeader.header[1] != 'D' && DBCHeader.header[2] != 'B' && DBCHeader.header[3] != 'C')
     {
-        WriteLogNoTime("FAILED: Not a DBC file.\n");
+        sLog->WriteLogNoTime("FAILED: Not a DBC file.\n");
         fclose(input);
         return false;
     }
 
-    WriteLogNoTime("DONE.\n");
+    sLog->WriteLogNoTime("DONE.\n");
 
     TotalRecords = DBCHeader.totalRecords;
     TotalFields = DBCHeader.totalFields;
@@ -53,12 +53,12 @@ bool DBCReader::Load()
 
 bool DBCReader::CheckStructure()
 {
-    WriteLog("DBCReader::CheckStructure(): Checking structure...");
+    sLog->WriteLog("DBCReader::CheckStructure(): Checking structure...");
     if (isFormated())
     {
         if (TotalFields != FormatedTotalFields || RecordSize != FormatedRecordSize)
         {
-            WriteLogNoTime("FAILED: Formated structure mismatch.\n");
+            sLog->WriteLogNoTime("FAILED: Formated structure mismatch.\n");
             fclose(input);
             return false;
         }
@@ -68,14 +68,14 @@ bool DBCReader::CheckStructure()
     long stringBytes = FileSize - HeaderSize - dataBytes;
     if ((dataBytes != (TotalRecords * RecordSize)) || !StringSize || (stringBytes != StringSize))
     {
-        WriteLogNoTime("FAILED: Structure is damaged.\n");
+        sLog->WriteLogNoTime("FAILED: Structure is damaged.\n");
         fclose(input);
         return false;
     }
 
     if (!TotalRecords || !TotalFields || !RecordSize )
     {
-        WriteLogNoTime("FAILED: No records/fields found.\n");
+        sLog->WriteLogNoTime("FAILED: No records/fields found.\n");
         fclose(input);
         return false;
     }
@@ -83,7 +83,7 @@ bool DBCReader::CheckStructure()
     Data = new unsigned char[dataBytes];
     if (fread(Data, dataBytes, 1, input) != 1)
     {
-        WriteLogNoTime("FAILED: Unable to read records data.\n");
+        sLog->WriteLogNoTime("FAILED: Unable to read records data.\n");
         fclose(input);
         return false;
     }
@@ -91,13 +91,13 @@ bool DBCReader::CheckStructure()
     StringTable = new unsigned char[StringSize];
     if (fread(StringTable, StringSize, 1, input) != 1)
     {
-        WriteLogNoTime("FAILED: Unable to read strings data.\n");
+        sLog->WriteLogNoTime("FAILED: Unable to read strings data.\n");
         fclose(input);
         return false;
     }
     fclose(input);
 
-    WriteLogNoTime("DONE.\n");
+    sLog->WriteLogNoTime("DONE.\n");
 
     if (isFormated())
     {
@@ -113,11 +113,11 @@ bool DBCReader::CheckStructure()
 
 bool DBCReader::PredictFieldTypes()
 {
-    WriteLog("DBCReader::PredictFieldTypes(): Predicting field types...");
+    sLog->WriteLog("DBCReader::PredictFieldTypes(): Predicting field types...");
 
     if (RecordSize / 4 != TotalFields)
     {
-        WriteLogNoTime("FAILED: Not supported byte packed format.\n");
+        sLog->WriteLogNoTime("FAILED: Not supported byte packed format.\n");
         return false;
     }
 
@@ -230,26 +230,26 @@ bool DBCReader::PredictFieldTypes()
 
     if ((countFloat + countString + countBool + countInt + countUInt) != TotalFields)
     {
-        WriteLogNoTime("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
+        sLog->WriteLogNoTime("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
         return false;
     }
 
-    WriteLogNoTime("DONE.\n");
+    sLog->WriteLogNoTime("DONE.\n");
 
     if (countFloat)
-        WriteLog("DBCReader::PredictFieldTypes(): Total float Fields Predicted: '%u'\n", countFloat);
+        sLog->WriteLog("DBCReader::PredictFieldTypes(): Total float Fields Predicted: '%u'\n", countFloat);
 
     if (countString)
-        WriteLog("DBCReader::PredictFieldTypes(): Total string Fields Predicted: '%u'\n", countString);
+        sLog->WriteLog("DBCReader::PredictFieldTypes(): Total string Fields Predicted: '%u'\n", countString);
 
     if (countBool)
-        WriteLog("DBCReader::PredictFieldTypes(): Total bool Fields Predicted: '%u'\n", countBool);
+        sLog->WriteLog("DBCReader::PredictFieldTypes(): Total bool Fields Predicted: '%u'\n", countBool);
 
     if (countInt)
-        WriteLog("DBCReader::PredictFieldTypes(): Total int Fields Predicted: '%u'\n", countInt);
+        sLog->WriteLog("DBCReader::PredictFieldTypes(): Total int Fields Predicted: '%u'\n", countInt);
 
     if (countUInt)
-        WriteLog("DBCReader::PredictFieldTypes(): Total unsigned int Fields Predicted: '%u'\n", countUInt);
+        sLog->WriteLog("DBCReader::PredictFieldTypes(): Total unsigned int Fields Predicted: '%u'\n", countUInt);
 
     return true;
 }

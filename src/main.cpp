@@ -7,14 +7,12 @@
 
 int main(int argc, char *arg[])
 {
-    CreateEmptyLogFile();
-
-    WriteLog("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
-    WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
-    WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
-    WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
-    WriteLog("\n");
-    WriteLog("======================LOG FILE START======================\n");
+    sLog->WriteLog("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
+    sLog->WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
+    sLog->WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
+    sLog->WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    sLog->WriteLog("\n");
+    sLog->WriteLog("======================LOG FILE START======================\n");
 
     Config_Reader Cfg;
     if (!Cfg.LoadConfiguarionFile())
@@ -27,35 +25,35 @@ int main(int argc, char *arg[])
         unsigned int adbFilesLoaded = Cfg.fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? Cfg.fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
 
         if (Cfg.fileNames.empty())
-            WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
+            sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
 
         map<string, string>::iterator FileName = Cfg.fileNames.begin();
         if (dbcFilesLoaded)
         {
-            WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
+            sLog->WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
             for (unsigned int x = 0; x < dbcFilesLoaded; x++)
             {
-                WriteLog("File: %s\n", FileName->first.c_str());
+                sLog->WriteLog("File: %s\n", FileName->first.c_str());
                 FileName++;
             }
         }
 
         if (db2FilesLoaded)
         {
-            WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
+            sLog->WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
             for (unsigned int x = 0; x < dbcFilesLoaded; x++)
             {
-                WriteLog("File: %s\n", FileName->first.c_str());
+                sLog->WriteLog("File: %s\n", FileName->first.c_str());
                 FileName++;
             }
         }
 
         if (adbFilesLoaded)
         {
-            WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
+            sLog->WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
             for (unsigned int x = 0; x < dbcFilesLoaded; x++)
             {
-                WriteLog("File: %s\n", FileName->first.c_str());
+                sLog->WriteLog("File: %s\n", FileName->first.c_str());
                 FileName++;
             }
         }
@@ -63,7 +61,7 @@ int main(int argc, char *arg[])
     else
     {
         if (Cfg.fileNames.empty())
-            WriteLogAndPrint("Configuration file loaded, but no files found.\n");
+            sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
     }
 
     for (map<string, string>::iterator FileName = Cfg.fileNames.begin(); FileName != Cfg.fileNames.end(); FileName++)
@@ -76,7 +74,7 @@ int main(int argc, char *arg[])
         dbcReader.Load();
     }
 
-    WriteLog("=======================LOG FILE END=======================\n");
+    sLog->WriteLog("=======================LOG FILE END=======================\n");
 
     printf("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
     printf("Hash: %s\tDate: %s\n", _HASH, _DATE);

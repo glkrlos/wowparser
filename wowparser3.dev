@@ -28,8 +28,8 @@ Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
-CompilerSettings=0000000100000000000000000
-UnitCount=10
+CompilerSettings=00000001b0000000000000000
+UnitCount=11
 
 [Unit1]
 FileName=src\dbc_reader.cpp
@@ -109,7 +109,7 @@ Build=1
 LanguageID=1033
 CharsetID=1252
 CompanyName=
-FileVersion=0.1
+FileVersion=0.1.1.1
 FileDescription=Developed using the Dev-C++ IDE
 InternalName=
 LegalCopyright=
@@ -150,3 +150,12 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit11]
+FileName=src\log.cpp
+CompileCpp=1
+Folder=wowparser3
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
