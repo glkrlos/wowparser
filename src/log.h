@@ -9,38 +9,31 @@
 
 #define WoWParserLogOutPut "wowparser3.log"
 
+#include <memory>
+
+using namespace std;
+
 template <typename T>
 class CSingleton
 {
     public:
-        CSingleton()
-        {
-            printf("cuantas veces se creo CSingleton\n");
-        };
-        ~CSingleton()
-        {
-            printf("cuantas destruimos singleton\n");
-            delete m_instance;
-            m_instance = NULL;
-        };
         static T* Instance()
         {
-            if (m_instance == NULL)
-            {
-                printf("cuantas veces?\n");
-                m_instance = new T;
-            }
+            if (!m_instance.get())
+                m_instance = auto_ptr<T>(new T);
 
-            return m_instance;
+            return m_instance.get();
         };
     protected:
+        //CSingleton();
+        //~CSingleton();
     private:
-        //CSingleton(const CSingleton& source) {};
-        static T* m_instance;
+        //CSingleton(CSingleton const&);
+        //CSingleton& operator = (CSingleton const*);
+        static auto_ptr<T> m_instance;
 };
 
-//! static class member initialisation.
-template <typename T> T* CSingleton<T>::m_instance = NULL;
+template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
 
 class Log
 {
