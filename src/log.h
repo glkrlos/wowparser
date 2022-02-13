@@ -20,26 +20,27 @@ class CSingleton
         ~CSingleton()
         {
             printf("cuantas destruimos singleton\n");
+            delete m_instance;
+            m_instance = NULL;
         };
         static T* Instance()
         {
-            if (!m_instance.get())
+            if (m_instance == NULL)
             {
                 printf("cuantas veces?\n");
-                m_instance = std::auto_ptr<T>(new T);
+                m_instance = new T;
             }
 
-            return m_instance.get();
+            return m_instance;
         };
     protected:
     private:
         //CSingleton(const CSingleton& source) {};
-        static std::auto_ptr<T> m_instance;
+        static T* m_instance;
 };
 
 //! static class member initialisation.
-//template <typename T> T* CSingleton<T>::m_instance = NULL;
-template <class T> std::auto_ptr<T> CSingleton<T>::m_instance;
+template <typename T> T* CSingleton<T>::m_instance = NULL;
 
 class Log
 {
