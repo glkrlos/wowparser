@@ -13,12 +13,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string>
 #include <map>
 #include <fstream>
 #include <vector>
 #include <sstream>
+
+#include "log.h"
 
 using namespace std;
 

@@ -1,12 +1,6 @@
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
-#ifdef __WIN32
-    #include <time.h>
-#endif
-
-#define WoWParserLogOutPut "wowparser3.log"
-
 enum enumFieldTypes
 {
     type_NONE   = 0,
@@ -23,44 +17,6 @@ template<typename T> string ToStr(T i)
     ostringstream buffer;
     buffer << i;
     return buffer.str();
-}
-
-inline void WriteLog(const char* args, ...)
-{
-    va_list ap;
-    va_start(ap, args);
-    char outstr[4096];
-    vsnprintf(outstr, 4096, args, ap);
-    va_end(ap);
-
-    FILE *logFile = fopen(WoWParserLogOutPut, "a");
-    if (logFile)
-    {
-        time_t rawtime;
-        struct tm * timeinfo;
-        char buffer [80];
-
-        time ( &rawtime );
-        timeinfo = localtime ( &rawtime );
-
-        strftime (buffer,80,"%Y-%m-%d %H:%M:%S",timeinfo);
-
-        fprintf(logFile, "%s %s", buffer, outstr);
-        fclose(logFile);
-    }
-}
-
-inline void WriteLogAndPrint(const char* args, ...)
-{
-    va_list ap;
-    va_start(ap, args);
-    char outstr[4096];
-    vsnprintf(outstr, 4096, args, ap);
-    va_end(ap);
-
-    printf("%s", outstr);
-
-    WriteLog(outstr);
 }
 
 class BasicFileInfo

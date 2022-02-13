@@ -24,17 +24,17 @@ HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=Config_Reader,DBC_Reader,XML_Reader
+Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=0000000100000000000000000
-UnitCount=9
+UnitCount=10
 
 [Unit1]
 FileName=src\dbc_reader.cpp
 CompileCpp=1
-Folder=DBC_Reader
+Folder=
 Compile=1
 Link=1
 Priority=1000
@@ -44,7 +44,7 @@ BuildCmd=
 [Unit2]
 FileName=src\dbc_reader.h
 CompileCpp=1
-Folder=DBC_Reader
+Folder=
 Compile=1
 Link=1
 Priority=1000
@@ -84,7 +84,7 @@ BuildCmd=
 [Unit6]
 FileName=src\tinyxml2.cpp
 CompileCpp=1
-Folder=XML_Reader
+Folder=
 Compile=1
 Link=1
 Priority=1000
@@ -94,7 +94,7 @@ BuildCmd=
 [Unit7]
 FileName=src\tinyxml2.h
 CompileCpp=1
-Folder=XML_Reader
+Folder=
 Compile=1
 Link=1
 Priority=1000
@@ -123,7 +123,7 @@ SyncProduct=0
 [Unit8]
 FileName=src\config_reader.cpp
 CompileCpp=1
-Folder=Config_Reader
+Folder=
 Compile=1
 Link=1
 Priority=1000
@@ -133,7 +133,17 @@ BuildCmd=
 [Unit9]
 FileName=src\config_reader.h
 CompileCpp=1
-Folder=Config_Reader
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit10]
+FileName=src\log.h
+CompileCpp=1
+Folder=
 Compile=1
 Link=1
 Priority=1000

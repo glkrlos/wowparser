@@ -33,11 +33,7 @@ bool DBCReader::Load()
 
         if (!CheckStructure())
             return false;
-
-        return true;
     }
-
-    // printf("FAILED: Not a DBC file.\n");
 
     return false;
 }

@@ -7,10 +7,7 @@
 
 int main(int argc, char *arg[])
 {
-    FILE *logFile;
-    logFile = fopen(WoWParserLogOutPut, "w");
-    if (logFile)
-        fclose(logFile);
+    CreateEmptyLogFile();
 
     WriteLog("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);
     WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
@@ -18,7 +15,7 @@ int main(int argc, char *arg[])
     WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
     WriteLog("\n");
     WriteLog("======================LOG FILE START======================\n");
-    
+
     Config_Reader Cfg;
     if (!Cfg.LoadConfiguarionFile())
     {

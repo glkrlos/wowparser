@@ -59,8 +59,8 @@ bool Config_Reader::LoadConfiguarionFile()
     {
         if (XMLdoc.ErrorID() == 3)
             WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
-        if (XMLdoc.ErrorID() != 3)
-            WriteLog("LoadConfiguarionFile(): WARNING: Unable to load configuration file. Syntax errors.\n");
+        else
+            WriteLog("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
 
         return false;
     }
