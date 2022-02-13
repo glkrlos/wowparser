@@ -1,3 +1,6 @@
+#ifndef _LOG_H_
+#define _LOG_H_
+
 #ifdef __WIN32__
     #include <time.h>
 #endif
@@ -65,3 +68,4 @@ inline void WriteLogAndPrint(const char* args, ...)
 
     WriteLog(outstr);
 }
+#endif
