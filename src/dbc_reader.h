@@ -23,6 +23,7 @@ class DBCReader : public BasicFileInfo
             FormatedTotalFields = _FmtTotalFields;
             FormatedRecordSize = _FmtRecordSize;
             HeaderSize = sizeof(structDBCHeader);
+            FileSize = 0;
         }
         bool Load();
     private:
