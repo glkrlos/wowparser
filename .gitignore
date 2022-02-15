@@ -1,5 +1,6 @@
 bin/
-*.win
-*.o
-*.layout
+Release/
+*.ncb
+*.suo
+*.user
 revision.h

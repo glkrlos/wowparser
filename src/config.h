@@ -6,10 +6,10 @@
 #include "tinyxml2.h"
 #include "log.h"
 
-#ifdef __linux__
-    #include <dirent.h>
-#else // __WIN32 || __WIN64
+#ifdef _WIN32
     #include "win32/dirent.h"
+#else
+    #include <dirent.h>
 #endif
 
 using namespace tinyxml2;

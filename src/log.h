@@ -4,7 +4,7 @@
 #include "pch.h"
 #include <memory>
 #include <stdarg.h>
-#ifdef __WIN32__
+#ifdef _WIN32
     #include <time.h>
 #endif
 
