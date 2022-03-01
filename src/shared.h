@@ -47,7 +47,7 @@ class DBFileReader
                     break;
             }
         }
-    private:
+    protected:
         unsigned int _dbcFiles = 0;
         unsigned int _adbFiles = 0;
         unsigned int _db2Files = 0;
