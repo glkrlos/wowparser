@@ -10,6 +10,7 @@ enum enumFieldTypes
     type_INT    = 4,
     type_UINT   = 5,
     type_BOOL   = 6,
+    type_UBYTE  = 7, // Remover, me parece que no es necesario y solo se usa en el modulo CSV reader
 };
 
 enum enumFileFormat
@@ -22,7 +23,21 @@ enum enumFileFormat
     csvFile = 5,
 };
 
+template<typename T> string ToStr(T i)
+{
+    ostringstream buffer;
+
+    buffer << i;
+
+    return buffer.str();
+}
+
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
+
+class BinaryReader
+{
+
+};
 
 class DBFileReader
 {
@@ -32,7 +47,14 @@ class DBFileReader
             static DBFileReader instance;
             return instance;
         }
-        void IncreaseCounters(enumFileFormat FileFormat)
+        enumFileFormat GetFileType(/*mapa con la lista de cada archivo a leer*/)
+        {
+            // Leemos el archivo
+            // Verificamos que al menos tenga de tamaño 20 bytes
+            // Comprobamos el header que coincida con WDBC, WADB, WDB2, y los de WDB (TSHW, QTSW, etc...)
+            // Regresamos el valor dependiendo del tipo de archivo
+        }
+        void IncreaseCounter(enumFileFormat FileFormat)
         {
             switch (FileFormat)
             {
