@@ -30,10 +30,10 @@ void DBC_Writer::CreateDBC()
     }
 
     structDBCHeader DBCHeader;
-    DBCHeader.headerName[0] = 'W';
-    DBCHeader.headerName[1] = 'D';
-    DBCHeader.headerName[2] = 'B';
-    DBCHeader.headerName[3] = 'C';
+    DBCHeader.header[0] = 'W';
+    DBCHeader.header[1] = 'D';
+    DBCHeader.header[2] = 'B';
+    DBCHeader.header[3] = 'C';
     DBCHeader.totalRecords = _file->GetTotalRecords();
     DBCHeader.totalFields = _file->GetTotalFields();
     DBCHeader.recordSize = _file->GetRecordSize();

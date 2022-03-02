@@ -3,15 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
-
-struct structDBCHeader
-{
-    char headerName[4];
-    int totalRecords;
-    int totalFields;
-    int recordSize;
-    int stringSize;
-};
+#include "module_dbc_reader.h"
 
 struct structRecord
 {
