@@ -61,12 +61,14 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\module_csv_reader.cpp" />
     <ClCompile Include="src\module_dbc_reader.cpp" />
+    <ClCompile Include="src\module_dbc_writer.cpp" />
     <ClCompile Include="src\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\config.h" />
     <ClInclude Include="src\module_csv_reader.h" />
     <ClInclude Include="src\module_dbc_reader.h" />
+    <ClInclude Include="src\module_dbc_writer.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\shared.h" />
   </ItemGroup>

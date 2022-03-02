@@ -10,7 +10,7 @@ enum enumFieldTypes
     type_INT    = 4,
     type_UINT   = 5,
     type_BOOL   = 6,
-    type_UBYTE  = 7, // Remover, me parece que no es necesario y solo se usa en el modulo CSV reader
+    type_UBYTE  = 7,
 };
 
 enum enumFileFormat
