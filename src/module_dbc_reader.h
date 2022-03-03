@@ -63,7 +63,7 @@ class BasicFileInfo
                 unsigned char *_data;
                 BasicFileInfo &_info;
                 friend class BasicFileInfo;
-            };
+        };
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
         Record GetRecord(size_t  RecordID) { return Record(*this, Data + RecordID * RecordSize); }
     protected:
