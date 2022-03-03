@@ -34,9 +34,66 @@ template<typename T> string ToStr(T i)
 
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 
-class BinaryReader
+// clase generica para leer los archivos binarios como son dbc, adb, y db2
+class GenericBinaryReader
 {
+    public:
+        const char *FileName;
+        unsigned int HeaderSize;
+        unsigned int TotalRecords;
+        unsigned int TotalFields;
+        unsigned int RecordSize;
+        unsigned int StringSize;
+        unsigned char *Data;
+        unsigned char *StringTable;
+        long FileSize;
+        long DataBytes = 0;
+        long StringBytes = 0;
+        long UnkBytes = 0;
+        unsigned int FormatedTotalFields;
+        unsigned int FormatedRecordSize;
+        vector<enumFieldTypes> FieldTypes;
+        bool isFormated() { return !FieldTypes.empty(); }
 
+        void SetFieldTypesToNONE()
+        {
+            FieldTypes.clear();
+            for (unsigned int x = 0; x < TotalFields; x++)
+                FieldTypes.push_back(type_NONE);
+        }
+        void SetFieldsOffset()
+        {
+            _fieldsOffset = new unsigned int[TotalFields];
+            _fieldsOffset[0] = 0;
+            for (unsigned int i = 1; i < TotalFields; ++i)
+            {
+                _fieldsOffset[i] = _fieldsOffset[i - 1];
+                if (FieldTypes[i - 1] == type_BYTE)
+                    _fieldsOffset[i] += 1;
+                else
+                    _fieldsOffset[i] += 4;
+            }
+        }
+        class RecordAccessor
+        {
+            public:
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
+                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
+            private:
+                RecordAccessor(GenericBinaryReader &info, unsigned char *data) : _data(data), _info(info) { }
+                unsigned char *_data;
+                GenericBinaryReader &_info;
+                friend class GenericBinaryReader;
+        };
+        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
+        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, Data + RecordID * RecordSize); }
+    protected:
+        unsigned int *_fieldsOffset;
+        unsigned int _recordOffset;
 };
 
 class DBFileReader
