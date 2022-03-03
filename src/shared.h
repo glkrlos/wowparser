@@ -38,23 +38,26 @@ template<typename T> string ToStr(T i)
 class GenericBinaryReader
 {
     public:
-        const char *FileName;
-        unsigned int HeaderSize;
-        unsigned int TotalRecords;
-        unsigned int TotalFields;
-        unsigned int RecordSize;
-        unsigned int StringSize;
-        unsigned char *Data;
-        unsigned char *StringTable;
-        long FileSize;
+        // Esto debe ir en una clase o estructura separada puesto que es la informacion total del archivo
+        const char *FileName = NULL;
+        long FileSize = 0;
+        unsigned int HeaderSize = 0;
+        unsigned int TotalRecords = 0;
+        unsigned int TotalFields = 0;
+        unsigned int RecordSize = 0;
+        unsigned int StringSize = 0;
         long DataBytes = 0;
         long StringBytes = 0;
         long UnkBytes = 0;
-        unsigned int FormatedTotalFields;
-        unsigned int FormatedRecordSize;
+        unsigned char *DataTable = NULL;
+        unsigned char *StringTable = NULL;
+        // -----------------------------------------------
+
+        // Esto debe ir en otra clase o estructura como DataAccessor
+        unsigned int FormatedTotalFields = 0;
+        unsigned int FormatedRecordSize = 0;
         vector<enumFieldTypes> FieldTypes;
         bool isFormated() { return !FieldTypes.empty(); }
-
         void SetFieldTypesToNONE()
         {
             FieldTypes.clear();
@@ -90,7 +93,7 @@ class GenericBinaryReader
                 friend class GenericBinaryReader;
         };
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
-        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, Data + RecordID * RecordSize); }
+        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, DataTable + RecordID * RecordSize); }
     protected:
         unsigned int *_fieldsOffset;
         unsigned int _recordOffset;

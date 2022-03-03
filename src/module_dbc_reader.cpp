@@ -79,8 +79,8 @@ bool DBCReader::CheckStructure()
         return false;
     }
 
-    Data = new unsigned char[dataBytes];
-    if (fread(Data, dataBytes, 1, input) != 1)
+    DataTable = new unsigned char[dataBytes];
+    if (fread(DataTable, dataBytes, 1, input) != 1)
     {
         printf("FAILED: Unable to read records data.\n");
         fclose(input);
