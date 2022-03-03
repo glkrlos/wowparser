@@ -51,19 +51,19 @@ class BasicFileInfo
         }
         class Record
         {
-        public:
-            float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
-            int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
-            unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
-            unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
-            char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-            const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
-        private:
-            Record(BasicFileInfo &info, unsigned char *data) : _data(data), _info(info) { }
-            unsigned char *_data;
-            BasicFileInfo &_info;
-            friend class BasicFileInfo;
-        };
+            public:
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
+                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
+            private:
+                Record(BasicFileInfo &info, unsigned char *data) : _data(data), _info(info) { }
+                unsigned char *_data;
+                BasicFileInfo &_info;
+                friend class BasicFileInfo;
+            };
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
         Record GetRecord(size_t  RecordID) { return Record(*this, Data + RecordID * RecordSize); }
     protected:
