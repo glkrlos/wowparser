@@ -13,7 +13,7 @@ struct structDBCHeader
     unsigned int stringSize;
 };
 
-class DBCReader : public GenericBinaryReader
+class DBCReader : public GenericBinaryDataAccessor
 {
     public:
         DBCReader(const char *_FileName, vector<enumFieldTypes> _FieldTypes, unsigned int _FmtTotalFields, unsigned int _FmtRecordSize)

@@ -35,10 +35,9 @@ template<typename T> string ToStr(T i)
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 
 // clase generica para leer los archivos binarios como son dbc, adb, y db2
-class GenericBinaryReader
+class GenericBinaryFileInfo
 {
     public:
-        // Esto debe ir en una clase o estructura separada puesto que es la informacion total del archivo
         const char *FileName = NULL;
         long FileSize = 0;
         unsigned int HeaderSize = 0;
@@ -51,9 +50,11 @@ class GenericBinaryReader
         long UnkBytes = 0;
         unsigned char *DataTable = NULL;
         unsigned char *StringTable = NULL;
-        // -----------------------------------------------
+};
 
-        // Esto debe ir en otra clase o estructura como DataAccessor
+class GenericBinaryDataAccessor : public GenericBinaryFileInfo
+{
+    public:
         unsigned int FormatedTotalFields = 0;
         unsigned int FormatedRecordSize = 0;
         vector<enumFieldTypes> FieldTypes;
@@ -87,10 +88,10 @@ class GenericBinaryReader
                 char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
                 const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
             private:
-                RecordAccessor(GenericBinaryReader &info, unsigned char *data) : _data(data), _info(info) { }
+                RecordAccessor(GenericBinaryDataAccessor &info, unsigned char *data) : _data(data), _info(info) { }
                 unsigned char *_data;
-                GenericBinaryReader &_info;
-                friend class GenericBinaryReader;
+                GenericBinaryDataAccessor &_info;
+                friend class GenericBinaryDataAccessor;
         };
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, DataTable + RecordID * RecordSize); }
