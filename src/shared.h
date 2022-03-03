@@ -50,26 +50,28 @@ class GenericBinaryFileInfo
         long UnkBytes = 0;
         unsigned char *DataTable = NULL;
         unsigned char *StringTable = NULL;
-};
-
-class GenericBinaryDataAccessor : public GenericBinaryFileInfo
-{
-    public:
         unsigned int FormatedTotalFields = 0;
         unsigned int FormatedRecordSize = 0;
+};
+
+class GenericBinaryDataAccessor
+{
+    public:
+        GenericBinaryDataAccessor(GenericBinaryFileInfo value) : GenericInfo(value) {}
+
         vector<enumFieldTypes> FieldTypes;
         bool isFormated() { return !FieldTypes.empty(); }
         void SetFieldTypesToNONE()
         {
             FieldTypes.clear();
-            for (unsigned int x = 0; x < TotalFields; x++)
+            for (unsigned int x = 0; x < GenericInfo.TotalFields; x++)
                 FieldTypes.push_back(type_NONE);
         }
         void SetFieldsOffset()
         {
-            _fieldsOffset = new unsigned int[TotalFields];
+            _fieldsOffset = new unsigned int[GenericInfo.TotalFields];
             _fieldsOffset[0] = 0;
-            for (unsigned int i = 1; i < TotalFields; ++i)
+            for (unsigned int i = 1; i < GenericInfo.TotalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
                 if (FieldTypes[i - 1] == type_BYTE)
@@ -78,6 +80,7 @@ class GenericBinaryDataAccessor : public GenericBinaryFileInfo
                     _fieldsOffset[i] += 4;
             }
         }
+
         class RecordAccessor
         {
             public:
@@ -86,18 +89,19 @@ class GenericBinaryDataAccessor : public GenericBinaryFileInfo
                 unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
                 unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
                 char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.StringTable + GetUInt(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info.GenericInfo.StringTable + GetUInt(FieldID)); }
             private:
                 RecordAccessor(GenericBinaryDataAccessor &info, unsigned char *data) : _data(data), _info(info) { }
                 unsigned char *_data;
                 GenericBinaryDataAccessor &_info;
                 friend class GenericBinaryDataAccessor;
         };
-        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < TotalFields) ? _fieldsOffset[FieldID] : 0; }
-        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, DataTable + RecordID * RecordSize); }
+        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < GenericInfo.TotalFields) ? _fieldsOffset[FieldID] : 0; }
+        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, GenericInfo.DataTable + RecordID * GenericInfo.RecordSize); }
     protected:
         unsigned int *_fieldsOffset;
         unsigned int _recordOffset;
+        GenericBinaryFileInfo GenericInfo;
 };
 
 class DBFileReader
