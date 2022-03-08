@@ -14,13 +14,6 @@ class Config
 {
     public:
         void AddFilesToList(string, string, string, bool, string);
-        unsigned int GetFormatedRecordSize(string);
-        vector<enumFieldTypes> GetFormatedFieldTypes(string);
-        unsigned int GetFormatedTotalFields(string structure)
-        {
-            return structure.empty() ? 0 : structure.size();
-        }
-        map<string, string> fileNames;
     private:
         void InsertIfFileNotExist(string file, string structure)
         {
@@ -31,5 +24,6 @@ class Config
             fileNames.insert(pair<string, string>(file, structure));
         }
     protected:
+		map<string, string> fileNames;
 };
 #endif
