@@ -1,0 +1,17 @@
+avanzamos de 1 en 1
+
+luego obtenemos el valor y si es un numero muy enorme entonces no es string o es nulo
+
+y si sale por ejemplo fkf lkdfj jf lkfjklfjfk jflkjfskl fjkl j
+y despues dfsfjsdfj lkf  fkjf lk jklf jlkfjlfk
+contamos la cantidad de veces que ocurre este proceso
+y entonces podriamos saber en que byte se encuentran los strings
+
+si pasamos el valor primero a numero
+y luego a string vemos el valor real
+
+
+
+luego para los valores empezar por lo siguiente
+si el valor es muy enorme en todas los records
+entonces por lo general hay 2 bytes ahi o hay un flotante
