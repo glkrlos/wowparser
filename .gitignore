@@ -1,6 +1,6 @@
 bin/
 Release/
-*.ncb
+*.opensdf
+*.sdf
 *.suo
-*.user
 revision.h
