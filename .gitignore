@@ -3,4 +3,5 @@ Release/
 *.opensdf
 *.sdf
 *.suo
+*.user
 revision.h
