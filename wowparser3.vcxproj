@@ -58,19 +58,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\config.cpp" />
-    <ClCompile Include="src\dbc_reader.cpp" />
-    <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\config.h" />
-    <ClInclude Include="src\dbc_reader.h" />
-    <ClInclude Include="src\log.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\shared.h" />
-    <ClInclude Include="src\tinyxml2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
