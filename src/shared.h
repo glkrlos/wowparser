@@ -12,4 +12,18 @@ enum enumFieldTypes
     type_BOOL   = 6,
 };
 
+// __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
+
+class DBFileReader
+{
+    public:
+        static DBFileReader& Instance()
+        {
+            static DBFileReader instance;
+            return instance;
+        }
+};
+
+#define sDBFileReader DBFileReader::Instance()
+
 #endif

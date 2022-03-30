@@ -12,7 +12,6 @@ int main(int argc, char *arg[])
     printf("Hash: %s Date: %s\n", _HASH, _DATE);
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
-
     getch();
     return 0;
 }
