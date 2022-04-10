@@ -24,6 +24,6 @@ class Config
             fileNames.insert(pair<string, string>(file, structure));
         }
     protected:
-		map<string, string> fileNames;
+        map<string, string> fileNames;
 };
 #endif

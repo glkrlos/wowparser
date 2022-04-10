@@ -6,7 +6,7 @@
 int main(int argc, char *arg[])
 {
     Config Cfg;
-	Cfg.AddFilesToList(".", "", "", true, "dbc");
+    Cfg.AddFilesToList(".", "", "", true, "dbc");
 
     printf("\n\n");
     printf("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);
