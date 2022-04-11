@@ -1,6 +1,6 @@
-#include "module_dbc_reader.h"
+#include "module_binary_reader.h"
 
-bool DBCReader::Load()
+bool BinaryReader::Load()
 {
     input = fopen(FileName, "rb");
     if (!input)
@@ -50,7 +50,7 @@ bool DBCReader::Load()
     return false;
 }
 
-bool DBCReader::CheckStructure()
+bool BinaryReader::CheckStructure()
 {
     printf("Checking structure...");
     if (isFormated())
@@ -110,7 +110,7 @@ bool DBCReader::CheckStructure()
     return true;
 }
 
-bool DBCReader::PredictFieldTypes()
+bool BinaryReader::PredictFieldTypes()
 {
     printf("Predicting field types...");
 
