@@ -13,47 +13,6 @@ struct structDBCHeader
     unsigned int stringSize;
 };
 
-class DataAccessor
-{
-    public:
-        // Helper para conocer si hay informacion necesaria y evitar un crash
-        operator bool()
-        {
-            if (_dataTable == NULL || _totalFields == 0 || _recordSize == 0 || _fieldsOffset == NULL)
-                return false;
-
-            if ((_stringTable == NULL && _stringSize > 0) || (_stringTable != NULL && _stringSize == 0))
-                return false;
-
-            return true;
-        }
-        class RecordAccessor
-        {
-            public:
-                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
-                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
-                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info._stringTable + GetUInt(FieldID)); }
-            private:
-                RecordAccessor(DataAccessor &info, unsigned char *data) : _data(data), _info(info) { }
-                unsigned char *_data = NULL;
-                DataAccessor &_info;
-                friend class DataAccessor;
-        };
-        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
-    private:
-        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
-    protected:
-        unsigned char *_dataTable = NULL;
-        unsigned char *_stringTable = NULL;
-        unsigned int _totalFields = 0;
-        unsigned int _recordSize = 0;
-        unsigned int _stringSize = 0;
-        unsigned int *_fieldsOffset = NULL;
-};
-
 class BinaryReader
 {
     public:
@@ -64,7 +23,11 @@ class BinaryReader
             _formatedTotalFields = FmtTotalFields;
             _formatedRecordSize = FmtRecordSize;
             _headerSize = sizeof(structDBCHeader);
-            _fileSize = 0;
+        }
+        ~BinaryReader()
+        {
+            if (_inputFile)
+                fclose(_inputFile);
         }
         bool Load();
     private:
@@ -91,6 +54,23 @@ class BinaryReader
                     _fieldsOffset[i] += 4;
             }
         }
+        class RecordAccessor
+        {
+            public:
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
+                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info._stringTable + GetUInt(FieldID)); }
+            private:
+                RecordAccessor(BinaryReader &info, unsigned char *data) : _data(data), _info(info) { }
+                unsigned char *_data = NULL;
+                BinaryReader &_info;
+                friend class BinaryReader;
+        };
+        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
+        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
     protected:
         FILE *_inputFile;
         const char *_fileName = NULL;
@@ -107,5 +87,7 @@ class BinaryReader
         unsigned int _formatedTotalFields = 0;
         unsigned int _formatedRecordSize = 0;
         unsigned int *_fieldsOffset = NULL;
+        unsigned char *_dataTable = NULL;
+        unsigned char *_stringTable = NULL;
 };
 #endif

@@ -26,14 +26,12 @@ bool BinaryReader::Load()
     if (_fileSize < 20 || fread(&DBCHeader, _headerSize, 1, _inputFile) != 1)
     {
         printf("FAILED: File size is too small. Are you sure is a DBC file?\n");
-        fclose(_inputFile);
         return false;
     }
 
     if (DBCHeader.header[0] != 'W' && DBCHeader.header[1] != 'D' && DBCHeader.header[2] != 'B' && DBCHeader.header[3] != 'C')
     {
         printf("FAILED: Not a DBC file.\n");
-        fclose(_inputFile);
         return false;
     }
 
@@ -47,76 +45,71 @@ bool BinaryReader::Load()
     if (!CheckStructure())
         return false;
 
-    return false;
+    if (isFormated())
+    {
+        if (_totalFields != _formatedTotalFields || _recordSize != _formatedRecordSize)
+        {
+            printf("FAILED: Formated structure mismatch.\n");
+            return false;
+        }
+
+        SetFieldsOffset();
+
+        // funcion para leer y duardar la informacion
+
+        return true;
+    }
+    else
+    {
+        if (!PredictFieldTypes())
+            return false;
+
+        return false;
+    }
 }
 
 bool BinaryReader::CheckStructure()
 {
-    /*
     printf("Checking structure...");
-    if (isFormated())
-    {
-        if (TotalFields != FormatedTotalFields || RecordSize != FormatedRecordSize)
-        {
-            printf("FAILED: Formated structure mismatch.\n");
-            fclose(input);
-            return false;
-        }
-    }
 
-    long dataBytes = FileSize - HeaderSize - StringSize;
-    long stringBytes = FileSize - HeaderSize - dataBytes;
-    if ((dataBytes != (TotalRecords * RecordSize)) || !StringSize || (stringBytes != StringSize))
+    _dataBytes = _fileSize - _headerSize - _stringSize;
+    _stringBytes = _fileSize - _headerSize - _dataBytes;
+    if ((_dataBytes != (_totalRecords * _recordSize)) || !_stringSize || (_stringBytes != _stringSize))
     {
         printf("FAILED: Structure is damaged.\n");
-        fclose(input);
         return false;
     }
 
-    if (!TotalRecords || !TotalFields || !RecordSize)
+    if (!_totalRecords || !_totalFields || !_recordSize)
     {
         printf("FAILED: No records/fields found.\n");
-        fclose(input);
         return false;
     }
 
-    DataTable = new unsigned char[dataBytes];
-    if (fread(DataTable, dataBytes, 1, input) != 1)
+    _dataTable = new unsigned char[_dataBytes];
+    if (fread(_dataTable, _dataBytes, 1, _inputFile) != 1)
     {
         printf("FAILED: Unable to read records data.\n");
-        fclose(input);
         return false;
     }
 
-    StringTable = new unsigned char[StringSize];
-    if (fread(StringTable, StringSize, 1, input) != 1)
+    _stringTable = new unsigned char[_stringSize];
+    if (fread(_stringTable, _stringSize, 1, _inputFile) != 1)
     {
         printf("FAILED: Unable to read strings data.\n");
-        fclose(input);
         return false;
     }
-    fclose(input);
 
     printf("DONE.\n");
 
-    if (isFormated())
-    {
-        SetFieldsOffset();
-        return true;
-    }
-
-    if (!PredictFieldTypes())
-        return false;
-*/
     return true;
 }
 
 bool BinaryReader::PredictFieldTypes()
 {
-    /*
     printf("Predicting field types...");
 
-    if (RecordSize / 4 != TotalFields)
+    if (_recordSize / 4 != _totalFields)
     {
         printf("FAILED: Not supported byte packed format.\n");
         return false;
@@ -128,9 +121,9 @@ bool BinaryReader::PredictFieldTypes()
 
     // Obtenemos los tipos de Fields
     // Float System
-    for (unsigned int currentField = 0; currentField < TotalFields; currentField++)
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
+        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
         {
             float floatValue = GetRecord(currentRecord).GetFloat(currentField);
             if (floatValue)
@@ -140,73 +133,73 @@ bool BinaryReader::PredictFieldTypes()
                 int isFloat2 = floatStringValue.find("#");
                 if (isFloat1 != -1 || isFloat2 != -1)
                 {
-                    FieldTypes[currentField] = type_NONE;
+                    _fieldTypes[currentField] = type_NONE;
                     break;
                 }
 
-                FieldTypes[currentField] = type_FLOAT;
+                _fieldTypes[currentField] = type_FLOAT;
             }
         }
     }
 
     // String System
-    if (StringSize > 1)
+    if (_stringSize > 1)
     {
-        for (unsigned int currentField = 0; currentField < TotalFields; currentField++)
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (FieldTypes[currentField] == type_FLOAT)
+            if (_fieldTypes[currentField] == type_FLOAT)
                 continue;
 
-            for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
             {
                 int intValue = GetRecord(currentRecord).GetInt(currentField);
-                if (intValue < 0 || intValue >= int(StringSize) || (intValue > 0 && StringTable[intValue - 1]))
+                if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
                 {
-                    FieldTypes[currentField] = type_NONE;
+                    _fieldTypes[currentField] = type_NONE;
                     break;
                 }
 
-                FieldTypes[currentField] = type_STRING;
+                _fieldTypes[currentField] = type_STRING;
             }
         }
     }
 
     // Bool System
-    for (unsigned int currentField = 0; currentField < TotalFields; currentField++)
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (FieldTypes[currentField] == type_FLOAT || FieldTypes[currentField] == type_STRING)
+        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_STRING)
             continue;
 
-        for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
+        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
         {
             int intValue = GetRecord(currentRecord).GetInt(currentField);
 
             if (intValue < 0 || intValue > 1)
             {
-                FieldTypes[currentField] = type_NONE;
+                _fieldTypes[currentField] = type_NONE;
                 break;
             }
 
-            FieldTypes[currentField] = type_BOOL;
+            _fieldTypes[currentField] = type_BOOL;
         }
     }
 
     // Unsigned/Signed Int System
-    for (unsigned int currentField = 0; currentField < TotalFields; currentField++)
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (FieldTypes[currentField] == type_FLOAT || FieldTypes[currentField] == type_STRING || FieldTypes[currentField] == type_BOOL)
+        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_STRING || _fieldTypes[currentField] == type_BOOL)
             continue;
 
-        for (unsigned int currentRecord = 0; currentRecord < TotalRecords; currentRecord++)
+        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
         {
             int intValue = GetRecord(currentRecord).GetInt(currentField);
             if (intValue < 0)
             {
-                FieldTypes[currentField] = type_INT;
+                _fieldTypes[currentField] = type_INT;
                 break;
             }
 
-            FieldTypes[currentField] = type_UINT;
+            _fieldTypes[currentField] = type_UINT;
         }
     }
 
@@ -215,21 +208,21 @@ bool BinaryReader::PredictFieldTypes()
     unsigned int countBool = 0;
     unsigned int countInt = 0;
     unsigned int countUInt = 0;
-    for (unsigned int currentField = 0; currentField < TotalFields; currentField++)
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (FieldTypes[currentField] == type_FLOAT)
+        if (_fieldTypes[currentField] == type_FLOAT)
             countFloat++;
-        if (FieldTypes[currentField] == type_STRING)
+        if (_fieldTypes[currentField] == type_STRING)
             countString++;
-        if (FieldTypes[currentField] == type_BOOL)
+        if (_fieldTypes[currentField] == type_BOOL)
             countBool++;
-        if (FieldTypes[currentField] == type_INT)
+        if (_fieldTypes[currentField] == type_INT)
             countInt++;
-        if (FieldTypes[currentField] == type_UINT)
+        if (_fieldTypes[currentField] == type_UINT)
             countUInt++;
     }
 
-    if ((countFloat + countString + countBool + countInt + countUInt) != TotalFields)
+    if ((countFloat + countString + countBool + countInt + countUInt) != _totalFields)
     {
         printf("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
         return false;
@@ -251,6 +244,6 @@ bool BinaryReader::PredictFieldTypes()
 
     if (countUInt)
         printf("Total unsigned int Fields Predicted: '%u'\n", countUInt);
-*/
+
     return true;
 }
