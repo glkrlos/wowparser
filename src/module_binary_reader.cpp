@@ -93,8 +93,8 @@ bool BinaryReader::CheckStructure()
         return false;
     }
 
-    _stringTable = new unsigned char[_stringSize];
-    if (fread(_stringTable, _stringSize, 1, _inputFile) != 1)
+    _stringTable = new unsigned char[_stringBytes];
+    if (fread(_stringTable, _stringBytes, 1, _inputFile) != 1)
     {
         printf("FAILED: Unable to read strings data.\n");
         return false;
@@ -120,7 +120,7 @@ bool BinaryReader::PredictFieldTypes()
     SetFieldsOffset();
 
     // Obtenemos los tipos de Fields
-    // Float System
+    // 01 - Float System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -142,32 +142,10 @@ bool BinaryReader::PredictFieldTypes()
         }
     }
 
-    // String System
-    if (_stringSize > 1)
-    {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-        {
-            if (_fieldTypes[currentField] == type_FLOAT)
-                continue;
-
-            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-            {
-                int intValue = GetRecord(currentRecord).GetInt(currentField);
-                if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
-                {
-                    _fieldTypes[currentField] = type_NONE;
-                    break;
-                }
-
-                _fieldTypes[currentField] = type_STRING;
-            }
-        }
-    }
-
-    // Bool System
+    // 02 - Bool System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_STRING)
+        if (_fieldTypes[currentField] == type_FLOAT)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -184,10 +162,10 @@ bool BinaryReader::PredictFieldTypes()
         }
     }
 
-    // Unsigned/Signed Int System
+    // 03 - Unsigned/Signed Int System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_STRING || _fieldTypes[currentField] == type_BOOL)
+        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -200,6 +178,30 @@ bool BinaryReader::PredictFieldTypes()
             }
 
             _fieldTypes[currentField] = type_UINT;
+        }
+    }
+
+    // 04 - String System
+    if (_stringSize > 1)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL || _fieldTypes[currentField] == type_INT)
+                continue;
+
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+            {
+                int intValue = GetRecord(currentRecord).GetInt(currentField);
+                if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
+                {
+                    _fieldTypes[currentField] = type_UINT;
+                    break;
+                }
+                //printf("--->%s<---\n", GetRecord(currentRecord).GetString(currentField));
+                //_getch();
+
+                _fieldTypes[currentField] = type_STRING;
+            }
         }
     }
 
