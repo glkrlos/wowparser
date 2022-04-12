@@ -52,6 +52,7 @@ bool BinaryReader::Load()
 
 bool BinaryReader::CheckStructure()
 {
+    /*
     printf("Checking structure...");
     if (isFormated())
     {
@@ -106,12 +107,13 @@ bool BinaryReader::CheckStructure()
 
     if (!PredictFieldTypes())
         return false;
-
+*/
     return true;
 }
 
 bool BinaryReader::PredictFieldTypes()
 {
+    /*
     printf("Predicting field types...");
 
     if (RecordSize / 4 != TotalFields)
@@ -249,6 +251,6 @@ bool BinaryReader::PredictFieldTypes()
 
     if (countUInt)
         printf("Total unsigned int Fields Predicted: '%u'\n", countUInt);
-
+*/
     return true;
 }
