@@ -2,47 +2,47 @@
 
 bool BinaryReader::Load()
 {
-    input = fopen(FileName, "rb");
-    if (!input)
+    _inputFile = fopen(_fileName, "rb");
+    if (!_inputFile)
     {
-        printf("ERROR: Can't open file '%s'.\n", FileName);
+        printf("ERROR: Can't open file '%s'.\n", _fileName);
         return false;
     }
 
-    printf("Reading file '%s'...", FileName);
+    printf("Reading file '%s'...", _fileName);
 
-    fseek(input, 0, SEEK_END);
-    FileSize = ftell(input);
+    fseek(_inputFile, 0, SEEK_END);
+    _fileSize = ftell(_inputFile);
 
-    if (!FileSize)
+    if (!_fileSize)
     {
         printf("FAILED: Empty File.\n");
         return false;
     }
 
-    rewind(input);
+    rewind(_inputFile);
 
     structDBCHeader DBCHeader;
-    if (FileSize < 20 || fread(&DBCHeader, HeaderSize, 1, input) != 1)
+    if (_fileSize < 20 || fread(&DBCHeader, _headerSize, 1, _inputFile) != 1)
     {
         printf("FAILED: File size is too small. Are you sure is a DBC file?\n");
-        fclose(input);
+        fclose(_inputFile);
         return false;
     }
 
     if (DBCHeader.header[0] != 'W' && DBCHeader.header[1] != 'D' && DBCHeader.header[2] != 'B' && DBCHeader.header[3] != 'C')
     {
         printf("FAILED: Not a DBC file.\n");
-        fclose(input);
+        fclose(_inputFile);
         return false;
     }
 
     printf("DONE.\n");
 
-    TotalRecords = DBCHeader.totalRecords;
-    TotalFields = DBCHeader.totalFields;
-    RecordSize = DBCHeader.recordSize;
-    StringSize = DBCHeader.stringSize;
+    _totalRecords = DBCHeader.totalRecords;
+    _totalFields = DBCHeader.totalFields;
+    _recordSize = DBCHeader.recordSize;
+    _stringSize = DBCHeader.stringSize;
 
     if (!CheckStructure())
         return false;

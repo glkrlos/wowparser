@@ -16,6 +16,17 @@ struct structDBCHeader
 class DataAccessor
 {
     public:
+        // Helper para conocer si hay informacion necesaria y evitar un crash
+        operator bool()
+        {
+            if (_dataTable == NULL || _totalFields == 0 || _recordSize == 0 || _fieldsOffset == NULL)
+                return false;
+
+            if ((_stringTable == NULL && _stringSize > 0) || (_stringTable != NULL && _stringSize == 0))
+                return false;
+
+            return true;
+        }
         class RecordAccessor
         {
             public:
@@ -39,67 +50,62 @@ class DataAccessor
         unsigned char *_stringTable = NULL;
         unsigned int _totalFields = 0;
         unsigned int _recordSize = 0;
+        unsigned int _stringSize = 0;
         unsigned int *_fieldsOffset = NULL;
 };
 
-class BinaryDataAccessor
+class BinaryReader
 {
     public:
-        const char *FileName = NULL;
-        long FileSize = 0;
-        unsigned int HeaderSize = 0;
-        unsigned int TotalRecords = 0;
-        unsigned int TotalFields = 0;
-        unsigned int RecordSize = 0;
-        unsigned int StringSize = 0;
-        long DataBytes = 0;
-        long StringBytes = 0;
-        long UnkBytes = 0;
-        unsigned int FormatedTotalFields = 0;
-        unsigned int FormatedRecordSize = 0;
+        BinaryReader(const char *FileName, vector<enumFieldTypes> FieldTypes, unsigned int FmtTotalFields, unsigned int FmtRecordSize)
+        {
+            _fileName = FileName;
+            _fieldTypes = FieldTypes;
+            _formatedTotalFields = FmtTotalFields;
+            _formatedRecordSize = FmtRecordSize;
+            _headerSize = sizeof(structDBCHeader);
+            _fileSize = 0;
+        }
+        bool Load();
+    private:
+        bool CheckStructure();
+        bool PredictFieldTypes();
 
-        vector<enumFieldTypes> FieldTypes;
-        bool isFormated() { return !FieldTypes.empty(); }
+        bool isFormated() { return !_fieldTypes.empty(); }
         void SetFieldTypesToNONE()
         {
-            FieldTypes.clear();
-            for (unsigned int x = 0; x < TotalFields; x++)
-                FieldTypes.push_back(type_NONE);
+            _fieldTypes.clear();
+            for (unsigned int x = 0; x < _totalFields; x++)
+                _fieldTypes.push_back(type_NONE);
         }
         void SetFieldsOffset()
         {
-            _fieldsOffset = new unsigned int[TotalFields];
+            _fieldsOffset = new unsigned int[_totalFields];
             _fieldsOffset[0] = 0;
-            for (unsigned int i = 1; i < TotalFields; ++i)
+            for (unsigned int i = 1; i < _totalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
-                if (FieldTypes[i - 1] == type_BYTE)
+                if (_fieldTypes[i - 1] == type_BYTE)
                     _fieldsOffset[i] += 1;
                 else
                     _fieldsOffset[i] += 4;
             }
         }
     protected:
+        FILE *_inputFile;
+        const char *_fileName = NULL;
+        long _fileSize = 0;
+        unsigned int _headerSize = 0;
+        unsigned int _totalRecords = 0;
+        unsigned int _totalFields = 0;
+        unsigned int _recordSize = 0;
+        unsigned int _stringSize = 0;
+        long _dataBytes = 0;
+        long _stringBytes = 0;
+        long _unkBytes = 0;
+        vector<enumFieldTypes> _fieldTypes;
+        unsigned int _formatedTotalFields = 0;
+        unsigned int _formatedRecordSize = 0;
         unsigned int *_fieldsOffset = NULL;
-};
-
-class BinaryReader : public BinaryDataAccessor
-{
-    public:
-        BinaryReader(const char *_FileName, vector<enumFieldTypes> _FieldTypes, unsigned int _FmtTotalFields, unsigned int _FmtRecordSize)
-        {
-            FileName = _FileName;
-            FieldTypes = _FieldTypes;
-            FormatedTotalFields = _FmtTotalFields;
-            FormatedRecordSize = _FmtRecordSize;
-            HeaderSize = sizeof(structDBCHeader);
-            FileSize = 0;
-        }
-        bool Load();
-    private:
-        bool CheckStructure();
-        bool PredictFieldTypes();
-    protected:
-        FILE *input;
 };
 #endif
