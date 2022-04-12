@@ -192,13 +192,11 @@ bool BinaryReader::PredictFieldTypes()
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
             {
                 int intValue = GetRecord(currentRecord).GetInt(currentField);
-                if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
+                if (intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
                 {
                     _fieldTypes[currentField] = type_UINT;
                     break;
                 }
-                //printf("--->%s<---\n", GetRecord(currentRecord).GetString(currentField));
-                //_getch();
 
                 _fieldTypes[currentField] = type_STRING;
             }
