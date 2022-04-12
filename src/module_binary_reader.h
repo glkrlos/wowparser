@@ -70,7 +70,6 @@ class BinaryDataAccessor
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, DataTable + RecordID * RecordSize); }
     protected:
         unsigned int *_fieldsOffset = NULL;
-        unsigned int _recordOffset = 0;
         unsigned char *DataTable = NULL;
         unsigned char *StringTable = NULL;
 };
