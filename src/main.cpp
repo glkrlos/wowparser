@@ -2,11 +2,16 @@
 #include "pch.h"
 #include "shared.h"
 #include "config.h"
+#include "module_binary_reader.h"
 
 int main(int argc, char *arg[])
 {
     Config Cfg;
     Cfg.AddFilesToList(".", "", "", true, "dbc");
+    vector<enumFieldTypes> FT;
+    FT.clear();
+    BinaryReader aaa("Achievement.dbc", FT, 0, 0);
+    aaa.Load();
 
     printf("\n\n");
     printf("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);

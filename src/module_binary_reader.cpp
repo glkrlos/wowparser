@@ -64,7 +64,7 @@ bool BinaryReader::Load()
         if (!PredictFieldTypes())
             return false;
 
-        return false;
+        return true;
     }
 }
 
@@ -162,10 +162,32 @@ bool BinaryReader::PredictFieldTypes()
         }
     }
 
-    // 03 - Unsigned/Signed Int System
+    // 03 - String System
+    if (_stringSize > 1)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL)
+                continue;
+
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+            {
+                int intValue = GetRecord(currentRecord).GetUInt(currentField);
+                if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
+                {
+                    _fieldTypes[currentField] = type_INT;
+                    break;
+                }
+
+                _fieldTypes[currentField] = type_STRING;
+            }
+        }
+    }
+
+    // 04 - Unsigned/Signed Int System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL)
+        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL || _fieldTypes[currentField] == type_STRING)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -178,28 +200,6 @@ bool BinaryReader::PredictFieldTypes()
             }
 
             _fieldTypes[currentField] = type_UINT;
-        }
-    }
-
-    // 04 - String System
-    if (_stringSize > 1)
-    {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-        {
-            if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL || _fieldTypes[currentField] == type_INT)
-                continue;
-
-            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-            {
-                unsigned int uIntValue = GetRecord(currentRecord).GetUInt(currentField);
-                if (uIntValue >= _stringSize || (uIntValue > 0 && _stringTable[uIntValue - 1]))
-                {
-                    _fieldTypes[currentField] = type_UINT;
-                    break;
-                }
-
-                _fieldTypes[currentField] = type_STRING;
-            }
         }
     }
 
@@ -244,6 +244,87 @@ bool BinaryReader::PredictFieldTypes()
 
     if (countUInt)
         printf("Total unsigned int Fields Predicted: '%u'\n", countUInt);
+
+    string outputFileName = _fileName;
+    outputFileName.append(".csv");
+    FILE *output = fopen(outputFileName.c_str(), "w");
+    if (!output)
+    {
+        printf("ERROR: File cannot be created '%s'.\n", outputFileName.c_str());
+        return false;
+    }
+
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+    {
+        switch (_fieldTypes[currentField])
+        {
+            case type_FLOAT:  fprintf(output, "float"); break;
+            case type_BOOL:   fprintf(output, "bool"); break;
+            case type_STRING: fprintf(output, "string"); break;
+            case type_INT:    fprintf(output, "int"); break;
+            case type_UINT:
+            default:          fprintf(output, "uint"); break;
+        }
+
+        if (currentField + 1 < _totalFields)
+            fprintf(output, ",");
+    }
+    fprintf(output, "\n");
+
+    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                if (value)
+                {
+                    string outText = "\"";
+                    for (unsigned int x = value; x < _stringSize; x++)
+                    {
+                        if (!_stringTable[x])
+                            break;
+
+                        if (_stringTable[x] == '"')
+                            outText.append("\"");
+
+                        if (_stringTable[x] == '\r')
+                        {
+                            outText.append("\\r");
+                            continue;
+                        }
+
+                        if (_stringTable[x] == '\n')
+                        {
+                            outText.append("\\n");
+                            continue;
+                        }
+
+                        outText.append(ToStr(_stringTable[x]));
+                    }
+                    outText.append("\"");
+                    fprintf(output, "%s", outText.c_str());
+                }
+            }
+            else if (_fieldTypes[currentField] == type_FLOAT)
+                fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
+            else if (_fieldTypes[currentField] == type_BOOL)
+                fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
+            else if (_fieldTypes[currentField] == type_INT)
+                fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
+            else if (_fieldTypes[currentField] == type_UINT)
+                fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
+
+            if (currentField + 1 < _totalFields)
+                fprintf(output, ",");
+        }
+        fprintf(output, "\n");
+    }
+
+    fclose(output);
+
+    printf("CSV file created: '%s'.\n", outputFileName.c_str());
 
     return true;
 }
