@@ -473,7 +473,7 @@ bool CSV_Reader::LoadCSVFile()
     // si el archivo existe entonces mostramos el mensaje
     printf("Loading file '%s'.\n", fileName);
 
-    // la primera linea no puede estar vacia
+    // la primera linea no puede estar vacia nunca
     string FirstLine = "";
     getline(input, FirstLine);
 
