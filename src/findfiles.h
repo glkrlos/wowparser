@@ -13,9 +13,9 @@
 class FindFiles
 {
     public:
-        void AddFilesToList(string, string, string, bool, string);
+        void FileToFind(string, string, string, bool, string);
     private:
-        void InsertIfFileNotExist(string file, string structure)
+        void AddFileToListIfNotExist(string file, string structure)
         {
             map<string, string>::iterator Found = fileNames.find(file);
             if (Found != fileNames.end())
