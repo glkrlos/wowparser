@@ -23,6 +23,12 @@ enum enumFileFormat
     csvFile = 5,
 };
 
+struct fileContent
+{
+    enumFieldTypes dataType;
+    unsigned char *data;
+};
+
 template<typename T> string ToStr(T i)
 {
     ostringstream buffer;
@@ -48,6 +54,8 @@ class DBFileReader
             // Verificamos que al menos tenga de tamaño 20 bytes
             // Comprobamos el header que coincida con WDBC, WADB, WDB2, y los de WDB (TSHW, QTSW, etc...)
             // Regresamos el valor dependiendo del tipo de archivo
+
+            return unkFile;
         }
         void IncreaseCounter(enumFileFormat FileFormat)
         {
@@ -64,6 +72,8 @@ class DBFileReader
                     break;
             }
         }
+    private:
+        map<string, vector<fileContent>> data;
     protected:
         unsigned int _dbcFiles = 0;
         unsigned int _adbFiles = 0;

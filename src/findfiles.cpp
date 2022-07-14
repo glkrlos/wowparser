@@ -1,6 +1,6 @@
-#include "config.h"
+#include "findfiles.h"
 
-void Config::AddFilesToList(string directory, string filename, string structure, bool recursive, string fileExt)
+void FindFiles::AddFilesToList(string directory, string filename, string structure, bool recursive, string fileExt)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;

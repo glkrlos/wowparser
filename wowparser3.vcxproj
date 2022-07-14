@@ -57,7 +57,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\config.cpp" />
+    <ClCompile Include="src\findfiles.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\module_csv_reader.cpp" />
     <ClCompile Include="src\module_binary_reader.cpp" />
@@ -65,7 +65,7 @@
     <ClCompile Include="src\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\config.h" />
+    <ClInclude Include="src\findfiles.h" />
     <ClInclude Include="src\module_csv_reader.h" />
     <ClInclude Include="src\module_binary_reader.h" />
     <ClInclude Include="src\module_dbc_writer.h" />

@@ -1,13 +1,13 @@
 #include "../revision.h"
 #include "pch.h"
 #include "shared.h"
-#include "config.h"
+#include "findfiles.h"
 #include "module_binary_reader.h"
 
 int main(int argc, char *arg[])
 {
-    Config Cfg;
-    Cfg.AddFilesToList(".", "", "", true, "dbc");
+    FindFiles Files;
+    Files.AddFilesToList(".", "", "", true, "dbc");
     vector<enumFieldTypes> FT;
     FT.clear();
     BinaryReader aaa("Achievement.dbc", FT, 0, 0);

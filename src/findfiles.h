@@ -1,5 +1,5 @@
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef _FINDFILES_H_
+#define _FINDFILES_H_
 
 #include "pch.h"
 #include "shared.h"
@@ -10,7 +10,7 @@
     #include <dirent.h>
 #endif
 
-class Config
+class FindFiles
 {
     public:
         void AddFilesToList(string, string, string, bool, string);

@@ -15,3 +15,8 @@ y luego a string vemos el valor real
 luego para los valores empezar por lo siguiente
 si el valor es muy enorme en todas los records
 entonces por lo general hay 2 bytes ahi o hay un flotante
+
+
+
+Leemos cada registro independiente
+Solo se pueden leer valores de 4bytes (int y flotantes) y strings
