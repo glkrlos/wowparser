@@ -10,7 +10,7 @@
 
 #define WoWParserLogOutPut "wowparser3.log"
 
-template <typename T>
+template <typename T> 
 class CSingleton
 {
     public:

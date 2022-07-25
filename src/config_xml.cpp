@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config_xml.h"
 
 Config::Config()
 {
@@ -58,9 +58,9 @@ bool Config::LoadConfiguarionFile()
     if (XMLdoc.ErrorID())
     {
         if (XMLdoc.ErrorID() == 3)
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
+            printf("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
         else
-            sLog->WriteLog("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
+            printf("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
 
         return false;
     }
@@ -68,14 +68,14 @@ bool Config::LoadConfiguarionFile()
     XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3BETA");
     if (!rootElement)
     {
-        sLog->WriteLog("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
+        printf("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
         return false;
     }
 
     XMLElement *fileElement = rootElement->FirstChildElement("file");
     if (!fileElement)
     {
-        sLog->WriteLog("LoadConfiguarionFile(): WARNING: No files specified.\n");
+        printf("LoadConfiguarionFile(): WARNING: No files specified.\n");
         return false;
     }
 
@@ -98,7 +98,7 @@ bool Config::LoadConfiguarionFile()
         // Si no hay nombre continuamos
         if (!Name)
         {
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
+            printf("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
             continue;
         }
 
@@ -115,20 +115,20 @@ bool Config::LoadConfiguarionFile()
 
         if (!IsValidFormat(FileFormat))
         {
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
+            printf("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
         }
 
-        sLog->WriteLog("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
+        printf("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
  
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
         if (isRecursive)
-            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
+            printf("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
         else
-            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
+            printf("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
         AddFilesToList(DirectoryName, FileName, FileFormat, isRecursive, "");
     }

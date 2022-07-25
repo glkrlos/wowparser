@@ -3,6 +3,7 @@
 #include "shared.h"
 #include "findfiles.h"
 #include "module_binary_reader.h"
+#include "config_xml.h"
 
 int main(int argc, char *arg[])
 {
