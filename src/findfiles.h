@@ -26,4 +26,6 @@ class FindFiles
     protected:
         map<string, string> fileNames;
 };
+
+#define sFindFiles CSingleton<FindFiles>::Instance()
 #endif

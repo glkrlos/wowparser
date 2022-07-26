@@ -29,7 +29,7 @@ struct fileContent
     unsigned char *data;
 };
 
-template<typename T> string ToStr(T i)
+template <typename T> string ToStr(T i)
 {
     ostringstream buffer;
 
@@ -37,6 +37,27 @@ template<typename T> string ToStr(T i)
 
     return buffer.str();
 }
+
+template <typename T> class CSingleton
+{
+    public:
+        static T* Instance()
+        {
+            if (!m_instance.get())
+                m_instance = auto_ptr<T>(new T);
+
+            return m_instance.get();
+        };
+    protected:
+        //CSingleton();
+        //~CSingleton();
+    private:
+        //CSingleton(CSingleton const&);
+        //CSingleton& operator = (CSingleton const*);
+        static auto_ptr<T> m_instance;
+};
+
+template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
 
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 

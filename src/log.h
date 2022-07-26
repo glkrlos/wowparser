@@ -2,6 +2,8 @@
 #define _LOG_H_
 
 #include "pch.h"
+#include "shared.h"
+
 #include <memory>
 #include <stdarg.h>
 #ifdef _WIN32
@@ -9,28 +11,6 @@
 #endif
 
 #define WoWParserLogOutPut "wowparser3.log"
-
-template <typename T> 
-class CSingleton
-{
-    public:
-        static T* Instance()
-        {
-            if (!m_instance.get())
-                m_instance = auto_ptr<T>(new T);
-
-            return m_instance.get();
-        };
-    protected:
-        //CSingleton();
-        //~CSingleton();
-    private:
-        //CSingleton(CSingleton const&);
-        //CSingleton& operator = (CSingleton const*);
-        static auto_ptr<T> m_instance;
-};
-
-template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
 
 class Log
 {

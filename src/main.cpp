@@ -7,8 +7,7 @@
 
 int main(int argc, char *arg[])
 {
-    FindFiles Files;
-    Files.FileToFind(".", "", "", true, "dbc");
+    sFindFiles->FileToFind(".", "", "", true, "dbc");
     vector<enumFieldTypes> FT;
     FT.clear();
     BinaryReader aaa("Achievement.dbc", FT, 0, 0);
