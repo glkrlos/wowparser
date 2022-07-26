@@ -27,8 +27,9 @@ Find files in recursive mode
 directory=
 Find files inside specified directory
     * Only works if extension is set.
-    * If recursive is "true", will find in recursive mode all files starting in specified directory
+    * If recursive is "true", will find in recursive mode all files starting in current directory
     * If recursive is "false", will not use recursive mode and find all files inside specified directory
+      and subsecuent subdirectories if any.
     * Default value is "."
     * Example: directory="./dbc"
         - ./ means directory of program
