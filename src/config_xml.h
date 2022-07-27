@@ -26,7 +26,6 @@ class Config
         {
             return structure.empty() ? 0 : structure.size();
         }
-        map<string, string> fileNames;
     private:
         bool IsValidFormat(string);
     protected:

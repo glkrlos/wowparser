@@ -13,7 +13,7 @@ enum enumFieldTypes
     type_UBYTE  = 7,
 };
 
-enum enumFileFormat
+enum enumFileType
 {
     unkFile = 0,
     dbcFile = 1,
@@ -69,7 +69,7 @@ class DBFileReader
             static DBFileReader instance;
             return instance;
         }
-        enumFileFormat GetFileType(/*mapa con la lista de cada archivo a leer*/)
+        enumFileType GetFileType(/*mapa con la lista de cada archivo a leer*/)
         {
             // Leemos el archivo
             // Verificamos que al menos tenga de tamaño 20 bytes
@@ -78,7 +78,7 @@ class DBFileReader
 
             return unkFile;
         }
-        void IncreaseCounter(enumFileFormat FileFormat)
+        void IncreaseCounter(enumFileType FileFormat)
         {
             switch (FileFormat)
             {

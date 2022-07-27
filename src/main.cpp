@@ -18,53 +18,40 @@ int main(int argc, char *arg[])
 
     if (!Cfg->LoadConfiguarionFile())
     {
-        sFindFiles->FileToFind(".", "", "", true, "dbc");
-        unsigned int dbcFilesLoaded = Cfg->fileNames.size();
-        sFindFiles->FileToFind(".", "", "", true, "db2");
-        unsigned int db2FilesLoaded = Cfg->fileNames.size() > dbcFilesLoaded ? Cfg->fileNames.size() - dbcFilesLoaded : 0;
-        sFindFiles->FileToFind(".", "", "", true, "adb");
-        unsigned int adbFilesLoaded = Cfg->fileNames.size() > (dbcFilesLoaded + db2FilesLoaded) ? Cfg->fileNames.size() - dbcFilesLoaded - db2FilesLoaded : 0;
+        sFindFiles->FileToFind(".", "", "", true, "dbc", dbcFile);
+        sFindFiles->FileToFind(".", "", "", true, "db2", db2File);
+        sFindFiles->FileToFind(".", "", "", true, "adb", adbFile);
 
-        if (Cfg->fileNames.empty())
+        if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
-
-        map<string, string>::iterator FileName = Cfg->fileNames.begin();
-        if (dbcFilesLoaded)
+        else
         {
-            sLog->WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", dbcFilesLoaded, dbcFilesLoaded > 1 ? "s" : "");
-            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            if (sFindFiles->TotalDBCFiles())
             {
-                sLog->WriteLog("File: %s\n", FileName->first.c_str());
-                FileName++;
+                sLog->WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", sFindFiles->TotalDBCFiles(), sFindFiles->TotalDBCFiles() > 1 ? "s" : "");
+                sFindFiles->PrintfDBCFiles();
             }
-        }
 
-        if (db2FilesLoaded)
-        {
-            sLog->WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", db2FilesLoaded, db2FilesLoaded > 1 ? "s" : "");
-            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            if (sFindFiles->TotalDB2Files())
             {
-                sLog->WriteLog("File: %s\n", FileName->first.c_str());
-                FileName++;
+                sLog->WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", sFindFiles->TotalDB2Files(), sFindFiles->TotalDB2Files() > 1 ? "s" : "");
+                sFindFiles->PrintfDB2Files();
             }
-        }
 
-        if (adbFilesLoaded)
-        {
-            sLog->WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", adbFilesLoaded, adbFilesLoaded > 1 ? "s" : "");
-            for (unsigned int x = 0; x < dbcFilesLoaded; x++)
+            if (sFindFiles->TotalADBFiles())
             {
-                sLog->WriteLog("File: %s\n", FileName->first.c_str());
-                FileName++;
+                sLog->WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalADBFiles(), sFindFiles->TotalADBFiles() > 1 ? "s" : "");
+                sFindFiles->PrintfADBFiles();
             }
         }
     }
     else
     {
-        if (Cfg->fileNames.empty())
+        if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
     }
 
+/*
     for (auto FileName = Cfg->fileNames.begin(); FileName != Cfg->fileNames.end(); FileName++)
     {
         vector<enumFieldTypes> FormatedFieldTypes = Cfg->GetFormatedFieldTypes(FileName->second);
@@ -74,7 +61,7 @@ int main(int argc, char *arg[])
         //DBCReader dbcReader(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize);
         //dbcReader.Load();
     }
-
+*/
     sLog->WriteLog("=======================LOG FILE END=======================\n");
 
     printf("WoWParser Version 3.0 BETA for %s   (Revision: %s)\n", _OS, _REVISION);

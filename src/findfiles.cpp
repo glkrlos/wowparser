@@ -1,6 +1,6 @@
 #include "findfiles.h"
 
-void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt)
+void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, enumFileType FileType)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;
@@ -25,15 +25,25 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
                 {
                     string _tempExt = _tempFileName.substr(_tempPosExt + 1, _tempFileName.size());
                     if (!strcmp(_tempExt.c_str(), fileExt.c_str()))
-                        AddFileToListIfNotExist(dirName, structure);
+                    {
+                        structFile File;
+                        File.Structure = structure;
+                        File.Type = FileType;
+                        AddFileToListIfNotExist(dirName, File);
+                    }
                 }
             }
             else if (ent->d_name == filename)
-                AddFileToListIfNotExist(dirName, structure);
+            {
+                structFile File;
+                File.Structure = structure;
+                File.Type = FileType;
+                AddFileToListIfNotExist(dirName, File);
+            }
         }
 
         if (recursive)
-            FileToFind(dirName, filename, structure, recursive, fileExt);
+            FileToFind(dirName, filename, structure, recursive, fileExt, FileType);
     }
     closedir(dir);
 }
