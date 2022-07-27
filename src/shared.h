@@ -69,13 +69,13 @@ inline unsigned int GetFormatedRecordSize(string structure)
     {
         switch (structure[x])
         {
-        case 'X':   // unk byte
-        case 'b':   // byte
-            RecordSize += 1;
-            break;
-        default:
-            RecordSize += 4;
-            break;
+            case 'X':   // unk byte
+            case 'b':   // byte
+                RecordSize += 1;
+                break;
+            default:
+                RecordSize += 4;
+                break;
         }
     }
 
@@ -89,28 +89,28 @@ inline vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
     {
         switch (structure[x])
         {
-        case 'X':   // unk byte
-        case 'b':   // byte
-            fieldTypes.push_back(type_BYTE);
-            continue;
-        case 's':   // string
-            fieldTypes.push_back(type_STRING);
-            continue;
-        case 'f':   // float
-            fieldTypes.push_back(type_FLOAT);
-            continue;
-        case 'd':   // int
-        case 'n':   // int
-        case 'x':   // unk int
-        case 'i':   // int
-            fieldTypes.push_back(type_INT);
-            continue;
-        case 'u':   // unsigned int
-            fieldTypes.push_back(type_UINT);
-            continue;
-        default:
-            fieldTypes.push_back(type_NONE);
-            continue;
+            case 'X':   // unk byte
+            case 'b':   // byte
+                fieldTypes.push_back(type_BYTE);
+                continue;
+            case 's':   // string
+                fieldTypes.push_back(type_STRING);
+                continue;
+            case 'f':   // float
+                fieldTypes.push_back(type_FLOAT);
+                continue;
+            case 'd':   // int
+            case 'n':   // int
+            case 'x':   // unk int
+            case 'i':   // int
+                fieldTypes.push_back(type_INT);
+                continue;
+            case 'u':   // unsigned int
+                fieldTypes.push_back(type_UINT);
+                continue;
+            default:
+                fieldTypes.push_back(type_NONE);
+                continue;
         }
     }
 
