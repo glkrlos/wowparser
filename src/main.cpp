@@ -18,37 +18,57 @@ int main(int argc, char *arg[])
 
     if (!Cfg->LoadConfiguarionFile())
     {
-        sFindFiles->FileToFind(".", "", "", true, "dbc", dbcFile);
-        sFindFiles->FileToFind(".", "", "", true, "db2", db2File);
-        sFindFiles->FileToFind(".", "", "", true, "adb", adbFile);
+        sFindFiles->FileToFind(".", "", "", true, "dbc");
+        sFindFiles->FileToFind(".", "", "", true, "db2");
+        sFindFiles->FileToFind(".", "", "", true, "adb");
+        sFindFiles->FileToFind(".", "", "", true, "csv");
 
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
-        else
-        {
-            if (sFindFiles->TotalDBCFiles())
-            {
-                sLog->WriteLogAndPrint("Automatic added to list '%i' DBC file%s using recursive mode.\n", sFindFiles->TotalDBCFiles(), sFindFiles->TotalDBCFiles() > 1 ? "s" : "");
-                sFindFiles->PrintfDBCFiles();
-            }
-
-            if (sFindFiles->TotalDB2Files())
-            {
-                sLog->WriteLogAndPrint("Automatic added to list '%i' DB2 file%s using recursive mode.\n", sFindFiles->TotalDB2Files(), sFindFiles->TotalDB2Files() > 1 ? "s" : "");
-                sFindFiles->PrintfDB2Files();
-            }
-
-            if (sFindFiles->TotalADBFiles())
-            {
-                sLog->WriteLogAndPrint("Automatic added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalADBFiles(), sFindFiles->TotalADBFiles() > 1 ? "s" : "");
-                sFindFiles->PrintfADBFiles();
-            }
-        }
     }
     else
     {
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
+    }
+
+    if (!sFindFiles->ListEmpty())
+    {
+        if (sFindFiles->TotalDBCFiles())
+        {
+            sLog->WriteLogAndPrint("Added to list '%i' DBC file%s using recursive mode.\n", sFindFiles->TotalDBCFiles(), sFindFiles->TotalDBCFiles() > 1 ? "s" : "");
+            sFindFiles->PrintfDBCFiles();
+        }
+
+        if (sFindFiles->TotalDB2Files())
+        {
+            sLog->WriteLogAndPrint("Added added to list '%i' DB2 file%s using recursive mode.\n", sFindFiles->TotalDB2Files(), sFindFiles->TotalDB2Files() > 1 ? "s" : "");
+            sFindFiles->PrintfDB2Files();
+        }
+
+        if (sFindFiles->TotalADBFiles())
+        {
+            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalADBFiles(), sFindFiles->TotalADBFiles() > 1 ? "s" : "");
+            sFindFiles->PrintfADBFiles();
+        }
+
+        if (sFindFiles->TotalWDBFiles())
+        {
+            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalWDBFiles(), sFindFiles->TotalWDBFiles() > 1 ? "s" : "");
+            sFindFiles->TotalWDBFiles();
+        }
+
+        if (sFindFiles->TotalCSVFiles())
+        {
+            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalCSVFiles(), sFindFiles->TotalCSVFiles() > 1 ? "s" : "");
+            sFindFiles->TotalCSVFiles();
+        }
+
+        if (sFindFiles->TotalUNKFiles())
+        {
+            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalUNKFiles(), sFindFiles->TotalUNKFiles() > 1 ? "s" : "");
+            sFindFiles->TotalUNKFiles();
+        }
     }
 
 /*
