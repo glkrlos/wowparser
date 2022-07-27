@@ -20,14 +20,7 @@ class Config
     public:
         Config();
         bool LoadConfiguarionFile();
-        unsigned int GetFormatedRecordSize(string);
-        vector<enumFieldTypes> GetFormatedFieldTypes(string);
-        unsigned int GetFormatedTotalFields(string structure)
-        {
-            return structure.empty() ? 0 : structure.size();
-        }
     private:
-        bool IsValidFormat(string);
     protected:
         XMLDocument XMLdoc;
 };

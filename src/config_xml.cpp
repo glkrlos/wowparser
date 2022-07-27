@@ -29,30 +29,6 @@ Config::Config()
     XMLdoc.LoadFile(__fileName.c_str());
 }
 
-bool Config::IsValidFormat(string structure)
-{
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
-        {
-            case 'X':   // unk byte
-            case 'b':   // byte
-            case 's':   // string
-            case 'f':   // float
-            case 'd':   // int
-            case 'n':   // int
-            case 'x':   // unk int
-            case 'i':   // int
-            case 'u':   // unsigned int
-                break;
-            default:
-                return false;
-        }
-    }
-    
-    return true;
-}
-
 bool Config::LoadConfiguarionFile()
 {
     if (XMLdoc.ErrorID())
@@ -160,60 +136,4 @@ bool Config::LoadConfiguarionFile()
     }
 
     return true;
-}
-
-unsigned int Config::GetFormatedRecordSize(string structure)
-{
-    unsigned int RecordSize = 0;
-
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
-        {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                RecordSize += 1;
-                break;
-            default:
-                RecordSize += 4;
-                break;
-        }
-    }
-
-    return RecordSize;
-}
-
-vector<enumFieldTypes> Config::GetFormatedFieldTypes(string structure)
-{
-    vector<enumFieldTypes> fieldTypes;
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
-        {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                fieldTypes.push_back(type_BYTE);
-                continue;
-            case 's':   // string
-                fieldTypes.push_back(type_STRING);
-                continue;
-            case 'f':   // float
-                fieldTypes.push_back(type_FLOAT);
-                continue;
-            case 'd':   // int
-            case 'n':   // int
-            case 'x':   // unk int
-            case 'i':   // int
-                fieldTypes.push_back(type_INT);
-                continue;
-            case 'u':   // unsigned int
-                fieldTypes.push_back(type_UINT);
-                continue;
-            default:
-                fieldTypes.push_back(type_NONE);
-                continue;
-        }
-    }
-
-    return fieldTypes;
 }
