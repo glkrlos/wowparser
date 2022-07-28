@@ -61,18 +61,14 @@ bool Config::LoadConfiguarionFile()
     {
         const char *_fileExtension = fileElement->Attribute("extension");
         string FileExtension = _fileExtension ? _fileExtension : "";
-        bool Extension = FileExtension.empty() ? false : true;
-
-        // No nos intereza si hay extension por ahora
-        if (Extension)
-            continue;
+        bool FileExtensionIsSet = FileExtension.empty() ? false : true;
 
         const char *_fileName = fileElement->Attribute("name");
         string FileName = _fileName ? _fileName : "";
         bool Name = FileName.empty() ? false : true;
 
         // Si no hay nombre continuamos
-        if (!Name)
+        if (!Name && !FileExtensionIsSet)
         {
             sLog->WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
             continue;
@@ -80,59 +76,40 @@ bool Config::LoadConfiguarionFile()
 
         bool isRecursive = false;
         // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-        bool RecursiveIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
+        bool RecursiveAttributeIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
 
         const char *_directoryName = fileElement->Attribute("directory");
         string DirectoryName = _directoryName ? _directoryName : "";
         DirectoryName = DirectoryName.empty() ? "." : DirectoryName;
 
+        // Si se establecio una extension de archivo y el atributo recursive no esta establecido entonces forzamos dicho modo
+        if (!RecursiveAttributeIsSet && FileExtensionIsSet)
+            isRecursive = true;
+
         const char *_fileFormat = fileElement->Attribute("format");
         string FileFormat = _fileFormat ? _fileFormat : "";
 
-        if (!IsValidFormat(FileFormat))
+        if (!FileExtensionIsSet && !IsValidFormat(FileFormat))
         {
             sLog->WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
         }
 
-        sLog->WriteLog("LoadConfiguarionFile(): File %u:'%s'\n", fileID, FileName.c_str());
+        if (FileExtensionIsSet)
+            sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'*.%s'", fileID, FileExtension.c_str());
+        else
+            sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'%s'", fileID, FileName.c_str());
  
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
         if (isRecursive)
-            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it using recursive mode starting on directory '%s'\n", tempDirectory.c_str());
+            sLog->WriteLogNoTime(" Will be able to find it using recursive mode starting on this directory '%s'\n", tempDirectory.c_str());
         else
-            sLog->WriteLog("LoadConfiguarionFile(): Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
+            sLog->WriteLogNoTime(" Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
-        sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, "");
-    }
-
-    // Primtero establecemos el apuntador a donde se encuentra <file
-    fileElement = rootElement->FirstChildElement("file");
-    // Ahora solo checamos todos los attributos que tengan extension establecida
-    for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"))
-    {
-        const char *_fileExtension = fileElement->Attribute("extension");
-        string FileExtension = _fileExtension ? _fileExtension : "";
-        bool Extension = FileExtension.empty() ? false : true;
-
-        if (!Extension)
-            continue;
-
-        bool isRecursive = false;
-        // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-        bool RecursiveIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
-
-        const char *_directoryName = fileElement->Attribute("directory");
-        string DirectoryName = _directoryName ? _directoryName : "";
-        DirectoryName = DirectoryName.empty() ? "." : DirectoryName;
-
-        if (!RecursiveIsSet)
-           isRecursive = true;
-
-        sFindFiles->FileToFind(DirectoryName, "", "", isRecursive, FileExtension);
+        sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "");
     }
 
     return true;
