@@ -37,37 +37,37 @@ int main(int argc, char *arg[])
         if (sFindFiles->TotalDBCFiles())
         {
             sLog->WriteLogAndPrint("Added to list '%i' DBC file%s using recursive mode.\n", sFindFiles->TotalDBCFiles(), sFindFiles->TotalDBCFiles() > 1 ? "s" : "");
-            sFindFiles->PrintfDBCFiles();
+            sFindFiles->PrintDBCFiles();
         }
 
         if (sFindFiles->TotalDB2Files())
         {
-            sLog->WriteLogAndPrint("Added added to list '%i' DB2 file%s using recursive mode.\n", sFindFiles->TotalDB2Files(), sFindFiles->TotalDB2Files() > 1 ? "s" : "");
-            sFindFiles->PrintfDB2Files();
+            sLog->WriteLogAndPrint("Added to list '%i' DB2 file%s using recursive mode.\n", sFindFiles->TotalDB2Files(), sFindFiles->TotalDB2Files() > 1 ? "s" : "");
+            sFindFiles->PrintDB2Files();
         }
 
         if (sFindFiles->TotalADBFiles())
         {
-            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalADBFiles(), sFindFiles->TotalADBFiles() > 1 ? "s" : "");
-            sFindFiles->PrintfADBFiles();
+            sLog->WriteLogAndPrint("Added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalADBFiles(), sFindFiles->TotalADBFiles() > 1 ? "s" : "");
+            sFindFiles->PrintADBFiles();
         }
 
         if (sFindFiles->TotalWDBFiles())
         {
-            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalWDBFiles(), sFindFiles->TotalWDBFiles() > 1 ? "s" : "");
-            sFindFiles->TotalWDBFiles();
+            sLog->WriteLogAndPrint("Added to list '%i' WDB file%s using recursive mode.\n", sFindFiles->TotalWDBFiles(), sFindFiles->TotalWDBFiles() > 1 ? "s" : "");
+            sFindFiles->PrintWDBFiles();
         }
 
         if (sFindFiles->TotalCSVFiles())
         {
-            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalCSVFiles(), sFindFiles->TotalCSVFiles() > 1 ? "s" : "");
-            sFindFiles->TotalCSVFiles();
+            sLog->WriteLogAndPrint("Added to list '%i' CSV file%s using recursive mode.\n", sFindFiles->TotalCSVFiles(), sFindFiles->TotalCSVFiles() > 1 ? "s" : "");
+            sFindFiles->PrintCSVFiles();
         }
 
         if (sFindFiles->TotalUNKFiles())
         {
-            sLog->WriteLogAndPrint("Added added to list '%i' ADB file%s using recursive mode.\n", sFindFiles->TotalUNKFiles(), sFindFiles->TotalUNKFiles() > 1 ? "s" : "");
-            sFindFiles->TotalUNKFiles();
+            sLog->WriteLogAndPrint("Added to list '%i' Unknown file%s using recursive mode.\n", sFindFiles->TotalUNKFiles(), sFindFiles->TotalUNKFiles() > 1 ? "s" : "");
+            sFindFiles->PrintUNKFiles();
         }
     }
 

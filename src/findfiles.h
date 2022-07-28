@@ -48,27 +48,27 @@ class FindFiles
         unsigned int TotalWDBFiles() { return wdbFileNames.size(); }
         unsigned int TotalCSVFiles() { return csvFileNames.size(); }
         unsigned int TotalUNKFiles() { return unkFileNames.size(); }
-        void PrintfDBCFiles() {
+        void PrintDBCFiles() {
             for (auto current = dbcFileNames.begin(); current != dbcFileNames.end(); current++)
                 sLog->WriteLog("DBC File Added: %s\n", current->first.c_str());
         }
-        void PrintfDB2Files() {
+        void PrintDB2Files() {
             for (auto current = db2FileNames.begin(); current != db2FileNames.end(); current++)
                 sLog->WriteLog("DB2 File Added: %s\n", current->first.c_str());
         }
-        void PrintfADBFiles() {
+        void PrintADBFiles() {
             for (auto current = adbFileNames.begin(); current != adbFileNames.end(); current++)
                 sLog->WriteLog("ADB File Added: %s\n", current->first.c_str());
         }
-        void PrintfWDBFiles() {
+        void PrintWDBFiles() {
             for (auto current = wdbFileNames.begin(); current != wdbFileNames.end(); current++)
                 sLog->WriteLog("WDB File Added: %s\n", current->first.c_str());
         }
-        void PrintfCSVFiles() {
+        void PrintCSVFiles() {
             for (auto current = csvFileNames.begin(); current != csvFileNames.end(); current++)
                 sLog->WriteLog("CSV File Added: %s\n", current->first.c_str());
         }
-        void PrintfUNKFiles() {
+        void PrintUNKFiles() {
             for (auto current = unkFileNames.begin(); current != unkFileNames.end(); current++)
                 sLog->WriteLog("Unknown File Added: %s\n", current->first.c_str());
         }
