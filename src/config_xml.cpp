@@ -55,7 +55,6 @@ bool Config::LoadConfiguarionFile()
         return false;
     }
 
-    // Primero buscamos todo lo que no tenga extension
     unsigned int fileID = 1;
     for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
     {
