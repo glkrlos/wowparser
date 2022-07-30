@@ -15,6 +15,9 @@ struct structFile
 {
     enumFileType Type;
     string Structure;
+    bool isRecursivelySearched;
+    bool isSearchedByExtension;
+    unsigned int XMLFileID;
 };
 
 class FindFiles
@@ -31,7 +34,7 @@ class FindFiles
                 countFiles[x] = 0;
             }
         }
-        const char *GetFileTypeNameByID(enumFileType eFT)
+        const char *GetFileExtensionByFileType(enumFileType eFT)
         {
             switch (eFT)
             {
@@ -74,9 +77,8 @@ class FindFiles
 
             return unkFile;
         }
-        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt);
-        unsigned int GetTotalFiles() { return fileNames.size(); }
-        void PrintTotalFiles()
+        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
+        void PrintFileNamesByFileType()
         {
             for (unsigned int x = 0; x < totalFileTypes; x++)
             {
@@ -88,11 +90,11 @@ class FindFiles
                     {
                         if (First)
                         {
-                            sLog->WriteLogAndPrint("Added to list '%i' %s file%s using recursive mode.\n", countFiles[current->second.Type], GetFileTypeNameByID(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
+                            sLog->WriteLog("Added to list '%i' %s file%s using recursive mode.\n", countFiles[current->second.Type], GetFileExtensionByFileType(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
                             First = false;
                         }
 
-                        sLog->WriteLog("%s File Added: %s\n", GetFileTypeNameByID(current->second.Type), current->first.c_str());
+                        sLog->WriteLog("%s File Added: %s\n", GetFileExtensionByFileType(current->second.Type), current->first.c_str());
                     }
                 }
             }

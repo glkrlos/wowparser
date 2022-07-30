@@ -31,29 +31,35 @@ Config::Config()
 
 bool Config::LoadConfiguarionFile()
 {
+    sLog->WriteLog("Loading Configuration file...");
+
     if (XMLdoc.ErrorID())
     {
         if (XMLdoc.ErrorID() == 3)
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: Configuration file not found.\n");
+            sLog->WriteLogNoTime("Failed: Configuration file not found.\n");
         else
-            sLog->WriteLog("LoadConfiguarionFile(): ERROR: Unable to load configuration file. Syntax errors.\n");
+            sLog->WriteLogNoTime("Failed: Unable to load because syntax errors.\n");
 
         return false;
     }
 
-    XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3BETA");
+    XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3");
     if (!rootElement)
     {
-        sLog->WriteLog("LoadConfiguarionFile(): WARNING: Invalid configuration file.\n");
+        sLog->WriteLogNoTime("Failed: Invalid XML file.\n");
         return false;
     }
 
     XMLElement *fileElement = rootElement->FirstChildElement("file");
     if (!fileElement)
     {
-        sLog->WriteLog("LoadConfiguarionFile(): WARNING: No files specified.\n");
+        sLog->WriteLogNoTime("Failed: No files specified to parse.\n");
         return false;
     }
+
+    sLog->WriteLogNoTime("OK\n");
+
+    sLog->WriteLog("Checking XML attributes of files to parse...\n");
 
     unsigned int fileID = 1;
     for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
@@ -69,7 +75,7 @@ bool Config::LoadConfiguarionFile()
         // Si no hay nombre continuamos
         if (!Name && !FileExtensionIsSet)
         {
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: name attribute can't be empty. Ignoring element '%u'\n", fileID);
+            sLog->WriteLog("\tWARNING: name attribute can't be empty in configuration file. Ignoring element number '%u'\n", fileID);
             continue;
         }
 
@@ -90,26 +96,28 @@ bool Config::LoadConfiguarionFile()
 
         if (!FileExtensionIsSet && !IsValidFormat(FileFormat))
         {
-            sLog->WriteLog("LoadConfiguarionFile(): WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
+            sLog->WriteLog("\tWARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
         }
 
-        if (FileExtensionIsSet)
-            sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'*.%s'", fileID, FileExtension.c_str());
-        else
-            sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'%s'", fileID, FileName.c_str());
+        //if (FileExtensionIsSet)
+        //    sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'*.%s'", fileID, FileExtension.c_str());
+        //else
+        //    sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'%s'", fileID, FileName.c_str());
  
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
-        if (isRecursive)
-            sLog->WriteLogNoTime(" Will be able to find it using recursive mode starting on this directory '%s'\n", tempDirectory.c_str());
-        else
-            sLog->WriteLogNoTime(" Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
+        //if (isRecursive)
+        //    sLog->WriteLogNoTime(" Will be able to find it using recursive mode starting on this directory '%s'\n", tempDirectory.c_str());
+        //else
+        //    sLog->WriteLogNoTime(" Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
-        sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "");
+        sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", fileID);
     }
+
+    sLog->WriteLog("All OK after checking XML attributes of files to parse.\n");
 
     return true;
 }

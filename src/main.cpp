@@ -26,13 +26,15 @@ int main(int argc, char *arg[])
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
         else
-            if (sFindFiles->GetTotalFiles())
-                sFindFiles->PrintTotalFiles();
+            sFindFiles->PrintFileNamesByFileType();
     }
     else
     {
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
+        else
+        {
+        }
     }
 
 /*

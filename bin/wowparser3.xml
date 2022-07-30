@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<WoWParser3BETA>
+<WoWParser3>
     <file extension="dbc" />
     <file extension="db2" />
     <file extension="adb" />
 	<file name="example1.csv.dbc" format="usibif" />
-</WoWParser3BETA>
+</WoWParser3>
 <!--
 WoWParser 3 BETA - XML Configuration File
 
