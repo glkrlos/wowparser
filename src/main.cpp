@@ -19,15 +19,19 @@ int main(int argc, char *arg[])
 
     if (!Cfg->LoadConfiguarionFile())
     {
+        sLog->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
         sFindFiles->FileToFind(".", "", "", true, "dbc");
         sFindFiles->FileToFind(".", "", "", true, "db2");
         sFindFiles->FileToFind(".", "", "", true, "adb");
         sFindFiles->FileToFind(".", "", "", true, "csv");
 
         if (sFindFiles->ListEmpty())
-            sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
+            sLog->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
         else
+        {
+            sLog->WriteLog("The next files will pass to predicted mode:\n");
             sFindFiles->PrintAllFileNamesByFileType();
+        }
     }
     else
     {

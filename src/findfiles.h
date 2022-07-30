@@ -90,11 +90,11 @@ class FindFiles
                     {
                         if (First)
                         {
-                            sLog->WriteLog("Added to list '%i' %s file%s using recursive mode.\n", countFiles[current->second.Type], GetFileExtensionByFileType(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
+                            sLog->WriteLog("-> '%u' %s file%s added...\n", countFiles[current->second.Type], GetFileExtensionByFileType(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
                             First = false;
                         }
 
-                        sLog->WriteLog("%s File Added: %s\n", GetFileExtensionByFileType(current->second.Type), current->first.c_str());
+                        sLog->WriteLog("File: '%s'\n", current->first.c_str());
                     }
                 }
             }
