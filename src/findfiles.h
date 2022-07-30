@@ -38,8 +38,10 @@ class FindFiles
                     break;
             }
         }
-        /// Obtiene el typo de archivo por extension
-        /// @string = Debe contener una cadena de texto
+        /* 
+            Obtiene el typo de archivo por extension
+            @string = Debe contener una cadena de texto
+        */
         enumFileType GetFileTypeByExtension(string FileName)
         {
             int _tempPosExt = FileName.rfind(".");
@@ -61,7 +63,10 @@ class FindFiles
 
             return unkFile;
         }
-        /// Esta funcion es necesaria para contar cada tipo de archivo
+
+        /*
+            Esta funcion es necesaria para contar cada tipo de archivo
+        */
         void CountTotalFilesByType()
         {
             countFiles.clear();
@@ -111,7 +116,9 @@ class FindFiles
         }
         bool ListEmpty() { return fileNames.empty(); }
     private:
-        /// Agrega archivos indexados por nombre y solo inserta un nuevo valor si el nombre no existe
+        /*
+            Agrega archivos indexados por nombre y solo inserta un nuevo valor si el nombre no existe
+        */
         void AddFileToListIfNotExist(string fileName, structFile File)
         {
             auto Found = fileNames.find(fileName);
