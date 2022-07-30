@@ -26,7 +26,7 @@ int main(int argc, char *arg[])
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
         else
-            sFindFiles->PrintFileNamesByFileType();
+            sFindFiles->PrintAllFileNamesByFileType();
     }
     else
     {

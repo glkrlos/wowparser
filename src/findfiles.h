@@ -78,7 +78,7 @@ class FindFiles
             return unkFile;
         }
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
-        void PrintFileNamesByFileType()
+        void PrintAllFileNamesByFileType()
         {
             for (unsigned int x = 0; x < totalFileTypes; x++)
             {
