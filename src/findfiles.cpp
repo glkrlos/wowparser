@@ -1,5 +1,58 @@
 #include "findfiles.h"
 
+FindFiles::FindFiles()
+{
+    countFiles.clear();
+
+    /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
+    for (unsigned int x = 0; x < totalFileTypes; x++)
+    {
+        countFiles.push_back(x);
+        countFiles[x] = 0;
+    }
+}
+
+const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
+{
+    switch (eFT)
+    {
+        case dbcFile: return "DBC";
+            break;
+        case db2File: return "DB2";
+            break;
+        case adbFile: return "ADB";
+            break;
+        case wdbFile: return "WDB";
+            break;
+        case csvFile: return "CSV";
+            break;
+        default: return "Unknown";
+            break;
+    }
+}
+
+enumFileType FindFiles::GetFileTypeByExtension(string FileName)
+{
+    int _tempPosExt = FileName.rfind(".");
+    if (_tempPosExt != -1)
+    {
+        string _tempExt = FileName.substr(_tempPosExt + 1, FileName.size());
+
+        if (!_tempExt.compare("dbc"))
+            return dbcFile;
+        else if (!_tempExt.compare("db2"))
+            return db2File;
+        else if (!_tempExt.compare("adb"))
+            return adbFile;
+        else if (!_tempExt.compare("wdb"))
+            return wdbFile;
+        else if (!_tempExt.compare("csv"))
+            return csvFile;
+    }
+
+    return unkFile;
+}
+
 void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
 {
     DIR *dir = opendir(directory.c_str());
@@ -52,4 +105,44 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
             FileToFind(dirName, filename, structure, recursive, fileExt, xmlFileID);
     }
     closedir(dir);
+}
+
+void FindFiles::PrintAllFileNamesByFileType()
+{
+    for (unsigned int x = 0; x < totalFileTypes; x++)
+    {
+        bool First = true;
+
+        for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+        {
+            if (x == current->second.Type)
+            {
+                if (First)
+                {
+                    sLog->WriteLog("-> '%u' %s file%s added...\n", countFiles[current->second.Type], GetFileExtensionByFileType(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
+                    First = false;
+                }
+
+                sLog->WriteLog("File: '%s'\n", current->first.c_str());
+            }
+        }
+    }
+}
+bool FindFiles::ListEmpty()
+{
+    return fileNames.empty();
+}
+
+void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
+{
+    auto Found = fileNames.find(fileName);
+    if (Found != fileNames.end())
+        return;
+
+    fileNames.insert(pair<string, structFile>(fileName, File));
+
+    // Contamos el numero de registros de cada tipo
+    countFiles[File.Type]++;
+
+    return;
 }
