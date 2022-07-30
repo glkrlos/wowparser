@@ -20,6 +20,26 @@ struct structFile
 class FindFiles
 {
     public:
+        const char *GetFileTypeNameByID(enumFileType eFT)
+        {
+            switch (eFT)
+            {
+                case dbcFile: return "DBC";
+                    break;
+                case db2File: return "DB2";
+                    break;
+                case adbFile: return "ADB";
+                    break;
+                case wdbFile: return "WDB";
+                    break;
+                case csvFile: return "CSV";
+                    break;
+                default: return "Unknown";
+                    break;
+            }
+        }
+        /// Obtiene el typo de archivo por extension
+        /// @string = Debe contener una cadena de texto
         enumFileType GetFileTypeByExtension(string FileName)
         {
             int _tempPosExt = FileName.rfind(".");
@@ -41,106 +61,69 @@ class FindFiles
 
             return unkFile;
         }
-        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt);
-        unsigned int TotalDBCFiles() { return dbcFileNames.size(); }
-        unsigned int TotalDB2Files() { return db2FileNames.size(); }
-        unsigned int TotalADBFiles() { return adbFileNames.size(); }
-        unsigned int TotalWDBFiles() { return wdbFileNames.size(); }
-        unsigned int TotalCSVFiles() { return csvFileNames.size(); }
-        unsigned int TotalUNKFiles() { return unkFileNames.size(); }
-        void PrintDBCFiles() {
-            for (auto current = dbcFileNames.begin(); current != dbcFileNames.end(); current++)
-                sLog->WriteLog("DBC File Added: %s\n", current->first.c_str());
-        }
-        void PrintDB2Files() {
-            for (auto current = db2FileNames.begin(); current != db2FileNames.end(); current++)
-                sLog->WriteLog("DB2 File Added: %s\n", current->first.c_str());
-        }
-        void PrintADBFiles() {
-            for (auto current = adbFileNames.begin(); current != adbFileNames.end(); current++)
-                sLog->WriteLog("ADB File Added: %s\n", current->first.c_str());
-        }
-        void PrintWDBFiles() {
-            for (auto current = wdbFileNames.begin(); current != wdbFileNames.end(); current++)
-                sLog->WriteLog("WDB File Added: %s\n", current->first.c_str());
-        }
-        void PrintCSVFiles() {
-            for (auto current = csvFileNames.begin(); current != csvFileNames.end(); current++)
-                sLog->WriteLog("CSV File Added: %s\n", current->first.c_str());
-        }
-        void PrintUNKFiles() {
-            for (auto current = unkFileNames.begin(); current != unkFileNames.end(); current++)
-                sLog->WriteLog("Unknown File Added: %s\n", current->first.c_str());
-        }
-        bool ListEmpty() { return dbcFileNames.empty() && db2FileNames.empty() && adbFileNames.empty() && wdbFileNames.empty() && csvFileNames.empty() && unkFileNames.empty(); }
-    private:
-        void AddFileToListIfNotExist(string fileName, structFile File)
+        /// Esta funcion es necesaria para contar cada tipo de archivo
+        void CountTotalFilesByType()
         {
-            switch (File.Type)
+            countFiles.clear();
+
+            /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
+            for (unsigned int x = 0; x < totalFileTypes; x++)
             {
-                case dbcFile:
-                {
-                    auto Found = dbcFileNames.find(fileName);
-                    if (Found != dbcFileNames.end())
-                        break;
+                countFiles.push_back(x);
+                countFiles[x] = 0;
+            }
 
-                    dbcFileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
-                }
-                case db2File:
+            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+            {
+                switch (current->second.Type)
                 {
-                    auto Found = db2FileNames.find(fileName);
-                    if (Found != db2FileNames.end())
-                        break;
-
-                    db2FileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
-                }
-                case adbFile:
-                {
-                    auto Found = adbFileNames.find(fileName);
-                    if (Found != adbFileNames.end())
-                        break;
-
-                    adbFileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
-                }
-                case wdbFile:
-                {
-                    auto Found = wdbFileNames.find(fileName);
-                    if (Found != wdbFileNames.end())
-                        break;
-
-                    wdbFileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
-                }
-                case csvFile:
-                {
-                    auto Found = csvFileNames.find(fileName);
-                    if (Found != csvFileNames.end())
-                        break;
-
-                    csvFileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
-                }
-                default:
-                {
-                    auto Found = unkFileNames.find(fileName);
-                    if (Found != unkFileNames.end())
-                        break;
-
-                    unkFileNames.insert(pair<string, structFile>(fileName, File));
-                    break;
+                    case dbcFile: countFiles[current->second.Type]++; break;
+                    case db2File: countFiles[current->second.Type]++; break;
+                    case adbFile: countFiles[current->second.Type]++; break;
+                    case wdbFile: countFiles[current->second.Type]++; break;
+                    case csvFile: countFiles[current->second.Type]++; break;
+                    default: countFiles[current->second.Type]++; break;
                 }
             }
         }
+        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt);
+        unsigned int GetTotalFiles() { return fileNames.size(); }
+        void PrintTotalFiles()
+        {
+            for (unsigned int x = 0; x < totalFileTypes; x++)
+            {
+                bool First = true;
+
+                for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+                {
+                    if (x == current->second.Type)
+                    {
+                        if (First)
+                        {
+                            sLog->WriteLogAndPrint("Added to list '%i' %s file%s using recursive mode.\n", countFiles[current->second.Type], GetFileTypeNameByID(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
+                            First = false;
+                        }
+
+                        sLog->WriteLog("%s File Added: %s\n", GetFileTypeNameByID(current->second.Type), current->first.c_str());
+                    }
+                }
+            }
+        }
+        bool ListEmpty() { return fileNames.empty(); }
+    private:
+        /// Agrega archivos indexados por nombre y solo inserta un nuevo valor si el nombre no existe
+        void AddFileToListIfNotExist(string fileName, structFile File)
+        {
+            auto Found = fileNames.find(fileName);
+            if (Found != fileNames.end())
+                return;
+
+            fileNames.insert(pair<string, structFile>(fileName, File));
+            return;
+        }
     protected:
-        map<string, structFile> dbcFileNames;
-        map<string, structFile> db2FileNames;
-        map<string, structFile> adbFileNames;
-        map<string, structFile> wdbFileNames;
-        map<string, structFile> csvFileNames;
-        map<string, structFile> unkFileNames;
+        map<string, structFile> fileNames;
+        vector<unsigned int> countFiles;
 };
 
 #define sFindFiles CSingleton<FindFiles>::Instance()

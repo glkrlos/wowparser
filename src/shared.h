@@ -15,12 +15,13 @@ enum enumFieldTypes
 
 enum enumFileType
 {
-    unkFile = 0,
-    dbcFile = 1,
+    dbcFile = 0,
+    db2File = 1,
     adbFile = 2,
-    db2File = 3,
-    wdbFile = 4,
-    csvFile = 5,
+    wdbFile = 3,
+    csvFile = 4,
+    unkFile = 5,
+    totalFileTypes = 6,
 };
 
 template <typename T> string ToStr(T i)
@@ -43,18 +44,18 @@ inline bool IsValidFormat(string structure)
     {
         switch (structure[x])
         {
-        case 'X':   // unk byte
-        case 'b':   // byte
-        case 's':   // string
-        case 'f':   // float
-        case 'd':   // int
-        case 'n':   // int
-        case 'x':   // unk int
-        case 'i':   // int
-        case 'u':   // unsigned int
-            break;
-        default:
-            return false;
+            case 'X':   // unk byte
+            case 'b':   // byte
+            case 's':   // string
+            case 'f':   // float
+            case 'd':   // int
+            case 'n':   // int
+            case 'x':   // unk int
+            case 'i':   // int
+            case 'u':   // unsigned int
+                break;
+            default:
+                return false;
         }
     }
 

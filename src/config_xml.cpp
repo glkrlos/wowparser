@@ -111,5 +111,7 @@ bool Config::LoadConfiguarionFile()
         sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "");
     }
 
+    sFindFiles->CountTotalFilesByType();
+
     return true;
 }
