@@ -11,6 +11,7 @@ int main(int argc, char *arg[])
 {
     sLog->WriteLog("WoWParser Version 3.0 (Stable) for %s (Revision: %s)\n", _OS, _REVISION);
     sLog->WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
+    sLog->WriteLog("\n");
     sLog->WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     sLog->WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
     sLog->WriteLog("\n");
@@ -52,7 +53,6 @@ int main(int argc, char *arg[])
 
     printf("WoWParser Version 3.0 (Stable) for %s (Revision: %s)\n", _OS, _REVISION);
     printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
-    printf("\n");
     printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
     /*
