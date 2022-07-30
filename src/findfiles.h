@@ -20,6 +20,17 @@ struct structFile
 class FindFiles
 {
     public:
+        FindFiles()
+        {
+            countFiles.clear();
+
+            /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
+            for (unsigned int x = 0; x < totalFileTypes; x++)
+            {
+                countFiles.push_back(x);
+                countFiles[x] = 0;
+            }
+        }
         const char *GetFileTypeNameByID(enumFileType eFT)
         {
             switch (eFT)
@@ -63,34 +74,6 @@ class FindFiles
 
             return unkFile;
         }
-
-        /*
-            Esta funcion es necesaria para contar cada tipo de archivo
-        */
-        void CountTotalFilesByType()
-        {
-            countFiles.clear();
-
-            /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
-            for (unsigned int x = 0; x < totalFileTypes; x++)
-            {
-                countFiles.push_back(x);
-                countFiles[x] = 0;
-            }
-
-            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
-            {
-                switch (current->second.Type)
-                {
-                    case dbcFile: countFiles[current->second.Type]++; break;
-                    case db2File: countFiles[current->second.Type]++; break;
-                    case adbFile: countFiles[current->second.Type]++; break;
-                    case wdbFile: countFiles[current->second.Type]++; break;
-                    case csvFile: countFiles[current->second.Type]++; break;
-                    default: countFiles[current->second.Type]++; break;
-                }
-            }
-        }
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt);
         unsigned int GetTotalFiles() { return fileNames.size(); }
         void PrintTotalFiles()
@@ -126,6 +109,10 @@ class FindFiles
                 return;
 
             fileNames.insert(pair<string, structFile>(fileName, File));
+
+            // Contamos el numero de registros de cada tipo
+            countFiles[File.Type]++;
+
             return;
         }
     protected:

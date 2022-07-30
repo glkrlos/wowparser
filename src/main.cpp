@@ -22,7 +22,6 @@ int main(int argc, char *arg[])
         sFindFiles->FileToFind(".", "", "", true, "db2");
         sFindFiles->FileToFind(".", "", "", true, "adb");
         sFindFiles->FileToFind(".", "", "", true, "csv");
-        sFindFiles->CountTotalFilesByType();
 
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No DBC, DB2 and ADB files found using recursive mode.\n");
@@ -34,8 +33,6 @@ int main(int argc, char *arg[])
     {
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
-        else
-            sFindFiles->CountTotalFilesByType();
     }
 
 /*
