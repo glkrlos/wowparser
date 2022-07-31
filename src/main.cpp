@@ -15,9 +15,9 @@ int main(int argc, char *arg[])
     sLog->WriteLog("\n");
     sLog->WriteLog("======================LOG FILE START======================\n");
 
-    auto_ptr<XML_Reader> Cfg(new XML_Reader);
+    const auto_ptr<XML_Reader> Config(new XML_Reader);
 
-    if (!Cfg->LoadConfiguarionFile())
+    if (!Config->LoadConfiguarionFile())
     {
         sLog->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
         sFindFiles->FileToFind(".", "", "", true, "dbc");
