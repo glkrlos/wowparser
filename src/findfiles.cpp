@@ -16,46 +16,30 @@ FindFiles::FindFiles()
     _fileExtensions["adb"] = adbFile;
     _fileExtensions["wdb"] = wdbFile;
     _fileExtensions["csv"] = csvFile;
-    _fileExtensions["Unknown"] = unkFile;
 }
 
 const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
 {
-    switch (eFT)
-    {
-        case dbcFile: return "dbc";
-            break;
-        case db2File: return "db2";
-            break;
-        case adbFile: return "adb";
-            break;
-        case wdbFile: return "wdb";
-            break;
-        case csvFile: return "csv";
-            break;
-        default: return "Unknown";
-            break;
-    }
+    for (auto current = _fileExtensions.begin(); current != _fileExtensions.end(); current++)
+        if (current->second == eFT)
+            return current->first.c_str();
+
+    return "Unknown";
 }
 
 enumFileType FindFiles::GetFileTypeByExtension(string FileName)
 {
-    int _tempPosExt = FileName.rfind(".");
-    if (_tempPosExt != -1)
+    string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
+
+    switch (_fileExtensions[_tempExt])
     {
-        string _tempExt = FileName.substr(_tempPosExt + 1, FileName.size());
-
-        switch (_fileExtensions[_tempExt])
-        {
-            case dbcFile: return dbcFile;
-            case db2File: return db2File;
-            case adbFile: return adbFile;
-            case wdbFile: return wdbFile;
-            case csvFile: return csvFile;
-        }
+        case dbcFile: return dbcFile;
+        case db2File: return db2File;
+        case adbFile: return adbFile;
+        case wdbFile: return wdbFile;
+        case csvFile: return csvFile;
+        default: return unkFile;
     }
-
-    return unkFile;
 }
 
 void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
@@ -75,21 +59,21 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
 
         if (ent->d_type == DT_REG)
         {
-            string lowerCaseFileName = ent->d_name;
-            transform(lowerCaseFileName.begin(), lowerCaseFileName.end(), lowerCaseFileName.begin(), ::tolower);
+            string lowerCaseOriginalFileName = ent->d_name;
+            transform(lowerCaseOriginalFileName.begin(), lowerCaseOriginalFileName.end(), lowerCaseOriginalFileName.begin(), ::tolower);
             transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
             transform(structure.begin(), structure.end(), structure.begin(), ::tolower);
             transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
 
             if (!fileExt.empty())
             {
-                if (HaveExtension(lowerCaseFileName))
+                if (HaveExtension(lowerCaseOriginalFileName))
                 {
-                    if (CompareTexts(GetFileExtension(lowerCaseFileName), fileExt))
+                    if (CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
                         structFile File;
                         File.Structure = structure;
-                        File.Type = GetFileTypeByExtension(lowerCaseFileName);
+                        File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
                         File.isRecursivelySearched = recursive;
                         File.isSearchedByExtension = true;
                         File.XMLFileID = xmlFileID;
@@ -97,11 +81,11 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
                     }
                 }
             }
-            else if (CompareTexts(lowerCaseFileName, filename))
+            else if (CompareTexts(lowerCaseOriginalFileName, filename))
             {
                 structFile File;
                 File.Structure = structure;
-                File.Type = GetFileTypeByExtension(lowerCaseFileName);
+                File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
                 File.isRecursivelySearched = recursive;
                 File.isSearchedByExtension = false;
                 File.XMLFileID = xmlFileID;
@@ -162,19 +146,12 @@ bool FindFiles::ListEmpty()
 
 bool FindFiles::HaveExtension(string fileName)
 {
-    int _tempPosExt = fileName.rfind(".");
-    if (_tempPosExt != -1)
-        return true;
-
-    return false;
+    return fileName.rfind(".") != -1;
 }
 
 bool FindFiles::CompareTexts(string txt1, string txt2)
 {
-    if (!strcmp(txt1.c_str(), txt2.c_str()))
-        return true;
-
-    return false;
+    return !strcmp(txt1.c_str(), txt2.c_str());
 }
 
 string FindFiles::GetFileExtension(string fileName)
@@ -186,11 +163,11 @@ void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
 {
     auto Found = fileNames.find(fileName);
 
-    if (Found != fileNames.end() && File.Structure.empty())
-        return;
-
-    if (Found != fileNames.end() && !File.Structure.empty())
+    if (Found != fileNames.end())
     {
+        if (File.Structure.empty())
+            return;
+
         countFiles[File.Type]--;
         fileNames.erase(Found);
     }
