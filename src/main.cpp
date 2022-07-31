@@ -13,7 +13,8 @@ int main(int argc, char *arg[])
     sLog->WriteLog(LINE3);
     sLog->WriteLog(LINE4);
     sLog->WriteLog(LINE_NEW);
-    sLog->WriteLog(LINE_START);
+
+    sLog->WriteLog("====================================LOG FILE START====================================\n");
 
     const auto_ptr<Config_Reader> Config(new Config_Reader);
 
@@ -50,7 +51,7 @@ int main(int argc, char *arg[])
         //dbcReader.Load();
     }
 */
-    sLog->WriteLog(LINE_END);
+    sLog->WriteLog("====================================LOG FILE END====================================\n");
 
     printf(LINE1);
     printf(LINE2);

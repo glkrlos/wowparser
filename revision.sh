@@ -16,6 +16,4 @@ echo "    #define LINE2 \"Hash: %s\tDate: %s\n\", _HASH, _DATE" >> revision.h
 echo "    #define LINE_NEW \"\n\"" >> revision.h
 echo "    #define LINE3 \"Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n\"" >> revision.h
 echo "    #define LINE4 \"Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n\"" >> revision.h
-echo "    #define LINE_START \"====================================LOG FILE START====================================\n\"" >> revision.h
-echo "    #define LINE_END \"====================================LOG FILE END====================================\n\"" >> revision.h
 echo "#endif // __REVISION_H__" >> revision.h
