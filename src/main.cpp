@@ -7,13 +7,13 @@
 
 int main(int argc, char *arg[])
 {
-    sLog->WriteLog("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);
-    sLog->WriteLog("Hash: %s\tDate: %s\n", _HASH, _DATE);
-    sLog->WriteLog("\n");
-    sLog->WriteLog("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
-    sLog->WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
-    sLog->WriteLog("\n");
-    sLog->WriteLog("====================================LOG FILE START====================================\n");
+    sLog->WriteLog(LINE1);
+    sLog->WriteLog(LINE2);
+    sLog->WriteLog(LINE_NEW);
+    sLog->WriteLog(LINE3);
+    sLog->WriteLog(LINE4);
+    sLog->WriteLog(LINE_NEW);
+    sLog->WriteLog(LINE_START);
 
     const auto_ptr<Config_Reader> Config(new Config_Reader);
 
@@ -50,12 +50,15 @@ int main(int argc, char *arg[])
         //dbcReader.Load();
     }
 */
-    sLog->WriteLog("====================================LOG FILE END====================================\n");
+    sLog->WriteLog(LINE_END);
 
-    printf("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);
-    printf("Hash: %s\tDate: %s\n", _HASH, _DATE);
-    printf("\nTool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
-    printf("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    printf(LINE1);
+    printf(LINE2);
+    printf(LINE_NEW);
+    printf(LINE3);
+    printf(LINE4);
+    printf(LINE_NEW);
+
     /*
     sFindFiles->FileToFind(".", "", "", true, "dbc");
     vector<enumFieldTypes> FT;
