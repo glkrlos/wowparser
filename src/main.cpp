@@ -28,10 +28,7 @@ int main(int argc, char *arg[])
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
         else
-        {
-            sLog->WriteLog("The next files will pass to predicted mode:\n");
             sFindFiles->PrintAllFileNamesByFileType();
-        }
     }
     else
     {
