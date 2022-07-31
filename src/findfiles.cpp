@@ -16,15 +16,15 @@ const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
 {
     switch (eFT)
     {
-        case dbcFile: return "DBC";
+        case dbcFile: return "dbc";
             break;
-        case db2File: return "DB2";
+        case db2File: return "db2";
             break;
-        case adbFile: return "ADB";
+        case adbFile: return "adb";
             break;
-        case wdbFile: return "WDB";
+        case wdbFile: return "wdb";
             break;
-        case csvFile: return "CSV";
+        case csvFile: return "csv";
             break;
         default: return "Unknown";
             break;
@@ -124,6 +124,25 @@ void FindFiles::PrintAllFileNamesByFileType()
                 }
 
                 sLog->WriteLog("File: '%s'\n", current->first.c_str());
+
+                if (!current->second.Structure.empty())
+                    sLog->WriteLog("---> Structure: %s\n", current->second.Structure.c_str());
+
+                if (current->second.isSearchedByExtension || current->second.XMLFileID)
+                {
+                    if (current->second.isSearchedByExtension)
+                        sLog->WriteLog("---> searched with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+
+                    if (current->second.XMLFileID)
+                    {
+                        if (!current->second.isSearchedByExtension)
+                            sLog->WriteLog("--->");
+ 
+                        sLog->WriteLogNoTime(" by <file> element %u", current->second.XMLFileID);
+                    }
+
+                    sLog->WriteLogNoTime("\n");
+                }
             }
         }
     }
@@ -136,8 +155,15 @@ bool FindFiles::ListEmpty()
 void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
 {
     auto Found = fileNames.find(fileName);
-    if (Found != fileNames.end())
+
+    if (Found != fileNames.end() && File.Structure.empty())
         return;
+
+    if (Found != fileNames.end() && !File.Structure.empty())
+    {
+        countFiles[File.Type]--;
+        fileNames.erase(Found);
+    }
 
     fileNames.insert(pair<string, structFile>(fileName, File));
 
