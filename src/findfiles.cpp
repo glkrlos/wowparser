@@ -136,7 +136,10 @@ void FindFiles::PrintAllFileNamesByFileType()
                         sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
 
                     if (current->second.XMLFileID)
-                        sLog->WriteLogNoTime(" by <file> element %u", current->second.XMLFileID);
+                        sLog->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
+
+                    if (current->second.isSearchedByExtension)
+                        sLog->WriteLogNoTime(", and these files will pass to predicted mode.");
 
                     sLog->WriteLogNoTime("\n");
 
