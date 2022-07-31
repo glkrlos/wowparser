@@ -33,13 +33,13 @@
     <ClCompile Include="src\findfiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\config_xml.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\module_xml_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,13 +62,13 @@
     <ClInclude Include="src\findfiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\config_xml.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\module_xml_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,11 +1,9 @@
 #include "../revision.h"
 #include "pch.h"
-#include "config_xml.h"
+#include "module_xml_reader.h"
 //#include "shared.h"
 //#include "findfiles.h"
 //#include "module_binary_reader.h"
-
-#define Cfg CSingleton<Config>::Instance()
 
 int main(int argc, char *arg[])
 {
@@ -16,6 +14,8 @@ int main(int argc, char *arg[])
     sLog->WriteLog("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
     sLog->WriteLog("\n");
     sLog->WriteLog("======================LOG FILE START======================\n");
+
+    auto_ptr<XML_Reader> Cfg(new XML_Reader);
 
     if (!Cfg->LoadConfiguarionFile())
     {
