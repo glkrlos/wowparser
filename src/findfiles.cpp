@@ -10,6 +10,13 @@ FindFiles::FindFiles()
         countFiles.push_back(x);
         countFiles[x] = 0;
     }
+
+    _fileExtensions["dbc"] = dbcFile;
+    _fileExtensions["db2"] = db2File;
+    _fileExtensions["adb"] = adbFile;
+    _fileExtensions["wdb"] = wdbFile;
+    _fileExtensions["csv"] = csvFile;
+    _fileExtensions["Unknown"] = unkFile;
 }
 
 const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
@@ -38,16 +45,14 @@ enumFileType FindFiles::GetFileTypeByExtension(string FileName)
     {
         string _tempExt = FileName.substr(_tempPosExt + 1, FileName.size());
 
-        if (!_tempExt.compare("dbc"))
-            return dbcFile;
-        else if (!_tempExt.compare("db2"))
-            return db2File;
-        else if (!_tempExt.compare("adb"))
-            return adbFile;
-        else if (!_tempExt.compare("wdb"))
-            return wdbFile;
-        else if (!_tempExt.compare("csv"))
-            return csvFile;
+        switch (_fileExtensions[_tempExt])
+        {
+            case dbcFile: return dbcFile;
+            case db2File: return db2File;
+            case adbFile: return adbFile;
+            case wdbFile: return wdbFile;
+            case csvFile: return csvFile;
+        }
     }
 
     return unkFile;
@@ -70,18 +75,21 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
 
         if (ent->d_type == DT_REG)
         {
+            string lowerCaseFileName = ent->d_name;
+            transform(lowerCaseFileName.begin(), lowerCaseFileName.end(), lowerCaseFileName.begin(), ::tolower);
+            transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
+            transform(structure.begin(), structure.end(), structure.begin(), ::tolower);
+            transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
+
             if (!fileExt.empty())
             {
-                string _tempFileName = ent->d_name;
-                int _tempPosExt = _tempFileName.rfind(".");
-                if (_tempPosExt != -1)
+                if (HaveExtension(lowerCaseFileName))
                 {
-                    string _tempExt = _tempFileName.substr(_tempPosExt + 1, _tempFileName.size());
-                    if (!strcmp(_tempExt.c_str(), fileExt.c_str()))
+                    if (CompareTexts(GetFileExtension(lowerCaseFileName), fileExt))
                     {
                         structFile File;
                         File.Structure = structure;
-                        File.Type = GetFileTypeByExtension(ent->d_name);
+                        File.Type = GetFileTypeByExtension(lowerCaseFileName);
                         File.isRecursivelySearched = recursive;
                         File.isSearchedByExtension = true;
                         File.XMLFileID = xmlFileID;
@@ -89,11 +97,11 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
                     }
                 }
             }
-            else if (ent->d_name == filename)
+            else if (CompareTexts(lowerCaseFileName, filename))
             {
                 structFile File;
                 File.Structure = structure;
-                File.Type = GetFileTypeByExtension(ent->d_name);
+                File.Type = GetFileTypeByExtension(lowerCaseFileName);
                 File.isRecursivelySearched = recursive;
                 File.isSearchedByExtension = false;
                 File.XMLFileID = xmlFileID;
@@ -150,6 +158,28 @@ void FindFiles::PrintAllFileNamesByFileType()
 bool FindFiles::ListEmpty()
 {
     return fileNames.empty();
+}
+
+bool FindFiles::HaveExtension(string fileName)
+{
+    int _tempPosExt = fileName.rfind(".");
+    if (_tempPosExt != -1)
+        return true;
+
+    return false;
+}
+
+bool FindFiles::CompareTexts(string txt1, string txt2)
+{
+    if (!strcmp(txt1.c_str(), txt2.c_str()))
+        return true;
+
+    return false;
+}
+
+string FindFiles::GetFileExtension(string fileName)
+{
+    return fileName.substr(fileName.rfind(".") + 1, fileName.size());
 }
 
 void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)

@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "shared.h"
 #include "log.h"
+#include <algorithm>
 
 #ifdef _WIN32
     #include "win32/dirent.h"
@@ -29,11 +30,15 @@ class FindFiles
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
         bool ListEmpty();
+        bool HaveExtension(string fileName);
+        bool CompareTexts(string txt1, string txt2);
+        string GetFileExtension(string fileName);
     private:
         void AddFileToListIfNotExist(string fileName, structFile File);
     protected:
         map<string, structFile> fileNames;
         vector<unsigned int> countFiles;
+        map<string, enumFileType> _fileExtensions;
 };
 
 #define sFindFiles CSingleton<FindFiles>::Instance()
