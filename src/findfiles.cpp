@@ -1,6 +1,6 @@
 #include "findfiles.h"
 
-FindFiles::FindFiles()
+cFindFiles::cFindFiles()
 {
     /*
     countFiles.clear();
@@ -19,7 +19,7 @@ FindFiles::FindFiles()
     _fileExtensions["csv"] = csvFile;
 }
 
-const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
+const char *cFindFiles::GetFileExtensionByFileType(enumFileType eFT)
 {
     for (auto current = _fileExtensions.begin(); current != _fileExtensions.end(); current++)
         if (current->second == eFT)
@@ -28,7 +28,7 @@ const char *FindFiles::GetFileExtensionByFileType(enumFileType eFT)
     return "Unknown";
 }
 
-enumFileType FindFiles::GetFileTypeByExtension(string FileName)
+enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
 
@@ -46,7 +46,7 @@ enumFileType FindFiles::GetFileTypeByExtension(string FileName)
         return unkFile;
 }
 
-void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
+void cFindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;
@@ -103,7 +103,7 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
     closedir(dir);
 }
 
-void FindFiles::PrintAllFileNamesByFileType()
+void cFindFiles::PrintAllFileNamesByFileType()
 {
     unsigned int maxFileIDInXML = 0;
 
@@ -134,28 +134,28 @@ void FindFiles::PrintAllFileNamesByFileType()
 
                 if (First)
                 {
-                    sLog->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+                    Log->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
 
                     if (current->second.isSearchedByExtension)
-                        sLog->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                        Log->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
 
                     if (current->second.XMLFileID)
-                        sLog->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
+                        Log->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
 
                     if (current->second.isSearchedByExtension)
-                        sLog->WriteLogNoTime(", and they will pass to predicted mode.");
+                        Log->WriteLogNoTime(", and they will pass to predicted mode.");
 
-                    sLog->WriteLogNoTime("\n");
+                    Log->WriteLogNoTime("\n");
 
                     First = false;
                 }
 
-                sLog->WriteLog("File: '%s'", current->first.c_str());
+                Log->WriteLog("File: '%s'", current->first.c_str());
 
                 if (!current->second.Structure.empty())
-                    sLog->WriteLogNoTime(", Structure: '%s'", current->second.Structure.c_str());
+                    Log->WriteLogNoTime(", Structure: '%s'", current->second.Structure.c_str());
 
-                sLog->WriteLogNoTime("\n");
+                Log->WriteLogNoTime("\n");
             }
 
         }
@@ -163,27 +163,27 @@ void FindFiles::PrintAllFileNamesByFileType()
     }
 }
 
-bool FindFiles::ListEmpty()
+bool cFindFiles::ListEmpty()
 {
     return fileNames.empty();
 }
 
-bool FindFiles::HaveExtension(string fileName)
+bool cFindFiles::HaveExtension(string fileName)
 {
     return fileName.rfind(".") != -1;
 }
 
-bool FindFiles::CompareTexts(string txt1, string txt2)
+bool cFindFiles::CompareTexts(string txt1, string txt2)
 {
     return !txt1.compare(txt2);
 }
 
-string FindFiles::GetFileExtension(string fileName)
+string cFindFiles::GetFileExtension(string fileName)
 {
     return fileName.substr(fileName.rfind(".") + 1, fileName.size());
 }
 
-void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
+void cFindFiles::AddFileToListIfNotExist(string fileName, structFile File)
 {
     auto Found = fileNames.find(fileName);
 

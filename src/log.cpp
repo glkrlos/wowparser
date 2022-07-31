@@ -1,6 +1,6 @@
 #include "log.h"
 
-Log::Log()
+cLog::cLog()
 {
     FILE *logFile;
     logFile = fopen(WoWParserLogOutPut, "w");
@@ -8,7 +8,7 @@ Log::Log()
         fclose(logFile);
 }
 
-void Log::WriteLog(const char* args, ...)
+void cLog::WriteLog(const char* args, ...)
 {
     FILE *logFile = fopen(WoWParserLogOutPut, "a");
     if (!logFile)
@@ -33,7 +33,7 @@ void Log::WriteLog(const char* args, ...)
     fclose(logFile);
 }
 
-void Log::WriteLogNoTime(const char* args, ...)
+void cLog::WriteLogNoTime(const char* args, ...)
 {
     FILE *logFile = fopen(WoWParserLogOutPut, "a");
     if (!logFile)
@@ -49,7 +49,7 @@ void Log::WriteLogNoTime(const char* args, ...)
     fclose(logFile);
 }
 
-void Log::WriteLogAndPrint(const char* args, ...)
+void cLog::WriteLogAndPrint(const char* args, ...)
 {
     va_list ap;
     va_start(ap, args);

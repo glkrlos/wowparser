@@ -22,10 +22,10 @@ struct structFile
     unsigned int XMLFileID;
 };
 
-class FindFiles
+class cFindFiles
 {
     public:
-        FindFiles();
+        cFindFiles();
         const char *GetFileExtensionByFileType(enumFileType eFT);
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
@@ -42,5 +42,5 @@ class FindFiles
         map<string, enumFileType> _fileExtensions;
 };
 
-#define sFindFiles CSingleton<FindFiles>::Instance()
+#define FindFiles CSingleton<cFindFiles>::Instance()
 #endif

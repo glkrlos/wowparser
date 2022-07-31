@@ -12,14 +12,14 @@
 
 #define WoWParserLogOutPut "wowparser3.log"
 
-class Log
+class cLog
 {
     public:
-        Log();
+        cLog();
         void WriteLog(const char* args, ...);
         void WriteLogNoTime(const char* args, ...);
         void WriteLogAndPrint(const char* args, ...);
 };
 
-#define sLog CSingleton<Log>::Instance()
+#define Log CSingleton<cLog>::Instance()
 #endif

@@ -45,7 +45,7 @@ template <typename T> class CSingleton
 
 template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
 
-class classShared
+class cShared
 {
     public:
         template <typename T> string ToStr(T i)
@@ -139,7 +139,7 @@ class classShared
         }
 };
 
-#define Shared CSingleton<classShared>::Instance()
+#define Shared CSingleton<cShared>::Instance()
 
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 

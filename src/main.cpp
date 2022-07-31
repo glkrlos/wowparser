@@ -5,36 +5,36 @@
 
 int main(int argc, char *arg[])
 {
-    sLog->WriteLog(LINE1);
-    sLog->WriteLog(LINE2);
-    sLog->WriteLog(LINE_NEW);
-    sLog->WriteLog(LINE3);
-    sLog->WriteLog(LINE4);
-    sLog->WriteLog(LINE_NEW);
+    Log->WriteLog(LINE1);
+    Log->WriteLog(LINE2);
+    Log->WriteLog(LINE_NEW);
+    Log->WriteLog(LINE3);
+    Log->WriteLog(LINE4);
+    Log->WriteLog(LINE_NEW);
 
-    sLog->WriteLog("====================================LOG FILE START====================================\n");
+    Log->WriteLog("====================================LOG FILE START====================================\n");
 
     const auto_ptr<Config_Reader> Config(new Config_Reader);
 
     if (!Config->LoadConfiguarionFile())
     {
-        sLog->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
-        sFindFiles->FileToFind(".", "", "", true, "dbc");
-        sFindFiles->FileToFind(".", "", "", true, "db2");
-        sFindFiles->FileToFind(".", "", "", true, "adb");
-        sFindFiles->FileToFind(".", "", "", true, "csv");
+        Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", FindFiles->GetFileExtensionByFileType(dbcFile), FindFiles->GetFileExtensionByFileType(db2File), FindFiles->GetFileExtensionByFileType(adbFile), FindFiles->GetFileExtensionByFileType(csvFile));
+        FindFiles->FileToFind(".", "", "", true, "dbc");
+        FindFiles->FileToFind(".", "", "", true, "db2");
+        FindFiles->FileToFind(".", "", "", true, "adb");
+        FindFiles->FileToFind(".", "", "", true, "csv");
 
-        if (sFindFiles->ListEmpty())
-            sLog->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", sFindFiles->GetFileExtensionByFileType(dbcFile), sFindFiles->GetFileExtensionByFileType(db2File), sFindFiles->GetFileExtensionByFileType(adbFile), sFindFiles->GetFileExtensionByFileType(csvFile));
+        if (FindFiles->ListEmpty())
+            Log->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", FindFiles->GetFileExtensionByFileType(dbcFile), FindFiles->GetFileExtensionByFileType(db2File), FindFiles->GetFileExtensionByFileType(adbFile), FindFiles->GetFileExtensionByFileType(csvFile));
         else
-            sFindFiles->PrintAllFileNamesByFileType();
+            FindFiles->PrintAllFileNamesByFileType();
     }
     else
     {
-        if (sFindFiles->ListEmpty())
-            sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
+        if (FindFiles->ListEmpty())
+            Log->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
         else
-            sFindFiles->PrintAllFileNamesByFileType();
+            FindFiles->PrintAllFileNamesByFileType();
     }
 
     // Enviamos la infor
@@ -52,7 +52,7 @@ int main(int argc, char *arg[])
         //dbcReader.Load();
     }
 */
-    sLog->WriteLog("====================================LOG FILE END====================================\n");
+    Log->WriteLog("====================================LOG FILE END====================================\n");
 
     printf(LINE1);
     printf(LINE2);

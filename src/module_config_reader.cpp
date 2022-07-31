@@ -31,14 +31,14 @@ Config_Reader::Config_Reader()
 
 bool Config_Reader::LoadConfiguarionFile()
 {
-    sLog->WriteLog("Loading Configuration file...");
+    Log->WriteLog("Loading Configuration file...");
 
     if (XMLdoc.ErrorID())
     {
         if (XMLdoc.ErrorID() == 3)
-            sLog->WriteLogNoTime("Failed: Configuration file not found.\n");
+            Log->WriteLogNoTime("Failed: Configuration file not found.\n");
         else
-            sLog->WriteLogNoTime("Failed: Unable to load because syntax errors.\n");
+            Log->WriteLogNoTime("Failed: Unable to load because syntax errors.\n");
 
         return false;
     }
@@ -46,20 +46,20 @@ bool Config_Reader::LoadConfiguarionFile()
     XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3");
     if (!rootElement)
     {
-        sLog->WriteLogNoTime("Failed: Invalid XML file.\n");
+        Log->WriteLogNoTime("Failed: Invalid XML file.\n");
         return false;
     }
 
     XMLElement *fileElement = rootElement->FirstChildElement("file");
     if (!fileElement)
     {
-        sLog->WriteLogNoTime("Failed: No files specified to parse.\n");
+        Log->WriteLogNoTime("Failed: No files specified to parse.\n");
         return false;
     }
 
-    sLog->WriteLogNoTime("OK\n");
+    Log->WriteLogNoTime("OK\n");
 
-    sLog->WriteLog("Checking XML attributes of files to parse...\n");
+    Log->WriteLog("Checking XML attributes of files to parse...\n");
 
     unsigned int fileID = 1;
     for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
@@ -75,7 +75,7 @@ bool Config_Reader::LoadConfiguarionFile()
         // Si no hay nombre continuamos
         if (!Name && !FileExtensionIsSet)
         {
-            sLog->WriteLog("\tWARNING: name attribute can't be empty in configuration file. Ignoring element number '%u'\n", fileID);
+            Log->WriteLog("\tWARNING: name attribute can't be empty in configuration file. Ignoring element number '%u'\n", fileID);
             continue;
         }
 
@@ -96,7 +96,7 @@ bool Config_Reader::LoadConfiguarionFile()
 
         if (!FileExtensionIsSet && !Shared->IsValidFormat(FileFormat))
         {
-            sLog->WriteLog("\tWARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
+            Log->WriteLog("\tWARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
         }
 
@@ -104,10 +104,10 @@ bool Config_Reader::LoadConfiguarionFile()
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
-        sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", fileID);
+        FindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", fileID);
     }
 
-    sLog->WriteLog("All OK after checking XML attributes of files to parse.\n");
+    Log->WriteLog("All OK after checking XML attributes of files to parse.\n");
 
     return true;
 }
