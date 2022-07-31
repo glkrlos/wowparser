@@ -32,7 +32,6 @@ enumFileType FindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
 
-
     if (CompareTexts(_tempExt, "dbc"))
         return dbcFile;
     else if (CompareTexts(_tempExt, "db2"))
@@ -138,12 +137,7 @@ void FindFiles::PrintAllFileNamesByFileType()
                     sLog->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
 
                     if (current->second.isSearchedByExtension)
-                    {
-                        if (current->second.Type == unkFile)
-                            sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtension(current->first).c_str(), current->second.isRecursivelySearched ? " in recursive mode" : "");
-                        else
-                            sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
-                    }
+                        sLog->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
 
                     if (current->second.XMLFileID)
                         sLog->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
