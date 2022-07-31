@@ -21,7 +21,7 @@ Find files by extension
 
 recursive=
 Find files in recursive mode
-    * Default value is always "true" only if extension is set
+    * Default value is "false" except when extension is set.
     * Example: recursive="true"
 
 directory=

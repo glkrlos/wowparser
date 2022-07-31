@@ -2,6 +2,7 @@
 
 FindFiles::FindFiles()
 {
+    /*
     countFiles.clear();
 
     /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
@@ -10,7 +11,7 @@ FindFiles::FindFiles()
         countFiles.push_back(x);
         countFiles[x] = 0;
     }
-
+    */
     _fileExtensions["dbc"] = dbcFile;
     _fileExtensions["db2"] = db2File;
     _fileExtensions["adb"] = adbFile;
@@ -101,44 +102,60 @@ void FindFiles::FileToFind(string directory, string filename, string structure, 
 
 void FindFiles::PrintAllFileNamesByFileType()
 {
-    for (unsigned int x = 0; x < totalFileTypes; x++)
-    {
-        bool First = true;
+    unsigned int maxFileIDInXML = 0;
 
-        for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+    for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+        if (current->second.XMLFileID > maxFileIDInXML)
+            maxFileIDInXML = current->second.XMLFileID;
+
+    for (unsigned int currentFileID = 0; currentFileID <= maxFileIDInXML; currentFileID++)
+    {
+        for (unsigned int x = 0; x < totalFileTypes; x++)
         {
-            if (x == current->second.Type)
+            unsigned int countCurrentFiles = 0;
+
+            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
             {
+                if (current->second.Type != x || current->second.XMLFileID != currentFileID)
+                    continue;
+                
+                countCurrentFiles++;
+            }
+
+            bool First = true;
+
+            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+            {
+                if (current->second.Type != x || current->second.XMLFileID != currentFileID)
+                    continue;
+
                 if (First)
                 {
-                    sLog->WriteLog("-> '%u' %s file%s added...\n", countFiles[current->second.Type], GetFileExtensionByFileType(current->second.Type), countFiles[current->second.Type] > 1 ? "s" : "");
+                    sLog->WriteLog("-> '%u' %s file%s added", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+                    if (current->second.isSearchedByExtension)
+                        sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+
+                    if (current->second.XMLFileID)
+                        sLog->WriteLogNoTime(" by <file> element %u", current->second.XMLFileID);
+
+                    sLog->WriteLogNoTime("\n");
+
                     First = false;
                 }
 
-                sLog->WriteLog("File: '%s'\n", current->first.c_str());
+                sLog->WriteLog("File: '%s'", current->first.c_str());
 
                 if (!current->second.Structure.empty())
-                    sLog->WriteLog("---> Structure: %s\n", current->second.Structure.c_str());
+                    sLog->WriteLogNoTime(", Structure: '%s'", current->second.Structure.c_str());
 
-                if (current->second.isSearchedByExtension || current->second.XMLFileID)
-                {
-                    if (current->second.isSearchedByExtension)
-                        sLog->WriteLog("---> searched with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
-
-                    if (current->second.XMLFileID)
-                    {
-                        if (!current->second.isSearchedByExtension)
-                            sLog->WriteLog("--->");
- 
-                        sLog->WriteLogNoTime(" by <file> element %u", current->second.XMLFileID);
-                    }
-
-                    sLog->WriteLogNoTime("\n");
-                }
+                sLog->WriteLogNoTime("\n");
             }
+
         }
+
     }
 }
+
 bool FindFiles::ListEmpty()
 {
     return fileNames.empty();
@@ -174,7 +191,7 @@ void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
     fileNames.insert(pair<string, structFile>(fileName, File));
 
     // Contamos el numero de registros de cada tipo
-    countFiles[File.Type]++;
+    // countFiles[File.Type]++;
 
     return;
 }

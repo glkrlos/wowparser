@@ -26,18 +26,18 @@ class FindFiles
     public:
         FindFiles();
         const char *GetFileExtensionByFileType(enumFileType eFT);
-        enumFileType GetFileTypeByExtension(string FileName);
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
         bool ListEmpty();
+    private:
+        enumFileType GetFileTypeByExtension(string FileName);
         bool HaveExtension(string fileName);
         bool CompareTexts(string txt1, string txt2);
         string GetFileExtension(string fileName);
-    private:
         void AddFileToListIfNotExist(string fileName, structFile File);
     protected:
         map<string, structFile> fileNames;
-        vector<unsigned int> countFiles;
+        //vector<unsigned int> countFiles;
         map<string, enumFileType> _fileExtensions;
 };
 
