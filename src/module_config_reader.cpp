@@ -1,6 +1,6 @@
-#include "module_xml_reader.h"
+#include "module_config_reader.h"
 
-XML_Reader::XML_Reader()
+Config_Reader::Config_Reader()
 {
     string __fileName = "wowparser3.xml";
 
@@ -29,7 +29,7 @@ XML_Reader::XML_Reader()
     XMLdoc.LoadFile(__fileName.c_str());
 }
 
-bool XML_Reader::LoadConfiguarionFile()
+bool Config_Reader::LoadConfiguarionFile()
 {
     sLog->WriteLog("Loading Configuration file...");
 

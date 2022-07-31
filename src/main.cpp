@@ -1,6 +1,6 @@
 #include "../revision.h"
 #include "pch.h"
-#include "module_xml_reader.h"
+#include "module_config_reader.h"
 //#include "shared.h"
 //#include "findfiles.h"
 //#include "module_binary_reader.h"
@@ -15,7 +15,7 @@ int main(int argc, char *arg[])
     sLog->WriteLog("\n");
     sLog->WriteLog("====================================LOG FILE START====================================\n");
 
-    const auto_ptr<XML_Reader> Config(new XML_Reader);
+    const auto_ptr<Config_Reader> Config(new Config_Reader);
 
     if (!Config->LoadConfiguarionFile())
     {

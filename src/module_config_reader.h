@@ -1,5 +1,5 @@
-#ifndef _MODULE_XML_READER_H_
-#define _MODULE_XML_READER_H_
+#ifndef _MODULE_CONFIG_READER_H_
+#define _MODULE_CONFIG_READER_H_
 
 #include "pch.h"
 #include "shared.h"
@@ -15,10 +15,10 @@
 
 using namespace tinyxml2;
 
-class XML_Reader
+class Config_Reader
 {
     public:
-        XML_Reader();
+        Config_Reader();
         bool LoadConfiguarionFile();
     private:
     protected:

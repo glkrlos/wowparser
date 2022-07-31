@@ -57,7 +57,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\module_xml_reader.cpp" />
+    <ClCompile Include="src\module_config_reader.cpp" />
     <ClCompile Include="src\findfiles.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -68,7 +68,7 @@
     <ClCompile Include="src\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\module_xml_reader.h" />
+    <ClInclude Include="src\module_config_reader.h" />
     <ClInclude Include="src\findfiles.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\module_csv_reader.h" />

@@ -39,7 +39,7 @@
     <ClCompile Include="src\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\module_xml_reader.cpp">
+    <ClCompile Include="src\module_config_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,7 +68,7 @@
     <ClInclude Include="src\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\module_xml_reader.h">
+    <ClInclude Include="src\module_config_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
