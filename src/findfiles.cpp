@@ -32,15 +32,19 @@ enumFileType FindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
 
-    switch (_fileExtensions[_tempExt])
-    {
-        case dbcFile: return dbcFile;
-        case db2File: return db2File;
-        case adbFile: return adbFile;
-        case wdbFile: return wdbFile;
-        case csvFile: return csvFile;
-        default: return unkFile;
-    }
+
+    if (CompareTexts(_tempExt, "dbc"))
+        return dbcFile;
+    else if (CompareTexts(_tempExt, "db2"))
+        return db2File;
+    else if (CompareTexts(_tempExt, "adb"))
+        return adbFile;
+    else if (CompareTexts(_tempExt, "wdb"))
+        return wdbFile;
+    else if (CompareTexts(_tempExt, "csv"))
+        return csvFile;
+    else
+        return unkFile;
 }
 
 void FindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
@@ -131,9 +135,15 @@ void FindFiles::PrintAllFileNamesByFileType()
 
                 if (First)
                 {
-                    sLog->WriteLog("-> '%u' %s file%s added", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+                    sLog->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+
                     if (current->second.isSearchedByExtension)
-                        sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                    {
+                        if (current->second.Type == unkFile)
+                            sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtension(current->first).c_str(), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                        else
+                            sLog->WriteLogNoTime(" with extension *.%s%s", GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                    }
 
                     if (current->second.XMLFileID)
                         sLog->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
