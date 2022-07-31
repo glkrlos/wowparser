@@ -3,10 +3,10 @@
     <file extension="dbc" />
     <file extension="db2" />
     <file extension="adb" />
-	<file name="example1.csv.dbc" format="usibif" />
+    <file name="example1.csv.dbc" format="usibif" />
 </WoWParser3>
 <!--
-WoWParser 3 BETA - XML Configuration File
+WoWParser 3 - XML Configuration File
 
 <file name="" extension="" recursive="" directory="" format=""/>
 
@@ -16,7 +16,7 @@ File name to be parsed
 
 extension=
 Find files by extension
-    * If this option is set, name will be ignored
+    * If this option is set, name and format will be ignored.
     * Example: extension="dbc"
 
 recursive=
@@ -37,9 +37,8 @@ Find files inside specified directory
 
 format=
 Set exact format for speficied file
-    * If extension is set, format will be ignored.
-	* If extension format is set, and other file with same name and in same location without format is present,
-	  then the file with format will prevail.
+    * If format is set, and other file with same name and in same location without format unset,
+      then the file with format will prevail and the other file will be ignored.
     * Example: "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii"
     * Only the next characters can be used in format:
         b X     -> byte
