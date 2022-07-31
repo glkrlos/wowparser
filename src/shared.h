@@ -45,105 +45,102 @@ template <typename T> class CSingleton
 
 template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
 
-class Shared
+class classShared
 {
-public:
-    template <typename T> string ToStr(T i)
-    {
-        ostringstream buffer;
-
-        buffer << i;
-
-        return buffer.str();
-    }
-
-    unsigned int GetFormatedTotalFields(string structure)
-    {
-        return structure.empty() ? 0 : structure.size();
-    }
-
-    inline bool IsValidFormat(string structure)
-    {
-        for (unsigned int x = 0; x < structure.size(); x++)
+    public:
+        template <typename T> string ToStr(T i)
         {
-            switch (structure[x])
-            {
-            case 'X':   // unk byte
-            case 'b':   // byte
-            case 's':   // string
-            case 'f':   // float
-            case 'd':   // int
-            case 'n':   // int
-            case 'x':   // unk int
-            case 'i':   // int
-            case 'u':   // unsigned int
-                break;
-            default:
-                return false;
-            }
+            ostringstream buffer;
+
+            buffer << i;
+
+            return buffer.str();
         }
-
-        return true;
-    }
-
-    unsigned int GetFormatedRecordSize(string structure)
-    {
-        unsigned int RecordSize = 0;
-
-        for (unsigned int x = 0; x < structure.size(); x++)
+        unsigned int GetFormatedTotalFields(string structure)
         {
-            switch (structure[x])
-            {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                RecordSize += 1;
-                break;
-            default:
-                RecordSize += 4;
-                break;
-            }
+            return structure.empty() ? 0 : structure.size();
         }
-
-        return RecordSize;
-    }
-
-    vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
-    {
-        vector<enumFieldTypes> fieldTypes;
-        for (unsigned int x = 0; x < structure.size(); x++)
+        inline bool IsValidFormat(string structure)
         {
-            switch (structure[x])
+            for (unsigned int x = 0; x < structure.size(); x++)
             {
-            case 'X':   // unk byte
-            case 'b':   // byte
-                fieldTypes.push_back(type_BYTE);
-                continue;
-            case 's':   // string
-                fieldTypes.push_back(type_STRING);
-                continue;
-            case 'f':   // float
-                fieldTypes.push_back(type_FLOAT);
-                continue;
-            case 'd':   // int
-            case 'n':   // int
-            case 'x':   // unk int
-            case 'i':   // int
-                fieldTypes.push_back(type_INT);
-                continue;
-            case 'u':   // unsigned int
-                fieldTypes.push_back(type_UINT);
-                continue;
-            default:
-                fieldTypes.push_back(type_NONE);
-                continue;
+                switch (structure[x])
+                {
+                case 'X':   // unk byte
+                case 'b':   // byte
+                case 's':   // string
+                case 'f':   // float
+                case 'd':   // int
+                case 'n':   // int
+                case 'x':   // unk int
+                case 'i':   // int
+                case 'u':   // unsigned int
+                    break;
+                default:
+                    return false;
+                }
             }
-        }
 
-        return fieldTypes;
-    }
+            return true;
+        }
+        unsigned int GetFormatedRecordSize(string structure)
+        {
+            unsigned int RecordSize = 0;
+
+            for (unsigned int x = 0; x < structure.size(); x++)
+            {
+                switch (structure[x])
+                {
+                case 'X':   // unk byte
+                case 'b':   // byte
+                    RecordSize += 1;
+                    break;
+                default:
+                    RecordSize += 4;
+                    break;
+                }
+            }
+
+            return RecordSize;
+        }
+        vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
+        {
+            vector<enumFieldTypes> fieldTypes;
+            for (unsigned int x = 0; x < structure.size(); x++)
+            {
+                switch (structure[x])
+                {
+                case 'X':   // unk byte
+                case 'b':   // byte
+                    fieldTypes.push_back(type_BYTE);
+                    continue;
+                case 's':   // string
+                    fieldTypes.push_back(type_STRING);
+                    continue;
+                case 'f':   // float
+                    fieldTypes.push_back(type_FLOAT);
+                    continue;
+                case 'd':   // int
+                case 'n':   // int
+                case 'x':   // unk int
+                case 'i':   // int
+                    fieldTypes.push_back(type_INT);
+                    continue;
+                case 'u':   // unsigned int
+                    fieldTypes.push_back(type_UINT);
+                    continue;
+                default:
+                    fieldTypes.push_back(type_NONE);
+                    continue;
+                }
+            }
+
+            return fieldTypes;
+        }
 };
 
-#define sShared CSingleton<Shared>::Instance()
+#define Shared CSingleton<classShared>::Instance()
+
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 
 /*
@@ -161,5 +158,4 @@ class classSingleton
 
 #define TestClassOfSingleton classSingleton::Instance()
 */
-
 #endif
