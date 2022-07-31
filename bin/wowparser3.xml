@@ -22,12 +22,11 @@ Find files by extension
 
 recursive=
 Find files in recursive mode
-    * Default value is "true" only if extension is set
+    * Default value is always "true" only if extension is set
     * Example: recursive="true"
 
 directory=
 Find files inside specified directory
-    * Only works if extension is set.
     * If recursive is "true", will find in recursive mode all files starting in current directory
     * If recursive is "false", will not use recursive mode and find all files inside specified directory
       and subsecuent subdirectories if any.
@@ -40,6 +39,8 @@ Find files inside specified directory
 format=
 Set exact format for speficied file
     * If extension is set, format will be ignored.
+	* If extension format is set, and other file with same name and in same location without format is present,
+	  then the file with format will prevail.
     * Example: "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii"
     * Only the next characters can be used in format:
         b X     -> byte

@@ -100,19 +100,9 @@ bool XML_Reader::LoadConfiguarionFile()
             continue;
         }
 
-        //if (FileExtensionIsSet)
-        //    sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'*.%s'", fileID, FileExtension.c_str());
-        //else
-        //    sLog->WriteLog("LoadConfiguarionFile(): File Element %u:'%s'", fileID, FileName.c_str());
- 
         string tempDirectory = DirectoryName;
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
-
-        //if (isRecursive)
-        //    sLog->WriteLogNoTime(" Will be able to find it using recursive mode starting on this directory '%s'\n", tempDirectory.c_str());
-        //else
-        //    sLog->WriteLogNoTime(" Will be able to find it only in this directory '%s'\n", tempDirectory.c_str());
 
         sFindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", fileID);
     }
