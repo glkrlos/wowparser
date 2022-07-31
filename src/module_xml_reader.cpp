@@ -108,6 +108,7 @@ bool XML_Reader::LoadConfiguarionFile()
     }
 
     sLog->WriteLog("All OK after checking XML attributes of files to parse.\n");
+
     sFindFiles->PrintAllFileNamesByFileType();
     return true;
 }
