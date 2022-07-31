@@ -151,7 +151,7 @@ bool FindFiles::HaveExtension(string fileName)
 
 bool FindFiles::CompareTexts(string txt1, string txt2)
 {
-    return !strcmp(txt1.c_str(), txt2.c_str());
+    return !txt1.compare(txt2);
 }
 
 string FindFiles::GetFileExtension(string fileName)
@@ -165,11 +165,10 @@ void FindFiles::AddFileToListIfNotExist(string fileName, structFile File)
 
     if (Found != fileNames.end())
     {
-        if (File.Structure.empty())
-            return;
+        if (!File.Structure.empty())
+            Found->second = File;
 
-        countFiles[File.Type]--;
-        fileNames.erase(Found);
+        return;
     }
 
     fileNames.insert(pair<string, structFile>(fileName, File));
