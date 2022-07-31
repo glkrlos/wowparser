@@ -24,26 +24,50 @@ enum enumFileType
     totalFileTypes = 6,
 };
 
-template <typename T> string ToStr(T i)
+template <typename T> class CSingleton
 {
-    ostringstream buffer;
-
-    buffer << i;
-
-    return buffer.str();
-}
-
-inline unsigned int GetFormatedTotalFields(string structure)
-{
-    return structure.empty() ? 0 : structure.size();
-}
-
-inline bool IsValidFormat(string structure)
-{
-    for (unsigned int x = 0; x < structure.size(); x++)
-    {
-        switch (structure[x])
+    public:
+        static T* Instance()
         {
+            if (!m_instance.get())
+                m_instance = auto_ptr<T>(new T);
+
+            return m_instance.get();
+        };
+    protected:
+        //CSingleton();
+        //~CSingleton();
+    private:
+        //CSingleton(CSingleton const&);
+        //CSingleton& operator = (CSingleton const*);
+        static auto_ptr<T> m_instance;
+};
+
+template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
+
+class Shared
+{
+public:
+    template <typename T> string ToStr(T i)
+    {
+        ostringstream buffer;
+
+        buffer << i;
+
+        return buffer.str();
+    }
+
+    unsigned int GetFormatedTotalFields(string structure)
+    {
+        return structure.empty() ? 0 : structure.size();
+    }
+
+    inline bool IsValidFormat(string structure)
+    {
+        for (unsigned int x = 0; x < structure.size(); x++)
+        {
+            switch (structure[x])
+            {
             case 'X':   // unk byte
             case 'b':   // byte
             case 's':   // string
@@ -56,20 +80,20 @@ inline bool IsValidFormat(string structure)
                 break;
             default:
                 return false;
+            }
         }
+
+        return true;
     }
 
-    return true;
-}
-
-inline unsigned int GetFormatedRecordSize(string structure)
-{
-    unsigned int RecordSize = 0;
-
-    for (unsigned int x = 0; x < structure.size(); x++)
+    unsigned int GetFormatedRecordSize(string structure)
     {
-        switch (structure[x])
+        unsigned int RecordSize = 0;
+
+        for (unsigned int x = 0; x < structure.size(); x++)
         {
+            switch (structure[x])
+            {
             case 'X':   // unk byte
             case 'b':   // byte
                 RecordSize += 1;
@@ -77,19 +101,19 @@ inline unsigned int GetFormatedRecordSize(string structure)
             default:
                 RecordSize += 4;
                 break;
+            }
         }
+
+        return RecordSize;
     }
 
-    return RecordSize;
-}
-
-inline vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
-{
-    vector<enumFieldTypes> fieldTypes;
-    for (unsigned int x = 0; x < structure.size(); x++)
+    vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
     {
-        switch (structure[x])
+        vector<enumFieldTypes> fieldTypes;
+        for (unsigned int x = 0; x < structure.size(); x++)
         {
+            switch (structure[x])
+            {
             case 'X':   // unk byte
             case 'b':   // byte
                 fieldTypes.push_back(type_BYTE);
@@ -112,33 +136,14 @@ inline vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
             default:
                 fieldTypes.push_back(type_NONE);
                 continue;
+            }
         }
+
+        return fieldTypes;
     }
-
-    return fieldTypes;
-}
-
-template <typename T> class CSingleton
-{
-    public:
-        static T* Instance()
-        {
-            if (!m_instance.get())
-                m_instance = auto_ptr<T>(new T);
-
-            return m_instance.get();
-        };
-    protected:
-        //CSingleton();
-        //~CSingleton();
-    private:
-        //CSingleton(CSingleton const&);
-        //CSingleton& operator = (CSingleton const*);
-        static auto_ptr<T> m_instance;
 };
 
-template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
-
+#define sShared CSingleton<Shared>::Instance()
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 
 /*

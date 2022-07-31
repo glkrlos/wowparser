@@ -290,7 +290,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData(map<unsigned int, string>
             if (currentRecord.fieldType == type_STRING)
             {
                 SetUniqueStringTexts(itFields->second);
-                currentRecord.fieldValue = ToStr(GetUniqueStringTextsPosition(itFields->second));
+                currentRecord.fieldValue = sShared->ToStr(GetUniqueStringTextsPosition(itFields->second));
             }
             else
                 currentRecord.fieldValue = itFields->second;

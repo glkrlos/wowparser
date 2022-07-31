@@ -94,7 +94,7 @@ bool Config_Reader::LoadConfiguarionFile()
         const char *_fileFormat = fileElement->Attribute("format");
         string FileFormat = _fileFormat ? _fileFormat : "";
 
-        if (!FileExtensionIsSet && !IsValidFormat(FileFormat))
+        if (!FileExtensionIsSet && !sShared->IsValidFormat(FileFormat))
         {
             sLog->WriteLog("\tWARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
@@ -109,6 +109,5 @@ bool Config_Reader::LoadConfiguarionFile()
 
     sLog->WriteLog("All OK after checking XML attributes of files to parse.\n");
 
-    sFindFiles->PrintAllFileNamesByFileType();
     return true;
 }

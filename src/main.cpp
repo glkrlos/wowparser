@@ -1,9 +1,7 @@
 #include "../revision.h"
 #include "pch.h"
 #include "module_config_reader.h"
-//#include "shared.h"
-//#include "findfiles.h"
-//#include "module_binary_reader.h"
+#include "module_binary_reader.h"
 
 int main(int argc, char *arg[])
 {
@@ -36,9 +34,12 @@ int main(int argc, char *arg[])
         if (sFindFiles->ListEmpty())
             sLog->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
         else
-        {
-        }
+            sFindFiles->PrintAllFileNamesByFileType();
     }
+
+    // Enviamos la infor
+    //const auto_ptr<BinaryReader> BR(new BinaryReader());
+
 
 /*
     for (auto FileName = Cfg->fileNames.begin(); FileName != Cfg->fileNames.end(); FileName++)

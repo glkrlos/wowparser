@@ -5,6 +5,7 @@
 #include "shared.h"
 #include "log.h"
 #include <algorithm>
+#include "module_binary_reader.h"
 
 #ifdef _WIN32
     #include "win32/dirent.h"
