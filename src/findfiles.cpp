@@ -139,7 +139,7 @@ void FindFiles::PrintAllFileNamesByFileType()
                         sLog->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
 
                     if (current->second.isSearchedByExtension)
-                        sLog->WriteLogNoTime(", and these files will pass to predicted mode.");
+                        sLog->WriteLogNoTime(", and they will pass to predicted mode.");
 
                     sLog->WriteLogNoTime("\n");
 
