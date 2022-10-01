@@ -1,5 +1,4 @@
 #include "module_parser.h"
-#include "log.h"
 
 bool module_parser::Load()
 {

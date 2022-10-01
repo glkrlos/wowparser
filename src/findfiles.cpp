@@ -1,5 +1,4 @@
 #include "findfiles.h"
-#include "ProgressBar.h"
 
 cFindFiles::cFindFiles()
 {

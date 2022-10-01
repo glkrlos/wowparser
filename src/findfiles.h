@@ -3,7 +3,6 @@
 
 #include "pch.h"
 #include "shared.h"
-#include "log.h"
 #include <algorithm>
 #include "module_parser.h"
 
@@ -12,6 +11,8 @@
 #else
     #include <dirent.h>
 #endif
+
+#include "ProgressBar.h"
 
 struct structFile
 {

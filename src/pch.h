@@ -20,4 +20,6 @@
 
 using namespace std;
 
+#include "log.h"
+
 #endif
