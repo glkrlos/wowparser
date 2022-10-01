@@ -25,6 +25,7 @@ struct structFile
 class cFindFiles
 {
     public:
+        void CheckHeadersAndDataConsistencyOfAllFilesAdded();
         cFindFiles();
         const char *GetFileExtensionByFileType(enumFileType eFT);
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);

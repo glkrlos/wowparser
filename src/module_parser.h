@@ -13,10 +13,10 @@ struct structDBCHeader
     unsigned int stringSize;
 };
 
-class BinaryReader
+class module_parser
 {
     public:
-        BinaryReader(const char *FileName, vector<enumFieldTypes> FieldTypes, unsigned int FmtTotalFields, unsigned int FmtRecordSize)
+        module_parser(const char *FileName, vector<enumFieldTypes> FieldTypes, unsigned int FmtTotalFields, unsigned int FmtRecordSize)
         {
             _fileName = FileName;
             _fieldTypes = FieldTypes;
@@ -24,7 +24,7 @@ class BinaryReader
             _formatedRecordSize = FmtRecordSize;
             _headerSize = sizeof(structDBCHeader);
         }
-        ~BinaryReader()
+        ~module_parser()
         {
             if (_inputFile)
                 fclose(_inputFile);
@@ -64,10 +64,10 @@ class BinaryReader
                 char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
                 const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info._stringTable + GetUInt(FieldID)); }
             private:
-                RecordAccessor(BinaryReader &info, unsigned char *data) : _data(data), _info(info) { }
+                RecordAccessor(module_parser &info, unsigned char *data) : _data(data), _info(info) { }
                 unsigned char *_data = NULL;
-                BinaryReader &_info;
-                friend class BinaryReader;
+                module_parser &_info;
+                friend class module_parser;
         };
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }

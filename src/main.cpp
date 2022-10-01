@@ -36,20 +36,17 @@ int main(int argc, char *arg[])
             FindFiles->PrintAllFileNamesByFileType();
     }
 
-    // Enviamos la infor
-    //const auto_ptr<BinaryReader> BR(new BinaryReader());
+    if (!FindFiles->ListEmpty())
+    {
+        Log->WriteLog(LINE_NEW);
+        Log->WriteLog("Checking header and data consistency of each file added to parse it...\n");
 
+        /// Enviamos la lista de archivos
+        FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+    }
 
 /*
-    for (auto FileName = Cfg->fileNames.begin(); FileName != Cfg->fileNames.end(); FileName++)
-    {
-        vector<enumFieldTypes> FormatedFieldTypes = Cfg->GetFormatedFieldTypes(FileName->second);
-        unsigned int FormatedTotalFields = Cfg->GetFormatedTotalFields(FileName->second);
-        unsigned int FormatedRecordSize = Cfg->GetFormatedRecordSize(FileName->second);
 
-        //DBCReader dbcReader(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize);
-        //dbcReader.Load();
-    }
 */
     Log->WriteLog("====================================LOG FILE END====================================\n");
 
