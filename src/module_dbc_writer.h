@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
-#include "module_binary_reader.h"
+#include "module_parser.h"
 
 struct structRecord
 {

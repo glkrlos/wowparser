@@ -39,7 +39,7 @@
     <ClCompile Include="src\module_dbc_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\module_binary_reader.cpp">
+    <ClCompile Include="src\module_parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,13 +62,13 @@
     <ClInclude Include="src\module_config_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\module_binary_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\module_csv_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\module_dbc_writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\module_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

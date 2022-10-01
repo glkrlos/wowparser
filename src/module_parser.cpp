@@ -1,4 +1,4 @@
-#include "module_binary_reader.h"
+#include "module_parser.h"
 
 bool BinaryReader::Load()
 {

@@ -1,5 +1,5 @@
-#ifndef _MODULE_BINARY_READER_H_
-#define _MODULE_BINARY_READER_H_
+#ifndef _MODULE_PARSER_H_
+#define _MODULE_PARSER_H_
 
 #include "pch.h"
 #include "shared.h"
