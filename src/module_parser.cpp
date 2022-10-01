@@ -3,6 +3,8 @@
 
 bool module_parser::Load()
 {
+    Log->WriteLogEmptyLine();
+
     _inputFile = fopen(_fileName, "rb");
     if (!_inputFile)
     {
@@ -18,7 +20,6 @@ bool module_parser::Load()
     if (!_fileSize)
     {
         Log->WriteLogNoTime("FAILED: Empty File.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -28,14 +29,12 @@ bool module_parser::Load()
     if (_fileSize < 20 || fread(&DBCHeader, _headerSize, 1, _inputFile) != 1)
     {
         Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a DBC file?\n");
-        Log->WriteLog("\n");
         return false;
     }
 
     if (DBCHeader.header[0] != 'W' && DBCHeader.header[1] != 'D' && DBCHeader.header[2] != 'B' && DBCHeader.header[3] != 'C')
     {
         Log->WriteLogNoTime("FAILED: Not a DBC file.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -54,7 +53,6 @@ bool module_parser::Load()
         if (_totalFields != _formatedTotalFields || _recordSize != _formatedRecordSize)
         {
             Log->WriteLogNoTime("FAILED: Formated structure mismatch.\n");
-            Log->WriteLog("\n");
             return false;
         }
 
@@ -82,14 +80,12 @@ bool module_parser::CheckStructure()
     if ((_dataBytes != (_totalRecords * _recordSize)) || !_stringSize || (_stringBytes != _stringSize))
     {
         Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
     if (!_totalRecords || !_totalFields || !_recordSize)
     {
         Log->WriteLogNoTime("FAILED: No records/fields found.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -97,7 +93,6 @@ bool module_parser::CheckStructure()
     if (fread(_dataTable, _dataBytes, 1, _inputFile) != 1)
     {
         Log->WriteLogNoTime("FAILED: Unable to read records data.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -105,7 +100,6 @@ bool module_parser::CheckStructure()
     if (fread(_stringTable, _stringBytes, 1, _inputFile) != 1)
     {
         Log->WriteLogNoTime("FAILED: Unable to read strings data.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -121,7 +115,6 @@ bool module_parser::PredictFieldTypes()
     if (_recordSize / 4 != _totalFields)
     {
         Log->WriteLogNoTime("FAILED: Not supported byte packed format.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -235,7 +228,6 @@ bool module_parser::PredictFieldTypes()
     if ((countFloat + countString + countBool + countInt + countUInt) != _totalFields)
     {
         Log->WriteLogNoTime("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -256,8 +248,6 @@ bool module_parser::PredictFieldTypes()
     if (countUInt)
         Log->WriteLog("Total unsigned int Fields Predicted: '%u'\n", countUInt);
 
-    Log->WriteLog("\n");
-/*
     string outputFileName = _fileName;
     outputFileName.append(".csv");
     FILE *output = fopen(outputFileName.c_str(), "w");
@@ -338,6 +328,6 @@ bool module_parser::PredictFieldTypes()
     fclose(output);
 
     Log->WriteLog("CSV file created: '%s'.\n", outputFileName.c_str());
-*/
+
     return true;
 }

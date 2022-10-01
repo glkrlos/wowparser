@@ -19,6 +19,7 @@ class cLog
         void WriteLog(const char* args, ...);
         void WriteLogNoTime(const char* args, ...);
         void WriteLogAndPrint(const char* args, ...);
+        void WriteLogEmptyLine();
 };
 
 #define Log CSingleton<cLog>::Instance()

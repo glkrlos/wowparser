@@ -61,3 +61,8 @@ void cLog::WriteLogAndPrint(const char* args, ...)
 
     WriteLog(outstr);
 }
+
+void cLog::WriteLogEmptyLine()
+{
+    WriteLog("\n");
+}

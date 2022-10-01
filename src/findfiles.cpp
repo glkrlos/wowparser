@@ -1,4 +1,5 @@
 #include "findfiles.h"
+#include "ProgressBar.h"
 
 cFindFiles::cFindFiles()
 {
@@ -21,16 +22,18 @@ cFindFiles::cFindFiles()
 
 void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
 {
+    barGoLink bar(fileNames.size());
+
     for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
         vector<enumFieldTypes> FormatedFieldTypes = Shared->GetFormatedFieldTypes(FileName->second.Structure);
         unsigned int FormatedTotalFields = Shared->GetFormatedTotalFields(FileName->second.Structure);
         unsigned int FormatedRecordSize = Shared->GetFormatedRecordSize(FileName->second.Structure);
 
-        //printf("%s %u %u\n", FileName->first.c_str(), FormatedTotalFields, FormatedRecordSize);
-        //_getch();
         auto_ptr<module_parser> Parser(new module_parser(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize));
         Parser->Load();
+
+        bar.step();
     }
 }
 

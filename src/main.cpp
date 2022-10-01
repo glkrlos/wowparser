@@ -4,16 +4,18 @@
 
 int main(int argc, char *arg[])
 {
-    Log->WriteLog(LINE1);
-    Log->WriteLog(LINE2);
-    Log->WriteLog(LINE_NEW);
-    Log->WriteLog(LINE3);
-    Log->WriteLog(LINE4);
-    Log->WriteLog(LINE_NEW);
+    Log->WriteLogAndPrint(LINE1);
+    Log->WriteLogAndPrint(LINE2);
+    Log->WriteLogAndPrint(LINE_NEW);
+    Log->WriteLogAndPrint(LINE3);
+    Log->WriteLogAndPrint(LINE4);
+    Log->WriteLogAndPrint(LINE_NEW);
 
     Log->WriteLog("====================================LOG FILE START====================================\n");
 
     const auto_ptr<Config_Reader> Config(new Config_Reader);
+
+    printf("*** Reading Configuration...\n");
 
     if (!Config->LoadConfiguarionFile())
     {
@@ -38,32 +40,20 @@ int main(int argc, char *arg[])
 
     if (!FindFiles->ListEmpty())
     {
+        printf("*** Checking header and data consistency of each file added to parse it...\n");
+
         Log->WriteLog(LINE_NEW);
         Log->WriteLog("Checking header and data consistency of each file added to parse it...\n");
 
         /// Enviamos la lista de archivos
         FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+
+        printf("*** Finished\n");
     }
 
-/*
-
-*/
     Log->WriteLog("====================================LOG FILE END====================================\n");
 
-    printf(LINE1);
-    printf(LINE2);
-    printf(LINE_NEW);
-    printf(LINE3);
-    printf(LINE4);
-    printf(LINE_NEW);
-
-    /*
-    sFindFiles->FileToFind(".", "", "", true, "dbc");
-    vector<enumFieldTypes> FT;
-    FT.clear();
-    BinaryReader aaa("Achievement.dbc", FT, 0, 0);
-    aaa.Load();
-*/
+    printf("--Press any key to exit--");
     getch();
     return 0;
 }
