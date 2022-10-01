@@ -1,7 +1,6 @@
 #include "../revision.h"
 #include "pch.h"
 #include "module_config_reader.h"
-#include "module_binary_reader.h"
 
 int main(int argc, char *arg[])
 {

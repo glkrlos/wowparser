@@ -21,15 +21,6 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\module_csv_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\module_dbc_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\module_binary_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\findfiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -42,21 +33,21 @@
     <ClCompile Include="src\module_config_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\module_csv_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\module_dbc_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\module_binary_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module_csv_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module_dbc_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module_binary_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\findfiles.h">
@@ -69,6 +60,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\module_config_reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\module_binary_reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\module_csv_reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\module_dbc_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -24,6 +24,83 @@ enum enumFileType
     totalFileTypes = 6,
 };
 
+struct structHeader
+{
+    char value01[4];
+    unsigned char *value02;
+    unsigned char *value03;
+    unsigned char *value04;
+    unsigned char *value05;
+    unsigned char *value06;
+    unsigned char *value07;
+    unsigned char *value08;
+    unsigned char *value09;
+    unsigned char *value10;
+    unsigned char *value11;
+    unsigned char *value12;
+};
+
+struct structWDBHeader
+{
+    /// 24 bytes del header + 8 bytes del primer record y su el tamaño del record
+    char header[4];
+    unsigned int revision;
+    char locale[4];
+    unsigned int maxRecordSize;
+    unsigned int unk1;
+    unsigned int unk2;
+
+    /*
+        Para cada registro:
+
+        unsigned int entry;
+        unsigned int recordSize;
+        unsigned char *restOfrecord; <- aqui hay que saber el formato para leerlo
+    */
+
+    /*
+        BDIW itemcache.wdb -> se abre de forma especial por que dependen de unos bytes las veces que lee otros bytes
+        BOMW creaturecache.wdb
+        BOGW gameobjectcache.wdb
+        BDNW itemnamecache.wdb
+        XTIW itemtextcache.wdb
+        CPNW npccache.wdb
+        XTPW pagetextcache.wdb
+        TSQW questcache.wdb
+    */
+};
+
+struct structDBCADBHeader
+{
+    /// 20 bytes del header
+    char header[4];             // WDBC dbc, WCH2 adb
+    unsigned int totalRecords;
+    unsigned int totalFields;
+    unsigned int recordSize;
+    unsigned int stringSize;
+};
+
+struct structDB2Header
+{
+    /// 32 bytes del header o 48 bytes si el build > 12880
+    char header[4];             // WDB2 db2
+    unsigned int totalRecords;
+    unsigned int totalFields;
+    unsigned int recordSize;
+    unsigned int stringSize;
+    unsigned int tableHash;
+    unsigned int build;
+    unsigned int unk1;
+
+    /// > 12880
+    /// int diff = maxIndexDB2 - unk2DB2 + 1;
+    /// fseek(input, diff * 4 + diff * 2, SEEK_CUR); // diff * 4: an index for rows, diff * 2: a memory allocation bank
+    unsigned int unk2;
+    unsigned int maxIndex;
+    unsigned int locales;
+    unsigned int unk3;
+};
+
 template <typename T> class CSingleton
 {
     public:
@@ -91,13 +168,13 @@ class cShared
             {
                 switch (structure[x])
                 {
-                case 'X':   // unk byte
-                case 'b':   // byte
-                    RecordSize += 1;
-                    break;
-                default:
-                    RecordSize += 4;
-                    break;
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                        RecordSize += 1;
+                        break;
+                    default:
+                        RecordSize += 4;
+                        break;
                 }
             }
 
@@ -110,28 +187,28 @@ class cShared
             {
                 switch (structure[x])
                 {
-                case 'X':   // unk byte
-                case 'b':   // byte
-                    fieldTypes.push_back(type_BYTE);
-                    continue;
-                case 's':   // string
-                    fieldTypes.push_back(type_STRING);
-                    continue;
-                case 'f':   // float
-                    fieldTypes.push_back(type_FLOAT);
-                    continue;
-                case 'd':   // int
-                case 'n':   // int
-                case 'x':   // unk int
-                case 'i':   // int
-                    fieldTypes.push_back(type_INT);
-                    continue;
-                case 'u':   // unsigned int
-                    fieldTypes.push_back(type_UINT);
-                    continue;
-                default:
-                    fieldTypes.push_back(type_NONE);
-                    continue;
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                        fieldTypes.push_back(type_BYTE);
+                        continue;
+                    case 's':   // string
+                        fieldTypes.push_back(type_STRING);
+                        continue;
+                    case 'f':   // float
+                        fieldTypes.push_back(type_FLOAT);
+                        continue;
+                    case 'd':   // int
+                    case 'n':   // int
+                    case 'x':   // unk int
+                    case 'i':   // int
+                        fieldTypes.push_back(type_INT);
+                        continue;
+                    case 'u':   // unsigned int
+                        fieldTypes.push_back(type_UINT);
+                        continue;
+                    default:
+                        fieldTypes.push_back(type_NONE);
+                        continue;
                 }
             }
 
