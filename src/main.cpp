@@ -4,21 +4,18 @@
 
 void print_header()
 {
-    Log->WriteLogAndPrint(LINE1);
-    Log->WriteLogAndPrint(LINE2);
-    Log->WriteLogAndPrint(LINE_NEW);
-    Log->WriteLogAndPrint(LINE3);
-    Log->WriteLogAndPrint(LINE4);
-    Log->WriteLogAndPrint(LINE_NEW);
-    Log->WriteLogAndPrint(LINE_NEW);
+    Log->WriteLogAndPrint("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);
+    Log->WriteLogAndPrint("Hash: %s\tDate: %s\n", _HASH, _DATE);
+    Log->WriteLogEmptyLineAndPrint();
+    Log->WriteLogAndPrint("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
+    Log->WriteLogAndPrint("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    Log->WriteLogEmptyLineAndPrint();
 
     Log->WriteLog("====================================LOG FILE START====================================\n");
 }
 
 void pass1_loadconfig()
 {
-    printf("*** Reading Configuration...\n");
-
     const auto_ptr<Config_Reader> Config(new Config_Reader);
 
     if (!Config->LoadConfiguarionFile())
@@ -46,9 +43,11 @@ void pass2_printfilestolog()
     if (FindFiles->ListEmpty())
         return;
 
-    printf("*** Printing all files found in the log...\n");
+    printf("-----> Printing all files found in the log... ");
 
     FindFiles->PrintAllFileNamesByFileType();
+
+    printf("DONE.\n");
 }
 
 void pass3_checkheadersanddataconsistency()
@@ -56,10 +55,8 @@ void pass3_checkheadersanddataconsistency()
     if (FindFiles->ListEmpty())
         return;
 
-    printf("*** Checking header and data consistency of each file added to parse it...\n");
-
-    Log->WriteLog(LINE_NEW);
-    Log->WriteLog("Checking header and data consistency of each file added to parse it...\n");
+    Log->WriteLogEmptyLine();
+    Log->WriteLogAndPrint("-----> Checking header and data consistency of each file added to parse it...\n");
 
     /// Enviamos la lista de archivos
     FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
@@ -67,7 +64,7 @@ void pass3_checkheadersanddataconsistency()
 
 void print_end()
 {
-    printf("*** Finished\n");
+    Log->WriteLogAndPrint("-----> Finished\n");
     Log->WriteLog("====================================LOG FILE END====================================\n");
     printf("--Press any key to exit--\n");
     getch();

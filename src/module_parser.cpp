@@ -2,8 +2,6 @@
 
 bool module_parser::Load()
 {
-    Log->WriteLogEmptyLine();
-
     _inputFile = fopen(_fileName, "rb");
     if (!_inputFile)
     {
@@ -327,6 +325,8 @@ bool module_parser::PredictFieldTypes()
     fclose(output);
 
     Log->WriteLog("CSV file created: '%s'.\n", outputFileName.c_str());
+
+    Log->WriteLogEmptyLine();
 
     return true;
 }

@@ -49,6 +49,19 @@ void cLog::WriteLogNoTime(const char* args, ...)
     fclose(logFile);
 }
 
+void cLog::WriteLogNoTimeAndPrint(const char* args, ...)
+{
+    va_list ap;
+    va_start(ap, args);
+    char outstr[4096];
+    vsnprintf(outstr, 4096, args, ap);
+    va_end(ap);
+
+    printf("%s", outstr);
+
+    WriteLogNoTime(outstr);
+}
+
 void cLog::WriteLogAndPrint(const char* args, ...)
 {
     va_list ap;
@@ -65,4 +78,9 @@ void cLog::WriteLogAndPrint(const char* args, ...)
 void cLog::WriteLogEmptyLine()
 {
     WriteLog("\n");
+}
+
+void cLog::WriteLogEmptyLineAndPrint()
+{
+    WriteLogAndPrint("\n");
 }
