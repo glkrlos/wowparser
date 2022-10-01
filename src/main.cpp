@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "module_config_reader.h"
 
-int main(int argc, char *arg[])
+void print_header()
 {
     Log->WriteLogAndPrint(LINE1);
     Log->WriteLogAndPrint(LINE2);
@@ -10,12 +10,16 @@ int main(int argc, char *arg[])
     Log->WriteLogAndPrint(LINE3);
     Log->WriteLogAndPrint(LINE4);
     Log->WriteLogAndPrint(LINE_NEW);
+    Log->WriteLogAndPrint(LINE_NEW);
 
     Log->WriteLog("====================================LOG FILE START====================================\n");
+}
+
+void pass1_loadconfig()
+{
+    printf("*** Reading Configuration...\n");
 
     const auto_ptr<Config_Reader> Config(new Config_Reader);
-
-    printf("*** Reading Configuration...\n");
 
     if (!Config->LoadConfiguarionFile())
     {
@@ -27,33 +31,59 @@ int main(int argc, char *arg[])
 
         if (FindFiles->ListEmpty())
             Log->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", FindFiles->GetFileExtensionByFileType(dbcFile), FindFiles->GetFileExtensionByFileType(db2File), FindFiles->GetFileExtensionByFileType(adbFile), FindFiles->GetFileExtensionByFileType(csvFile));
-        else
-            FindFiles->PrintAllFileNamesByFileType();
-    }
-    else
-    {
-        if (FindFiles->ListEmpty())
-            Log->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
-        else
-            FindFiles->PrintAllFileNamesByFileType();
+
+        return;
     }
 
-    if (!FindFiles->ListEmpty())
-    {
-        printf("*** Checking header and data consistency of each file added to parse it...\n");
+    if (FindFiles->ListEmpty())
+        Log->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
 
-        Log->WriteLog(LINE_NEW);
-        Log->WriteLog("Checking header and data consistency of each file added to parse it...\n");
+    return;
+}
 
-        /// Enviamos la lista de archivos
-        FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+void pass2_printfilestolog()
+{
+    if (FindFiles->ListEmpty())
+        return;
 
-        printf("*** Finished\n");
-    }
+    printf("*** Printing all files found in the log...\n");
 
+    FindFiles->PrintAllFileNamesByFileType();
+}
+
+void pass3_checkheadersanddataconsistency()
+{
+    if (FindFiles->ListEmpty())
+        return;
+
+    printf("*** Checking header and data consistency of each file added to parse it...\n");
+
+    Log->WriteLog(LINE_NEW);
+    Log->WriteLog("Checking header and data consistency of each file added to parse it...\n");
+
+    /// Enviamos la lista de archivos
+    FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+}
+
+void print_end()
+{
+    printf("*** Finished\n");
     Log->WriteLog("====================================LOG FILE END====================================\n");
-
-    printf("--Press any key to exit--");
+    printf("--Press any key to exit--\n");
     getch();
+}
+
+int main(int argc, char *arg[])
+{
+    print_header();
+
+    pass1_loadconfig();
+
+    pass2_printfilestolog();
+
+    pass3_checkheadersanddataconsistency();
+
+    print_end();
+
     return 0;
 }

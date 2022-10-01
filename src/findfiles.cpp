@@ -122,6 +122,9 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
 
 void cFindFiles::PrintAllFileNamesByFileType()
 {
+    if (fileNames.empty())
+        return;
+
     unsigned int maxFileIDInXML = 0;
 
     for (auto current = fileNames.begin(); current != fileNames.end(); current++)
