@@ -32,15 +32,15 @@ enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
 
-    if (CompareTexts(_tempExt, "dbc"))
+    if (Shared->CompareTexts(_tempExt, "dbc"))
         return dbcFile;
-    else if (CompareTexts(_tempExt, "db2"))
+    else if (Shared->CompareTexts(_tempExt, "db2"))
         return db2File;
-    else if (CompareTexts(_tempExt, "adb"))
+    else if (Shared->CompareTexts(_tempExt, "adb"))
         return adbFile;
-    else if (CompareTexts(_tempExt, "wdb"))
+    else if (Shared->CompareTexts(_tempExt, "wdb"))
         return wdbFile;
-    else if (CompareTexts(_tempExt, "csv"))
+    else if (Shared->CompareTexts(_tempExt, "csv"))
         return csvFile;
     else
         return unkFile;
@@ -73,7 +73,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
             {
                 if (HaveExtension(lowerCaseOriginalFileName))
                 {
-                    if (CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
+                    if (Shared->CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
                         structFile File;
                         File.Structure = structure;
@@ -85,7 +85,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                     }
                 }
             }
-            else if (CompareTexts(lowerCaseOriginalFileName, filename))
+            else if (Shared->CompareTexts(lowerCaseOriginalFileName, filename))
             {
                 structFile File;
                 File.Structure = structure;
@@ -171,11 +171,6 @@ bool cFindFiles::ListEmpty()
 bool cFindFiles::HaveExtension(string fileName)
 {
     return fileName.rfind(".") != -1;
-}
-
-bool cFindFiles::CompareTexts(string txt1, string txt2)
-{
-    return !txt1.compare(txt2);
 }
 
 string cFindFiles::GetFileExtension(string fileName)

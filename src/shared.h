@@ -214,6 +214,10 @@ class cShared
 
             return fieldTypes;
         }
+        bool CompareTexts(string txt1, string txt2)
+        {
+            return !txt1.compare(txt2);
+        }
 };
 
 #define Shared CSingleton<cShared>::Instance()

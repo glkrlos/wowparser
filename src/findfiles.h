@@ -33,7 +33,6 @@ class cFindFiles
     private:
         enumFileType GetFileTypeByExtension(string FileName);
         bool HaveExtension(string fileName);
-        bool CompareTexts(string txt1, string txt2);
         string GetFileExtension(string fileName);
         void AddFileToListIfNotExist(string fileName, structFile File);
     protected:

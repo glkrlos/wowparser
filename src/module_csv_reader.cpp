@@ -180,41 +180,41 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
         return false;
     }
 
-    map<unsigned int, string> fieldNames = GetFields(FirstLine);
+    auto fieldNames = GetFields(FirstLine);
 
-    for (map<unsigned int, string>::iterator it = fieldNames.begin(); it != fieldNames.end(); ++it)
+    for (auto it = fieldNames.begin(); it != fieldNames.end(); ++it)
     {
-        if (!it->second.compare("string"))
+        if (Shared->CompareTexts(it->second, "string"))
         {
             fieldTypes.push_back(type_STRING);
             recordSize += 4;
         }
-        else if (!it->second.compare("float"))
+        else if (Shared->CompareTexts(it->second, "float"))
         {
             fieldTypes.push_back(type_FLOAT);
             recordSize += 4;
         }
-        else if (!it->second.compare("byte"))
+        else if (Shared->CompareTexts(it->second, "byte"))
         {
             fieldTypes.push_back(type_BYTE);
             recordSize += 1;
         }
-        else if (!it->second.compare("ubyte"))
+        else if (Shared->CompareTexts(it->second, "ubyte"))
         {
             fieldTypes.push_back(type_UBYTE);
             recordSize += 1;
         }
-        else if (!it->second.compare("int"))
+        else if (Shared->CompareTexts(it->second, "int"))
         {
             fieldTypes.push_back(type_INT);
             recordSize += 4;
         }
-        else if (!it->second.compare("uint"))
+        else if (Shared->CompareTexts(it->second, "uint"))
         {
             fieldTypes.push_back(type_UINT);
             recordSize += 4;
         }
-        else if (!it->second.compare("bool"))
+        else if (Shared->CompareTexts(it->second, "bool"))
         {
             fieldTypes.push_back(type_BOOL);
             recordSize += 4;
