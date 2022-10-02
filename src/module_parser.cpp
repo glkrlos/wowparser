@@ -26,24 +26,16 @@ bool module_parser::Load()
     _dataTable = new unsigned char[_fileSize];
     if (fread(_dataTable, _fileSize, 1, _inputFile) != 1)
     {
-        Log->WriteLogNoTime("FAILED: Unable read file.\n");
+        Log->WriteLogNoTime("FAILED: Unable to read file.\n");
         return false;
     }
 
-    bool isASCII = true;
-    for (auto x = 0; x < _fileSize; x++)
+    if (FileIsASCII() == DATA_READ_ERROR)
     {
-        if (static_cast<char>(_dataTable[x]) == '\n' || static_cast<char>(_dataTable[x]) == '\r')
-            continue;
-
-        if (!isprint(static_cast<char>(_dataTable[x])))
-        {
-            isASCII = false;
-            break;
-        }
+        Log->WriteLogNoTime("FATAL: DATA_READ_ERROR: null Pointer to dataTable. Report this to fix it.\n");
+        return false;
     }
-
-    if (isASCII)
+    else if (FileIsASCII() == ASCII_FILE)
         Log->WriteLogNoTime("ASCII");
     else
         Log->WriteLogNoTime("BINARY");

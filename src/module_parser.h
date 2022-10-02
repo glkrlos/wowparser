@@ -13,6 +13,13 @@ struct structDBCHeader
     unsigned int stringSize;
 };
 
+enum enumErrorTypes
+{
+    DATA_READ_ERROR,
+    ASCII_FILE,
+    BINARY_FILE
+};
+
 class module_parser
 {
     public:
@@ -31,6 +38,22 @@ class module_parser
         }
         bool Load();
     private:
+        enumErrorTypes FileIsASCII()
+        {
+            if (!_dataTable)
+                return DATA_READ_ERROR;
+
+            for (auto x = 0; x < _fileSize; x++)
+            {
+                if (static_cast<char>(_dataTable[x]) == '\n' || static_cast<char>(_dataTable[x]) == '\r')
+                    continue;
+
+                if (!isprint(static_cast<char>(_dataTable[x])))
+                    return BINARY_FILE;
+            }
+
+            return ASCII_FILE;
+        }
         bool CheckStructure();
         bool PredictFieldTypes();
 
