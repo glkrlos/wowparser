@@ -22,6 +22,39 @@ bool module_parser::Load()
 
     rewind(_inputFile);
 
+    ////// Nuevo aqui
+    _dataTable = new unsigned char[_fileSize];
+    if (fread(_dataTable, _fileSize, 1, _inputFile) != 1)
+    {
+        Log->WriteLogNoTime("FAILED: Unable the whole data.\n");
+        return false;
+    }
+
+    bool isASCII = true;
+    for (unsigned int x = 0; x < _fileSize; x++)
+    {
+        if (static_cast<char>(_dataTable[x]) == '\n' || static_cast<char>(_dataTable[x]) == '\r')
+            continue;
+
+        if (!isprint(static_cast <char>(_dataTable[x])))
+        {
+            isASCII = false;
+            break;
+        }
+        //printf("'%c' '%d'\n", static_cast <char>(_dataTable[x]), isprint(static_cast <char>(_dataTable[x])) );
+        //_getch();
+    }
+
+    if (isASCII)
+        Log->WriteLogNoTime("ASCII");
+    else
+        Log->WriteLogNoTime("BINARY");
+//    Log->WriteLogNoTime("BINARY '%d' '%c'", isprint(_dataTable[x]), reinterpret_cast<char *>(_dataTable[x]));
+
+
+    Log->WriteLogEmptyLine();
+    //////
+/*
     structDBCHeader DBCHeader;
     if (_fileSize < 20 || fread(&DBCHeader, _headerSize, 1, _inputFile) != 1)
     {
@@ -66,10 +99,12 @@ bool module_parser::Load()
 
         return true;
     }
+    */
 }
 
 bool module_parser::CheckStructure()
 {
+    /*
     Log->WriteLog("Checking structure...");
 
     _dataBytes = _fileSize - _headerSize - _stringSize;
@@ -329,4 +364,5 @@ bool module_parser::PredictFieldTypes()
     Log->WriteLogEmptyLine();
 
     return true;
+    */
 }
