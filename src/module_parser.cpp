@@ -31,7 +31,7 @@ bool module_parser::Load()
     }
 
     bool isASCII = true;
-    for (unsigned int x = 0; x < _fileSize; x++)
+    for (long x = 0; x < _fileSize; x++)
     {
         if (static_cast<char>(_dataTable[x]) == '\n' || static_cast<char>(_dataTable[x]) == '\r')
             continue;
@@ -41,18 +41,14 @@ bool module_parser::Load()
             isASCII = false;
             break;
         }
-        //printf("'%c' '%d'\n", static_cast <char>(_dataTable[x]), isprint(static_cast <char>(_dataTable[x])) );
-        //_getch();
     }
 
     if (isASCII)
         Log->WriteLogNoTime("ASCII");
     else
         Log->WriteLogNoTime("BINARY");
-//    Log->WriteLogNoTime("BINARY '%d' '%c'", isprint(_dataTable[x]), reinterpret_cast<char *>(_dataTable[x]));
 
-
-    Log->WriteLogEmptyLine();
+    Log->WriteLogNoTime("\n");
     //////
 /*
     structDBCHeader DBCHeader;
