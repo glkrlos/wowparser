@@ -31,6 +31,22 @@ class module_parser
         }
         bool Load();
     private:
+        bool FileIsASCII()
+        {
+            int c;
+            ifstream a(_fileName);
+            while ((c = a.get()) != EOF && c <= 127)
+                ;
+
+            if (a.is_open())
+                a.close();
+
+            if (c == EOF)
+                return true;
+
+            return false;
+
+        }
         bool CheckStructure();
         bool PredictFieldTypes();
 
