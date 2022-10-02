@@ -68,5 +68,6 @@ Find files by extension with recursive mode starting in specified directory:
 Find files by extension without recursive mode in specified directory:
 <file extension="dbc" recursive="false" directory="./dbc/esMX" />
 
-The program can't read byte fields without the specific format for that file.
+NOTES: * The program can't read byte fields without the specific format for that file.
+       * The output of parsed files for now are always to CSV and SQL formats
 -->
