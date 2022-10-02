@@ -26,7 +26,7 @@ bool module_parser::Load()
     _dataTable = new unsigned char[_fileSize];
     if (fread(_dataTable, _fileSize, 1, _inputFile) != 1)
     {
-        Log->WriteLogNoTime("FAILED: Unable the whole data.\n");
+        Log->WriteLogNoTime("FAILED: Unable read file.\n");
         return false;
     }
 
@@ -49,6 +49,8 @@ bool module_parser::Load()
         Log->WriteLogNoTime("BINARY");
 
     Log->WriteLogNoTime("\n");
+
+    return true;
     //////
 /*
     structDBCHeader DBCHeader;
