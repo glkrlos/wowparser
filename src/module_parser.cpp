@@ -31,12 +31,12 @@ bool module_parser::Load()
     }
 
     bool isASCII = true;
-    for (long x = 0; x < _fileSize; x++)
+    for (auto x = 0; x < _fileSize; x++)
     {
         if (static_cast<char>(_dataTable[x]) == '\n' || static_cast<char>(_dataTable[x]) == '\r')
             continue;
 
-        if (!isprint(static_cast <char>(_dataTable[x])))
+        if (!isprint(static_cast<char>(_dataTable[x])))
         {
             isASCII = false;
             break;
