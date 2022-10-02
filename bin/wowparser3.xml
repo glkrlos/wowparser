@@ -3,6 +3,7 @@
     <file extension="dbc" />
     <file extension="db2" />
     <file extension="adb" />
+    <file extension="csv" />
     <file name="example1.csv.dbc" format="usibif" />
 </WoWParser3>
 <!--
