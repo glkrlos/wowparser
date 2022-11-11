@@ -170,7 +170,7 @@ bool module_parser::CreateCSVFile()
 {
     string outputFileNameCSV = GetFileName();
     outputFileNameCSV.append(".csv");
-    Log->WriteLog("Creating CSV file '%s'....", outputFileNameCSV.c_str());
+    Log->WriteLog("Creating CSV file '%s'... ", outputFileNameCSV.c_str());
 
     FILE *output = fopen(outputFileNameCSV.c_str(), "w");
     if (!output)
@@ -252,7 +252,7 @@ bool module_parser::CreateCSVFile()
 
     fclose(output);
 
-    Log->WriteLog("DONE.\n");
+    Log->WriteLogNoTime("DONE.\n");
 
     return true;
 }
@@ -261,7 +261,7 @@ bool module_parser::CreateDBCFile()
 {
     string outputFileNameDBC = GetFileName();
     outputFileNameDBC.append(".dbc");
-    Log->WriteLog("Creating DBC file '%s'....", outputFileNameDBC.c_str());
+    Log->WriteLog("Creating DBC file '%s'... ", outputFileNameDBC.c_str());
 
     for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
     {
@@ -286,8 +286,6 @@ bool module_parser::CreateDBCFile()
             }
         }
     }
-
-    Log->WriteLog("%u, %u\n", _stringTexts.size(), _stringSize);
 
     if (_stringTexts.size() != _stringSize)
     {
@@ -356,7 +354,7 @@ bool module_parser::CreateDBCFile()
 
     fclose(output);
 
-    Log->WriteLog("DONE.\n");
+    Log->WriteLogNoTime("DONE.\n");
 
     return true;
 }
