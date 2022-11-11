@@ -14,15 +14,6 @@
 
 #include "ProgressBar.h"
 
-struct structFile
-{
-    enumFileType Type;
-    string Structure;
-    bool isRecursivelySearched;
-    bool isSearchedByExtension;
-    unsigned int XMLFileID;
-};
-
 class cFindFiles
 {
     public:

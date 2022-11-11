@@ -15,13 +15,33 @@ enum enumFieldTypes
 
 enum enumFileType
 {
-    dbcFile = 0,
-    db2File = 1,
-    adbFile = 2,
-    wdbFile = 3,
-    csvFile = 4,
-    unkFile = 5,
+    unkFile = 0,
+    dbcFile = 1,
+    db2File = 2,
+    adbFile = 3,
+    wdbFile = 4,
+    csvFile = 5,
     totalFileTypes = 6,
+};
+
+struct structFile
+{
+    public:
+        structFile()
+        {
+            Type = unkFile;
+            Structure.clear();
+            FormatedFieldTypes.clear();
+        }
+
+        enumFileType Type;
+        string Structure;
+        bool isRecursivelySearched = false;
+        bool isSearchedByExtension = false;
+        unsigned int XMLFileID = 0;
+        vector<enumFieldTypes> FormatedFieldTypes;
+        unsigned int FormatedTotalFields = 0;
+        unsigned int FormatedRecordSize = 0;
 };
 
 struct structHeader

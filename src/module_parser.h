@@ -23,12 +23,10 @@ enum enumErrorTypes
 class module_parser
 {
     public:
-        module_parser(const char *FileName, vector<enumFieldTypes> FieldTypes, unsigned int FmtTotalFields, unsigned int FmtRecordSize)
+        module_parser(const char *fileName, structFile &sFile)
         {
-            _fileName = FileName;
-            _fieldTypes = FieldTypes;
-            _formatedTotalFields = FmtTotalFields;
-            _formatedRecordSize = FmtRecordSize;
+            _fileName = fileName;
+            _sFile = sFile;
         }
         ~module_parser()
         {
@@ -59,12 +57,10 @@ class module_parser
             return ASCII_FILE;
         }
     protected:
+        structFile _sFile;
         FILE *_inputFile;
         const char *_fileName = NULL;
         long _fileSize = 0;
-        vector<enumFieldTypes> _fieldTypes;
-        unsigned int _formatedTotalFields = 0;
-        unsigned int _formatedRecordSize = 0;
         unsigned char *_fileData = NULL;
 };
 #endif

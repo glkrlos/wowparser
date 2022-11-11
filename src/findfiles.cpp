@@ -25,11 +25,7 @@ void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
 
     for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
-        vector<enumFieldTypes> FormatedFieldTypes = Shared->GetFormatedFieldTypes(FileName->second.Structure);
-        unsigned int FormatedTotalFields = Shared->GetFormatedTotalFields(FileName->second.Structure);
-        unsigned int FormatedRecordSize = Shared->GetFormatedRecordSize(FileName->second.Structure);
-
-        auto_ptr<module_parser> Parser(new module_parser(FileName->first.c_str(), FormatedFieldTypes, FormatedTotalFields, FormatedRecordSize));
+        auto_ptr<module_parser> Parser(new module_parser(FileName->first.c_str(), FileName->second));
         Parser->Load();
 
         bar.step();
