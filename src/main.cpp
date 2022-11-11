@@ -1,5 +1,6 @@
 #include "../revision.h"
 #include "pch.h"
+#include "shared.h"
 #include "module_config_reader.h"
 
 void print_header()
@@ -20,14 +21,14 @@ void pass1_loadconfig()
 
     if (!Config->LoadConfiguarionFile())
     {
-        Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", FindFiles->GetFileExtensionByFileType(dbcFile), FindFiles->GetFileExtensionByFileType(db2File), FindFiles->GetFileExtensionByFileType(adbFile), FindFiles->GetFileExtensionByFileType(csvFile));
+        Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile), Shared->GetFileExtensionByFileType(csvFile));
         FindFiles->FileToFind(".", "", "", true, "dbc");
         FindFiles->FileToFind(".", "", "", true, "db2");
         FindFiles->FileToFind(".", "", "", true, "adb");
         FindFiles->FileToFind(".", "", "", true, "csv");
 
         if (FindFiles->ListEmpty())
-            Log->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", FindFiles->GetFileExtensionByFileType(dbcFile), FindFiles->GetFileExtensionByFileType(db2File), FindFiles->GetFileExtensionByFileType(adbFile), FindFiles->GetFileExtensionByFileType(csvFile));
+            Log->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile), Shared->GetFileExtensionByFileType(csvFile));
 
         return;
     }

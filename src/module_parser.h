@@ -17,7 +17,7 @@ enum enumErrorTypes
 {
     DATA_READ_ERROR,
     ASCII_FILE,
-    BINARY_FILE
+    BINARY_FILE,
 };
 
 class module_parser
@@ -56,10 +56,16 @@ class module_parser
 
             return ASCII_FILE;
         }
+        enumFileType GetFileTypeByHeader();
+        char GetChar()
+        {
+            return static_cast<char>(_fileData[_headerOffset++]);
+        }
     protected:
         structFile _sFile;
         FILE *_inputFile;
         long _fileSize = 0;
+        unsigned int _headerOffset = 0;
         unsigned char *_fileData = NULL;
 };
 #endif

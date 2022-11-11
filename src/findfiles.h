@@ -19,7 +19,6 @@ class cFindFiles
     public:
         void CheckHeadersAndDataConsistencyOfAllFilesAdded();
         cFindFiles();
-        const char *GetFileExtensionByFileType(enumFileType eFT);
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
         bool ListEmpty();
@@ -31,7 +30,6 @@ class cFindFiles
     protected:
         map<string, structFile> fileNames;
         //vector<unsigned int> countFiles;
-        map<string, enumFileType> _fileExtensions;
 };
 
 #define FindFiles CSingleton<cFindFiles>::Instance()

@@ -12,11 +12,6 @@ cFindFiles::cFindFiles()
         countFiles[x] = 0;
     }
     */
-    _fileExtensions["dbc"] = dbcFile;
-    _fileExtensions["db2"] = db2File;
-    _fileExtensions["adb"] = adbFile;
-    _fileExtensions["wdb"] = wdbFile;
-    _fileExtensions["csv"] = csvFile;
 }
 
 void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
@@ -30,15 +25,6 @@ void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
 
         bar.step();
     }
-}
-
-const char *cFindFiles::GetFileExtensionByFileType(enumFileType eFT)
-{
-    for (auto current = _fileExtensions.begin(); current != _fileExtensions.end(); current++)
-        if (current->second == eFT)
-            return current->first.c_str();
-
-    return "Unknown";
 }
 
 enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
@@ -152,10 +138,10 @@ void cFindFiles::PrintAllFileNamesByFileType()
 
                 if (First)
                 {
-                    Log->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+                    Log->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, Shared->GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
 
                     if (current->second.isSearchedByExtension)
-                        Log->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                        Log->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : Shared->GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
 
                     if (current->second.XMLFileID)
                         Log->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);

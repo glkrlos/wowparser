@@ -22,6 +22,15 @@ enum enumFileType
     wdbFile = 4,
     csvFile = 5,
     totalFileTypes = 6,
+
+    wdbitemcache = 7,
+    wdbcreaturecache = 8,
+    wdbgameobjectcache = 9,
+    wdbitemnamecache = 10,
+    wdbitemtextcache = 11,
+    wdbnpccache = 12,
+    wdbpagetextcache = 13,
+    wdbquestcache = 14,
 };
 
 struct structFile
@@ -44,22 +53,6 @@ struct structFile
         vector<enumFieldTypes> FormatedFieldTypes;
         unsigned int FormatedTotalFields = 0;
         unsigned int FormatedRecordSize = 0;
-};
-
-struct structHeader
-{
-    char value01[4];
-    unsigned char *value02;
-    unsigned char *value03;
-    unsigned char *value04;
-    unsigned char *value05;
-    unsigned char *value06;
-    unsigned char *value07;
-    unsigned char *value08;
-    unsigned char *value09;
-    unsigned char *value10;
-    unsigned char *value11;
-    unsigned char *value12;
 };
 
 struct structWDBHeader
@@ -239,6 +232,18 @@ class cShared
         bool CompareTexts(string txt1, string txt2)
         {
             return !txt1.compare(txt2);
+        }
+        const char *GetFileExtensionByFileType(enumFileType eFT)
+        {
+            switch (eFT)
+            {
+                case dbcFile: return "dbc";
+                case db2File: return "db2";
+                case adbFile: return "adb";
+                case wdbFile: return "wdb";
+                case csvFile: return "csv";
+                default: return "Unknown";
+            }
         }
 };
 

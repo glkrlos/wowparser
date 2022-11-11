@@ -20,6 +20,12 @@ bool module_parser::Load()
         return false;
     }
 
+    if (_fileSize < 5)
+    {
+        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a %s file ?");
+        return false;
+    }
+
     rewind(_inputFile);
 
     _fileData = new unsigned char[_fileSize];
@@ -34,12 +40,27 @@ bool module_parser::Load()
         Log->WriteLogNoTime("FATAL: DATA_READ_ERROR: null Pointer to file data. Report this to fix it.\n");
         return false;
     }
-    else if (FileIsASCII() == ASCII_FILE)
-        Log->WriteLogNoTime("");
+
+    if (FileIsASCII() == ASCII_FILE)
+        ; // Pasar a funcion csv_reader, cerrando el archivo aqui
     else
-        Log->WriteLogNoTime("");
+        GetFileTypeByHeader();
 
     Log->WriteLogNoTime("DONE.\n");
 
     return true;
+}
+
+enumFileType module_parser::GetFileTypeByHeader()
+{
+    string header = "";
+    header.append(Shared->ToStr(GetChar()));
+    header.append(Shared->ToStr(GetChar()));
+    header.append(Shared->ToStr(GetChar()));
+    header.append(Shared->ToStr(GetChar()));
+
+    printf("'%s'\n", header.c_str());
+    _getch();
+
+    return unkFile;
 }
