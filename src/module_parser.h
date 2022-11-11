@@ -30,6 +30,7 @@ class module_parser
         bool ParseBinaryFile();
         bool ParseCSVFile();
         bool CheckStructure();
+        bool FormatedFile();
         bool PredictFieldTypes();
         bool IsPreFormatted() { return !_sFile.FormatedFieldTypes.empty(); }
         const char *GetFileName() { return _sFile.FileName.c_str(); }
@@ -179,6 +180,8 @@ class module_parser
         unsigned int _countFloatFields = 0;
         unsigned int _countStringFields = 0;
         unsigned int _countBoolFields = 0;
+        unsigned int _countByteFields = 0;
+        unsigned int _countUByteFields = 0;
         unsigned int _countIntFields = 0;
         unsigned int _countUIntFields = 0;
 

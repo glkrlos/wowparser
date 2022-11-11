@@ -186,6 +186,8 @@ bool module_parser::CreateCSVFile()
         {
             case type_FLOAT:  fprintf(output, "float"); break;
             case type_BOOL:   fprintf(output, "bool"); break;
+            case type_BYTE:   fprintf(output, "byte"); break;
+            case type_UBYTE:  fprintf(output, "ubyte"); break;
             case type_STRING: fprintf(output, "string"); break;
             case type_INT:    fprintf(output, "int"); break;
             case type_UINT:
@@ -237,6 +239,10 @@ bool module_parser::CreateCSVFile()
                 fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
             else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
                 fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
+            else if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
+                fprintf(output, "%i", GetRecord(currentRecord).GetByte(currentField));
+            else if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
+                fprintf(output, "%u", GetRecord(currentRecord).GetByte(currentField));
             else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
                 fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
             else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
@@ -372,7 +378,36 @@ bool module_parser::ParseBinaryFile()
             return false;
         }
 
-        Log->WriteLogNoTime("DONE.\n");
+        if (FormatedFile())
+        {
+            Log->WriteLogNoTime("DONE.\n");
+
+            if (_countFloatFields)
+                Log->WriteLog("Total float Fields: '%u'\n", _countFloatFields);
+
+            if (_countStringFields)
+                Log->WriteLog("Total string Fields: '%u'\n", _countStringFields);
+
+            if (_countBoolFields)
+                Log->WriteLog("Total bool Fields: '%u'\n", _countBoolFields);
+
+            if (_countByteFields)
+                Log->WriteLog("Total byte Fields: '%u'\n", _countByteFields);
+
+            if (_countUByteFields)
+                Log->WriteLog("Total unsigned byte Fields: '%u'\n", _countUByteFields);
+
+            if (_countIntFields)
+                Log->WriteLog("Total int Fields: '%u'\n", _countIntFields);
+
+            if (_countUIntFields)
+                Log->WriteLog("Total unsigned int Fields: '%u'\n", _countUIntFields);
+
+            CreateCSVFile();
+            // CreateDBCFile();
+        }
+        else
+            Log->WriteLog("FAILED: Unexpected error.\n");
     }
     else
     {
@@ -406,7 +441,10 @@ bool module_parser::ParseBinaryFile()
 
             CreateCSVFile();
             // CreateDBCFile();
+            // CreateSQLFile();
         }
+        else
+            Log->WriteLog("FAILED: Unexpected error.\n");
     }
 
     Log->WriteLogEmptyLine();
@@ -418,6 +456,37 @@ bool module_parser::ParseCSVFile()
 {
     Log->WriteLog("Not implemented yet.\n");
     Log->WriteLogEmptyLine();
+
+    return true;
+}
+
+bool module_parser::FormatedFile()
+{
+    SetFieldsOffset();
+
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+    {
+        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
+            _countFloatFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_STRING)
+            _countStringFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
+            _countBoolFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
+            _countByteFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
+            _countUByteFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_INT)
+            _countIntFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
+            _countUIntFields++;
+    }
+
+    if ((_countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields) != _totalFields)
+    {
+        Log->WriteLogNoTime("FAILED: One or more fields are not parsed correctly. Conctact Developer to fix it.\n");
+        return false;
+    }
 
     return true;
 }
@@ -521,15 +590,19 @@ bool module_parser::PredictFieldTypes()
             _countStringFields++;
         if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
             _countBoolFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
+            _countByteFields++;
+        if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
+            _countUByteFields++;
         if (_sFile.FormatedFieldTypes[currentField] == type_INT)
             _countIntFields++;
         if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
             _countUIntFields++;
     }
 
-    if ((_countFloatFields + _countStringFields + _countBoolFields + _countIntFields + _countUIntFields) != _totalFields)
+    if ((_countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields) != _totalFields)
     {
-        Log->WriteLogNoTime("FAILED: One or more fields are not predicted. Conctact Developer to fix it.\n");
+        Log->WriteLogNoTime("FAILED: One or more fields are not parsed correctly. Conctact Developer to fix it.\n");
         return false;
     }
 
