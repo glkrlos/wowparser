@@ -405,7 +405,7 @@ bool module_parser::ParseBinaryFile()
                 Log->WriteLog("Total unsigned int Fields Predicted: '%u'\n", _countUIntFields);
 
             CreateCSVFile();
-            CreateDBCFile();
+            // CreateDBCFile();
         }
     }
 
