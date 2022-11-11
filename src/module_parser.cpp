@@ -182,7 +182,7 @@ bool module_parser::CreateCSVFile()
 
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        switch (_fieldTypes[currentField])
+        switch (_sFile.FormatedFieldTypes[currentField])
         {
             case type_FLOAT:  fprintf(output, "float"); break;
             case type_BOOL:   fprintf(output, "bool"); break;
@@ -201,7 +201,7 @@ bool module_parser::CreateCSVFile()
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+            if (_stringSize > 1 && _sFile.FormatedFieldTypes[currentField] == type_STRING)
             {
                 unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                 if (value)
@@ -233,13 +233,13 @@ bool module_parser::CreateCSVFile()
                     fprintf(output, "%s", outText.c_str());
                 }
             }
-            else if (_fieldTypes[currentField] == type_FLOAT)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
                 fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
-            else if (_fieldTypes[currentField] == type_BOOL)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
                 fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
-            else if (_fieldTypes[currentField] == type_INT)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
                 fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
-            else if (_fieldTypes[currentField] == type_UINT)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
                 fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
 
             if (currentField + 1 < _totalFields)
@@ -267,7 +267,7 @@ bool module_parser::CreateDBCFile()
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+            if (_stringSize > 1 && _sFile.FormatedFieldTypes[currentField] == type_STRING)
             {
                 unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                 if (value)
@@ -312,32 +312,32 @@ bool module_parser::CreateDBCFile()
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_fieldTypes[currentField] == type_FLOAT)
+            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
             {
                 float value = GetRecord(currentRecord).GetFloat(currentField);
                 fwrite(&value, 4, 1, output);
             }
-            else if (_fieldTypes[currentField] == type_BOOL)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
             {
                 unsigned int value = GetRecord(currentRecord).GetBool(currentField);
                 fwrite(&value, 4, 1, output);
             }
-            else if (_fieldTypes[currentField] == type_BYTE)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
             {
                 int value = GetRecord(currentRecord).GetByte(currentField);
                 fwrite(&value, 1, 1, output);
             }
-            else if (_fieldTypes[currentField] == type_UBYTE)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
             {
                 unsigned int value = GetRecord(currentRecord).GetByte(currentField);
                 fwrite(&value, 1, 1, output);
             }
-            else if (_fieldTypes[currentField] == type_INT)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
             {
                 int value = GetRecord(currentRecord).GetInt(currentField);
                 fwrite(&value, 4, 1, output);
             }
-            else if (_fieldTypes[currentField] == type_UINT)
+            else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
             {
                 unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                 fwrite(&value, 4, 1, output);
@@ -442,11 +442,11 @@ bool module_parser::PredictFieldTypes()
                 int isFloat2 = floatStringValue.find("#");
                 if (isFloat1 != -1 || isFloat2 != -1)
                 {
-                    _fieldTypes[currentField] = type_NONE;
+                    _sFile.FormatedFieldTypes[currentField] = type_NONE;
                     break;
                 }
 
-                _fieldTypes[currentField] = type_FLOAT;
+                _sFile.FormatedFieldTypes[currentField] = type_FLOAT;
             }
         }
     }
@@ -454,7 +454,7 @@ bool module_parser::PredictFieldTypes()
     // 02 - Bool System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT)
+        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -463,11 +463,11 @@ bool module_parser::PredictFieldTypes()
 
             if (intValue < 0 || intValue > 1)
             {
-                _fieldTypes[currentField] = type_NONE;
+                _sFile.FormatedFieldTypes[currentField] = type_NONE;
                 break;
             }
 
-            _fieldTypes[currentField] = type_BOOL;
+            _sFile.FormatedFieldTypes[currentField] = type_BOOL;
         }
     }
 
@@ -476,7 +476,7 @@ bool module_parser::PredictFieldTypes()
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL)
+            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_BOOL)
                 continue;
 
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -484,11 +484,11 @@ bool module_parser::PredictFieldTypes()
                 int intValue = GetRecord(currentRecord).GetUInt(currentField);
                 if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
                 {
-                    _fieldTypes[currentField] = type_INT;
+                    _sFile.FormatedFieldTypes[currentField] = type_INT;
                     break;
                 }
 
-                _fieldTypes[currentField] = type_STRING;
+                _sFile.FormatedFieldTypes[currentField] = type_STRING;
             }
         }
     }
@@ -496,7 +496,7 @@ bool module_parser::PredictFieldTypes()
     // 04 - Unsigned/Signed Int System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL || _fieldTypes[currentField] == type_STRING)
+        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_BOOL || _sFile.FormatedFieldTypes[currentField] == type_STRING)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -504,25 +504,25 @@ bool module_parser::PredictFieldTypes()
             int intValue = GetRecord(currentRecord).GetInt(currentField);
             if (intValue < 0)
             {
-                _fieldTypes[currentField] = type_INT;
+                _sFile.FormatedFieldTypes[currentField] = type_INT;
                 break;
             }
 
-            _fieldTypes[currentField] = type_UINT;
+            _sFile.FormatedFieldTypes[currentField] = type_UINT;
         }
     }
 
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_fieldTypes[currentField] == type_FLOAT)
+        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
             _countFloatFields++;
-        if (_fieldTypes[currentField] == type_STRING)
+        if (_sFile.FormatedFieldTypes[currentField] == type_STRING)
             _countStringFields++;
-        if (_fieldTypes[currentField] == type_BOOL)
+        if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
             _countBoolFields++;
-        if (_fieldTypes[currentField] == type_INT)
+        if (_sFile.FormatedFieldTypes[currentField] == type_INT)
             _countIntFields++;
-        if (_fieldTypes[currentField] == type_UINT)
+        if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
             _countUIntFields++;
     }
 

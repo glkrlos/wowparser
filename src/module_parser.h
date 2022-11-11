@@ -15,7 +15,6 @@ class module_parser
         ~module_parser()
         {
             _header.clear();
-            _fieldTypes.clear();
 
             if (_fileData)
             {
@@ -32,12 +31,6 @@ class module_parser
         bool ParseCSVFile();
         bool CheckStructure();
         bool PredictFieldTypes();
-        void SetFieldTypesToNONE()
-        {
-            _fieldTypes.clear();
-            for (unsigned int x = 0; x < _totalFields; x++)
-                _fieldTypes.push_back(type_NONE);
-        }
         bool IsPreFormatted() { return !_sFile.FormatedFieldTypes.empty(); }
         const char *GetFileName() { return _sFile.FileName.c_str(); }
         enumFileType GetFileType() { return _sFile.Type; }
@@ -111,6 +104,12 @@ class module_parser
         unsigned int HeaderGetUInt() { return *reinterpret_cast<unsigned int*>(_fileData + HeaderGetOffSet(4)); }
         unsigned int HeaderGetOffSet(size_t size) { return (_headerOffset + size) <= _fileSize ? (_headerOffset += size) - size : 0; }
 
+        void SetFieldTypesToNONE()
+        {
+            _sFile.FormatedFieldTypes.clear();
+            for (unsigned int x = 0; x < _totalFields; x++)
+                _sFile.FormatedFieldTypes.push_back(type_NONE);
+        }
         void SetFieldsOffset()
         {
             _fieldsOffset = new unsigned int[_totalFields];
@@ -118,7 +117,7 @@ class module_parser
             for (unsigned int i = 1; i < _totalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
-                if (_fieldTypes[i - 1] == type_BYTE)
+                if (_sFile.FormatedFieldTypes[i - 1] == type_BYTE)
                     _fieldsOffset[i] += 1;
                 else
                     _fieldsOffset[i] += 4;
@@ -182,8 +181,6 @@ class module_parser
         unsigned int _countBoolFields = 0;
         unsigned int _countIntFields = 0;
         unsigned int _countUIntFields = 0;
-
-        vector<enumFieldTypes> _fieldTypes;
 
         bool _FirstTimeGetHeader = true;
         bool _isASCIIFile = false;
