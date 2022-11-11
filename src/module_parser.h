@@ -10,6 +10,7 @@ class module_parser
         module_parser(structFile sFile)
         {
             _sFile = sFile;
+            _stringTexts = '\0';
         }
         ~module_parser()
         {
@@ -140,6 +141,30 @@ class module_parser
         };
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
+
+        bool CreateCSVFile();
+        bool CreateDBCFile();
+        void SetUniqueStringTexts(string Text)
+        {
+            if (!Text.empty() && !GetUniqueStringTextsPosition(Text))
+            {
+                unsigned int currentStringPos = _stringTexts.size();
+                _stringTexts.append(Text + '\0');
+                //_stringSize += Text.size() + 1;
+                _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
+            }
+        }
+        unsigned int GetUniqueStringTextsPosition(string Text)
+        {
+            if (!Text.empty())
+            {
+                map<string, unsigned int>::iterator it = _uniqueStringTexts.find(Text);
+                if (it != _uniqueStringTexts.end())
+                    return (it->second);
+            }
+
+            return 0;
+        }
     protected:
         structFile _sFile;
 
@@ -173,5 +198,8 @@ class module_parser
         unsigned int *_fieldsOffset = NULL;
         unsigned char *_dataTable = NULL;
         unsigned char *_stringTable = NULL;
+
+        map<string, unsigned int> _uniqueStringTexts;
+        string _stringTexts;
 };
 #endif

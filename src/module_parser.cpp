@@ -166,6 +166,201 @@ void module_parser::ParseFile()
         ParseBinaryFile();
 }
 
+bool module_parser::CreateCSVFile()
+{
+    string outputFileNameCSV = GetFileName();
+    outputFileNameCSV.append(".csv");
+    Log->WriteLog("Creating CSV file '%s'....", outputFileNameCSV.c_str());
+
+    FILE *output = fopen(outputFileNameCSV.c_str(), "w");
+    if (!output)
+    {
+        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        Log->WriteLog("\n");
+        return false;
+    }
+
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+    {
+        switch (_fieldTypes[currentField])
+        {
+            case type_FLOAT:  fprintf(output, "float"); break;
+            case type_BOOL:   fprintf(output, "bool"); break;
+            case type_STRING: fprintf(output, "string"); break;
+            case type_INT:    fprintf(output, "int"); break;
+            case type_UINT:
+            default:          fprintf(output, "uint"); break;
+        }
+
+        if (currentField + 1 < _totalFields)
+            fprintf(output, ",");
+    }
+    fprintf(output, "\n");
+
+    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                if (value)
+                {
+                    string outText = "\"";
+                    for (unsigned int x = value; x < _stringSize; x++)
+                    {
+                        if (!_stringTable[x])
+                            break;
+
+                        if (_stringTable[x] == '"')
+                            outText.append("\"");
+
+                        if (_stringTable[x] == '\r')
+                        {
+                            outText.append("\\r");
+                            continue;
+                        }
+
+                        if (_stringTable[x] == '\n')
+                        {
+                            outText.append("\\n");
+                            continue;
+                        }
+
+                        outText.append(Shared->ToStr(_stringTable[x]));
+                    }
+                    outText.append("\"");
+                    fprintf(output, "%s", outText.c_str());
+                }
+            }
+            else if (_fieldTypes[currentField] == type_FLOAT)
+                fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
+            else if (_fieldTypes[currentField] == type_BOOL)
+                fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
+            else if (_fieldTypes[currentField] == type_INT)
+                fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
+            else if (_fieldTypes[currentField] == type_UINT)
+                fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
+
+            if (currentField + 1 < _totalFields)
+                fprintf(output, ",");
+        }
+
+        if (currentRecord + 1 < _totalRecords)
+            fprintf(output, "\n");
+    }
+
+    fclose(output);
+
+    Log->WriteLog("DONE.\n");
+
+    return true;
+}
+
+bool module_parser::CreateDBCFile()
+{
+    string outputFileNameDBC = GetFileName();
+    outputFileNameDBC.append(".dbc");
+    Log->WriteLog("Creating DBC file '%s'....", outputFileNameDBC.c_str());
+
+    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                if (value)
+                {
+                    string outText = "";
+                    for (unsigned int x = value; x < _stringSize; x++)
+                    {
+                        if (!_stringTable[x])
+                            break;
+
+                        outText.append(Shared->ToStr(_stringTable[x]));
+                    }
+
+                    SetUniqueStringTexts(outText);
+                }
+            }
+        }
+    }
+
+    Log->WriteLog("%u, %u\n", _stringTexts.size(), _stringSize);
+
+    if (_stringTexts.size() != _stringSize)
+    {
+        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        Log->WriteLog("\n");
+        return false;
+    }
+
+    FILE *output;
+    fopen_s(&output, outputFileNameDBC.c_str(), "wb");
+    if (!output)
+    {
+        printf("ERROR: '%s': Can't create DBC file.\n", outputFileNameDBC.c_str());
+        return false;
+    }
+
+    fwrite("WDBC", 4, 1, output);
+    fwrite(&_totalRecords, sizeof(_totalRecords), 1, output);
+    fwrite(&_totalFields, sizeof(_totalFields), 1, output);
+    fwrite(&_recordSize, sizeof(_recordSize), 1, output);
+    fwrite(&_stringSize, sizeof(_stringSize), 1, output);
+
+    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+    {
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_fieldTypes[currentField] == type_FLOAT)
+            {
+                float value = GetRecord(currentRecord).GetFloat(currentField);
+                fwrite(&value, 4, 1, output);
+            }
+            else if (_fieldTypes[currentField] == type_BOOL)
+            {
+                unsigned int value = GetRecord(currentRecord).GetBool(currentField);
+                fwrite(&value, 4, 1, output);
+            }
+            else if (_fieldTypes[currentField] == type_BYTE)
+            {
+                int value = GetRecord(currentRecord).GetByte(currentField);
+                fwrite(&value, 1, 1, output);
+            }
+            else if (_fieldTypes[currentField] == type_UBYTE)
+            {
+                unsigned int value = GetRecord(currentRecord).GetByte(currentField);
+                fwrite(&value, 1, 1, output);
+            }
+            else if (_fieldTypes[currentField] == type_INT)
+            {
+                int value = GetRecord(currentRecord).GetInt(currentField);
+                fwrite(&value, 4, 1, output);
+            }
+            else if (_fieldTypes[currentField] == type_UINT)
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                fwrite(&value, 4, 1, output);
+            }
+            else
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                fwrite(&value, 4, 1, output);
+            }
+        }
+    }
+
+    fwrite(_stringTexts.c_str(), _stringTexts.size(), 1, output);
+
+    fclose(output);
+
+    Log->WriteLog("DONE.\n");
+
+    return true;
+}
+
 bool module_parser::ParseBinaryFile()
 {
     if (IsPreFormatted())
@@ -211,88 +406,8 @@ bool module_parser::ParseBinaryFile()
             if (_countUIntFields)
                 Log->WriteLog("Total unsigned int Fields Predicted: '%u'\n", _countUIntFields);
 
-            string outputFileName = GetFileName();
-            outputFileName.append(".csv");
-            FILE *output = fopen(outputFileName.c_str(), "w");
-            if (!output)
-            {
-                Log->WriteLog("ERROR: File cannot be created '%s'.\n", outputFileName.c_str());
-                return false;
-            }
-
-            for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-            {
-                switch (_fieldTypes[currentField])
-                {
-                case type_FLOAT:  fprintf(output, "float"); break;
-                case type_BOOL:   fprintf(output, "bool"); break;
-                case type_STRING: fprintf(output, "string"); break;
-                case type_INT:    fprintf(output, "int"); break;
-                case type_UINT:
-                default:          fprintf(output, "uint"); break;
-                }
-
-                if (currentField + 1 < _totalFields)
-                    fprintf(output, ",");
-            }
-            fprintf(output, "\n");
-
-            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-            {
-                for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-                {
-                    if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
-                    {
-                        unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
-                        if (value)
-                        {
-                            string outText = "\"";
-                            for (unsigned int x = value; x < _stringSize; x++)
-                            {
-                                if (!_stringTable[x])
-                                    break;
-
-                                if (_stringTable[x] == '"')
-                                    outText.append("\"");
-
-                                if (_stringTable[x] == '\r')
-                                {
-                                    outText.append("\\r");
-                                    continue;
-                                }
-
-                                if (_stringTable[x] == '\n')
-                                {
-                                    outText.append("\\n");
-                                    continue;
-                                }
-
-                                outText.append(Shared->ToStr(_stringTable[x]));
-                            }
-                            outText.append("\"");
-                            fprintf(output, "%s", outText.c_str());
-                        }
-                    }
-                    else if (_fieldTypes[currentField] == type_FLOAT)
-                        fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
-                    else if (_fieldTypes[currentField] == type_BOOL)
-                        fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
-                    else if (_fieldTypes[currentField] == type_INT)
-                        fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
-                    else if (_fieldTypes[currentField] == type_UINT)
-                        fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
-
-                    if (currentField + 1 < _totalFields)
-                        fprintf(output, ",");
-                }
-
-                if (currentRecord + 1 < _totalRecords)
-                    fprintf(output, "\n");
-            }
-
-            fclose(output);
-
-            Log->WriteLog("CSV file created: '%s'.\n", outputFileName.c_str());
+            CreateCSVFile();
+            CreateDBCFile();
         }
     }
 
