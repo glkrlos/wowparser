@@ -210,6 +210,89 @@ bool module_parser::ParseBinaryFile()
 
             if (_countUIntFields)
                 Log->WriteLog("Total unsigned int Fields Predicted: '%u'\n", _countUIntFields);
+
+            string outputFileName = GetFileName();
+            outputFileName.append(".csv");
+            FILE *output = fopen(outputFileName.c_str(), "w");
+            if (!output)
+            {
+                Log->WriteLog("ERROR: File cannot be created '%s'.\n", outputFileName.c_str());
+                return false;
+            }
+
+            for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+            {
+                switch (_fieldTypes[currentField])
+                {
+                case type_FLOAT:  fprintf(output, "float"); break;
+                case type_BOOL:   fprintf(output, "bool"); break;
+                case type_STRING: fprintf(output, "string"); break;
+                case type_INT:    fprintf(output, "int"); break;
+                case type_UINT:
+                default:          fprintf(output, "uint"); break;
+                }
+
+                if (currentField + 1 < _totalFields)
+                    fprintf(output, ",");
+            }
+            fprintf(output, "\n");
+
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+            {
+                for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+                {
+                    if (_stringSize > 1 && _fieldTypes[currentField] == type_STRING)
+                    {
+                        unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                        if (value)
+                        {
+                            string outText = "\"";
+                            for (unsigned int x = value; x < _stringSize; x++)
+                            {
+                                if (!_stringTable[x])
+                                    break;
+
+                                if (_stringTable[x] == '"')
+                                    outText.append("\"");
+
+                                if (_stringTable[x] == '\r')
+                                {
+                                    outText.append("\\r");
+                                    continue;
+                                }
+
+                                if (_stringTable[x] == '\n')
+                                {
+                                    outText.append("\\n");
+                                    continue;
+                                }
+
+                                outText.append(Shared->ToStr(_stringTable[x]));
+                            }
+                            outText.append("\"");
+                            fprintf(output, "%s", outText.c_str());
+                        }
+                    }
+                    else if (_fieldTypes[currentField] == type_FLOAT)
+                        fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
+                    else if (_fieldTypes[currentField] == type_BOOL)
+                        fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
+                    else if (_fieldTypes[currentField] == type_INT)
+                        fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
+                    else if (_fieldTypes[currentField] == type_UINT)
+                        fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
+
+                    if (currentField + 1 < _totalFields)
+                        fprintf(output, ",");
+                }
+
+                if (currentRecord + 1 < _totalRecords)
+                    fprintf(output, "\n");
+            }
+
+            fclose(output);
+
+            Log->WriteLog("CSV file created: '%s'.\n", outputFileName.c_str());
         }
     }
 
