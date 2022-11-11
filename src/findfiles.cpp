@@ -25,7 +25,7 @@ void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
 
     for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
-        auto_ptr<module_parser> Parser(new module_parser(FileName->first.c_str(), FileName->second));
+        auto_ptr<module_parser> Parser(new module_parser(FileName->second));
         Parser->Load();
 
         bar.step();
@@ -89,6 +89,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                     if (Shared->CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
                         structFile File;
+                        File.FileName = dirName;
                         File.Structure = structure;
                         File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
                         File.isRecursivelySearched = recursive;
@@ -101,6 +102,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
             else if (Shared->CompareTexts(lowerCaseOriginalFileName, filename))
             {
                 structFile File;
+                File.FileName = dirName;
                 File.Structure = structure;
                 File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
                 File.isRecursivelySearched = recursive;
@@ -166,7 +168,7 @@ void cFindFiles::PrintAllFileNamesByFileType()
                     First = false;
                 }
 
-                Log->WriteLog("File: '%s'", current->first.c_str());
+                Log->WriteLog("File: '%s'", current->second.FileName.c_str());
 
                 if (!current->second.Structure.empty())
                     Log->WriteLogNoTime(", Structure: '%s'", current->second.Structure.c_str());

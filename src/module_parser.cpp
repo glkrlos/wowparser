@@ -2,14 +2,14 @@
 
 bool module_parser::Load()
 {
-    _inputFile = fopen(_fileName, "rb");
+    _inputFile = fopen(GetFileName(), "rb");
     if (!_inputFile)
     {
-        Log->WriteLog("ERROR: Can't open file '%s'.\n", _fileName);
+        Log->WriteLog("ERROR: Can't open file '%s'.\n", GetFileName());
         return false;
     }
 
-    Log->WriteLog("Reading file '%s'...", _fileName);
+    Log->WriteLog("Reading file '%s'... ", GetFileName());
 
     fseek(_inputFile, 0, SEEK_END);
     _fileSize = ftell(_inputFile);
@@ -35,11 +35,11 @@ bool module_parser::Load()
         return false;
     }
     else if (FileIsASCII() == ASCII_FILE)
-        Log->WriteLogNoTime("ASCII");
+        Log->WriteLogNoTime("");
     else
-        Log->WriteLogNoTime("BINARY");
+        Log->WriteLogNoTime("");
 
-    Log->WriteLogNoTime("\n");
+    Log->WriteLogNoTime("DONE.\n");
 
     return true;
 }

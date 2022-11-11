@@ -23,9 +23,8 @@ enum enumErrorTypes
 class module_parser
 {
     public:
-        module_parser(const char *fileName, structFile &sFile)
+        module_parser(structFile &sFile)
         {
-            _fileName = fileName;
             _sFile = sFile;
         }
         ~module_parser()
@@ -40,6 +39,7 @@ class module_parser
         }
         bool Load();
     private:
+        const char *GetFileName() { return _sFile.FileName.c_str(); }
         enumErrorTypes FileIsASCII()
         {
             if (!_fileData)
@@ -59,7 +59,6 @@ class module_parser
     protected:
         structFile _sFile;
         FILE *_inputFile;
-        const char *_fileName = NULL;
         long _fileSize = 0;
         unsigned char *_fileData = NULL;
 };

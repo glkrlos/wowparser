@@ -29,11 +29,13 @@ struct structFile
     public:
         structFile()
         {
+            FileName.clear();
             Type = unkFile;
             Structure.clear();
             FormatedFieldTypes.clear();
         }
 
+        string FileName;
         enumFileType Type;
         string Structure;
         bool isRecursivelySearched = false;
