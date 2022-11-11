@@ -440,7 +440,8 @@ bool module_parser::PredictFieldTypes()
                 string floatStringValue = Shared->ToStr(floatValue);
                 int isFloat1 = floatStringValue.find("e");
                 int isFloat2 = floatStringValue.find("#");
-                if (isFloat1 != -1 || isFloat2 != -1)
+                int isFloat3 = floatStringValue.find("-nan");
+                if (isFloat1 != -1 || isFloat2 != -1 || isFloat3 != -1)
                 {
                     _sFile.FormatedFieldTypes[currentField] = type_NONE;
                     break;
