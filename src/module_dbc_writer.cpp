@@ -28,7 +28,7 @@ void DBC_Writer::CreateDBC()
         printf("ERROR: '%s': Can't create DBC file.\n", outFileName.c_str());
         return;
     }
-
+/*
     structDBCHeader DBCHeader;
     DBCHeader.header[0] = 'W';
     DBCHeader.header[1] = 'D';
@@ -64,7 +64,7 @@ void DBC_Writer::CreateDBC()
             }
         }
     }
-
+*/
     fwrite(_file->GetStringTexts(), _file->GetStringSize(), 1, output);
 
     fclose(output);

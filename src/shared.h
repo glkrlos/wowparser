@@ -23,14 +23,14 @@ enum enumFileType
     csvFile = 5,
     totalFileTypes = 6,
 
-    wdbitemcache = 7,
-    wdbcreaturecache = 8,
-    wdbgameobjectcache = 9,
-    wdbitemnamecache = 10,
-    wdbitemtextcache = 11,
-    wdbnpccache = 12,
-    wdbpagetextcache = 13,
-    wdbquestcache = 14,
+    wdbitemcacheFile = 7,
+    wdbcreaturecacheFile = 8,
+    wdbgameobjectcacheFile = 9,
+    wdbitemnamecacheFile = 10,
+    wdbitemtextcacheFile = 11,
+    wdbnpccacheFile = 12,
+    wdbpagetextcacheFile = 13,
+    wdbquestcacheFile = 14,
 };
 
 struct structFile
@@ -53,67 +53,6 @@ struct structFile
         vector<enumFieldTypes> FormatedFieldTypes;
         unsigned int FormatedTotalFields = 0;
         unsigned int FormatedRecordSize = 0;
-};
-
-struct structWDBHeader
-{
-    /// 24 bytes del header + 8 bytes del primer record y su el tamaño del record
-    char header[4];
-    unsigned int revision;
-    char locale[4];
-    unsigned int maxRecordSize;
-    unsigned int unk1;
-    unsigned int unk2;
-
-    /*
-        Para cada registro:
-
-        unsigned int entry;
-        unsigned int recordSize;
-        unsigned char *restOfrecord; <- aqui hay que saber el formato para leerlo
-    */
-
-    /*
-        BDIW itemcache.wdb -> se abre de forma especial por que dependen de unos bytes las veces que lee otros bytes
-        BOMW creaturecache.wdb
-        BOGW gameobjectcache.wdb
-        BDNW itemnamecache.wdb
-        XTIW itemtextcache.wdb
-        CPNW npccache.wdb
-        XTPW pagetextcache.wdb
-        TSQW questcache.wdb
-    */
-};
-
-struct structDBCADBHeader
-{
-    /// 20 bytes del header
-    char header[4];             // WDBC dbc, WCH2 adb
-    unsigned int totalRecords;
-    unsigned int totalFields;
-    unsigned int recordSize;
-    unsigned int stringSize;
-};
-
-struct structDB2Header
-{
-    /// 32 bytes del header o 48 bytes si el build > 12880
-    char header[4];             // WDB2 db2
-    unsigned int totalRecords;
-    unsigned int totalFields;
-    unsigned int recordSize;
-    unsigned int stringSize;
-    unsigned int tableHash;
-    unsigned int build;
-    unsigned int unk1;
-
-    /// > 12880
-    /// int diff = maxIndexDB2 - unk2DB2 + 1;
-    /// fseek(input, diff * 4 + diff * 2, SEEK_CUR); // diff * 4: an index for rows, diff * 2: a memory allocation bank
-    unsigned int unk2;
-    unsigned int maxIndex;
-    unsigned int locales;
-    unsigned int unk3;
 };
 
 template <typename T> class CSingleton

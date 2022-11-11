@@ -21,7 +21,8 @@ void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
     for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
         auto_ptr<module_parser> Parser(new module_parser(FileName->second));
-        Parser->Load();
+        if (Parser->Load())
+            Parser->ParseFile();
 
         bar.step();
     }
@@ -81,6 +82,9 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                         File.isRecursivelySearched = recursive;
                         File.isSearchedByExtension = true;
                         File.XMLFileID = xmlFileID;
+                        File.FormatedFieldTypes = Shared->GetFormatedFieldTypes(structure);
+                        File.FormatedRecordSize = Shared->GetFormatedRecordSize(structure);
+                        File.FormatedTotalFields = Shared->GetFormatedTotalFields(structure);
                         AddFileToListIfNotExist(dirName, File);
                     }
                 }
@@ -94,6 +98,9 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 File.isRecursivelySearched = recursive;
                 File.isSearchedByExtension = false;
                 File.XMLFileID = xmlFileID;
+                File.FormatedFieldTypes = Shared->GetFormatedFieldTypes(structure);
+                File.FormatedRecordSize = Shared->GetFormatedRecordSize(structure);
+                File.FormatedTotalFields = Shared->GetFormatedTotalFields(structure);
                 AddFileToListIfNotExist(dirName, File);
             }
         }
