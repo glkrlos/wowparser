@@ -117,7 +117,7 @@ class module_parser
             for (unsigned int i = 1; i < _totalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
-                if (_sFile.FormatedFieldTypes[i - 1] == type_BYTE)
+                if (_sFile.FormatedFieldTypes[i - 1] == type_BYTE || _sFile.FormatedFieldTypes[i - 1] == type_UBYTE)
                     _fieldsOffset[i] += 1;
                 else
                     _fieldsOffset[i] += 4;
