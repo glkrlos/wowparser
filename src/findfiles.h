@@ -29,7 +29,6 @@ class cFindFiles
         void AddFileToListIfNotExist(string fileName, structFile File);
     protected:
         map<string, structFile> fileNames;
-        //vector<unsigned int> countFiles;
 };
 
 #define FindFiles CSingleton<cFindFiles>::Instance()

@@ -97,18 +97,18 @@ class cShared
             {
                 switch (structure[x])
                 {
-                case 'X':   // unk byte
-                case 'b':   // byte
-                case 's':   // string
-                case 'f':   // float
-                case 'd':   // int
-                case 'n':   // int
-                case 'x':   // unk int
-                case 'i':   // int
-                case 'u':   // unsigned int
-                    break;
-                default:
-                    return false;
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                    case 's':   // string
+                    case 'f':   // float
+                    case 'd':   // int
+                    case 'n':   // int
+                    case 'x':   // unk int
+                    case 'i':   // int
+                    case 'u':   // unsigned int
+                        break;
+                    default:
+                        return false;
                 }
             }
 

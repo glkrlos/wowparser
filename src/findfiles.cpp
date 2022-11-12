@@ -2,16 +2,6 @@
 
 cFindFiles::cFindFiles()
 {
-    /*
-    countFiles.clear();
-
-    /// Se tiene que crear cada registro para evitar un crash y establecer el contador a 0 que no existan errores de conteo
-    for (unsigned int x = 0; x < totalFileTypes; x++)
-    {
-        countFiles.push_back(x);
-        countFiles[x] = 0;
-    }
-    */
 }
 
 void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
@@ -202,9 +192,6 @@ void cFindFiles::AddFileToListIfNotExist(string fileName, structFile File)
     }
 
     fileNames.insert(pair<string, structFile>(fileName, File));
-
-    // Contamos el numero de registros de cada tipo
-    // countFiles[File.Type]++;
 
     return;
 }
