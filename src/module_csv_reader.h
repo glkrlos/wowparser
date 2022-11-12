@@ -98,6 +98,14 @@ class CSV_Reader : public SaveFileInfo
         map<string, structFileData> _fileData;
         vector<enumFieldTypes> _fieldTypes;
         map<unsigned int, string> _mapRecordsData;
+
+        unsigned int _countFloatFields = 0;
+        unsigned int _countStringFields = 0;
+        unsigned int _countBoolFields = 0;
+        unsigned int _countByteFields = 0;
+        unsigned int _countUByteFields = 0;
+        unsigned int _countIntFields = 0;
+        unsigned int _countUIntFields = 0;
 };
 
 #endif

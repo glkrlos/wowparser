@@ -83,7 +83,41 @@ bool CSV_Reader::ParseFile()
 
 void CSV_Reader::PrintResults()
 {
+    for (auto it = _fieldTypes.begin(); it != _fieldTypes.end(); ++it)
+    {
+        switch (*it)
+        {
+            case type_FLOAT:    _countFloatFields++; break;
+            case type_STRING:   _countStringFields++; break;
+            case type_BOOL:     _countBoolFields++; break;
+            case type_BYTE:     _countByteFields++; break;
+            case type_UBYTE:    _countUByteFields++; break;
+            case type_INT:      _countIntFields++; break;
+            case type_UINT:     _countUIntFields++; break;
+            default: break;
+        }
+    }
 
+    if (_countFloatFields)
+        Log->WriteLog("Total float Fields: '%u'\n", _countFloatFields);
+
+    if (_countStringFields)
+        Log->WriteLog("Total string Fields: '%u'\n", _countStringFields);
+
+    if (_countBoolFields)
+        Log->WriteLog("Total bool Fields: '%u'\n", _countBoolFields);
+
+    if (_countByteFields)
+        Log->WriteLog("Total byte Fields: '%u'\n", _countByteFields);
+
+    if (_countUByteFields)
+        Log->WriteLog("Total unsigned byte Fields: '%u'\n", _countUByteFields);
+
+    if (_countIntFields)
+        Log->WriteLog("Total int Fields: '%u'\n", _countIntFields);
+
+    if (_countUIntFields)
+        Log->WriteLog("Total unsigned int Fields: '%u'\n", _countUIntFields);
 }
 
 /*map<unsigned int, string> CSV_Reader::GetFields(string text)

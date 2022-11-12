@@ -458,12 +458,8 @@ bool module_parser::ParseCSVFile()
 
     const auto_ptr<CSV_Reader> CSVReader(new CSV_Reader(GetFileName()));
     if (CSVReader->LoadCSVFile())
-    {
         if (CSVReader->ParseFile())
-        {
-            // imprimir resultados
-        }
-    }
+            CSVReader->PrintResults();
 
     Log->WriteLog("\n");
 
