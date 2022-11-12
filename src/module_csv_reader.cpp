@@ -305,14 +305,14 @@ const char* CSV_Reader::GetFieldTypeName(enumFieldTypes fieldType)
 {
     switch (fieldType)
     {
-    case type_STRING:   return "string";
-    case type_FLOAT:    return "float";
-    case type_BYTE:     return "byte";
-    case type_UBYTE:    return "unsigned byte";
-    case type_INT:      return "int";
-    case type_UINT:     return "unsigned int";
-    case type_BOOL:
-    default:            return "bool";
+        case type_STRING:   return "string";
+        case type_FLOAT:    return "float";
+        case type_BYTE:     return "byte";
+        case type_UBYTE:    return "unsigned byte";
+        case type_INT:      return "int";
+        case type_UINT:     return "unsigned int";
+        case type_BOOL:
+        default:            return "bool";
     }
 }
 
