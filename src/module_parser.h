@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
+#include "module_csv_reader.h"
 
 class module_parser
 {

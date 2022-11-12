@@ -456,7 +456,15 @@ bool module_parser::ParseCSVFile()
 {
     if (_inputFile) fclose(_inputFile);
 
-    Log->WriteLog("Not implemented yet.\n");
+    const auto_ptr<CSV_Reader> CSVReader(new CSV_Reader(GetFileName()));
+    if (CSVReader->LoadCSVFile())
+    {
+        if (CSVReader->ParseFile())
+        {
+            // imprimir resultados
+        }
+    }
+
     Log->WriteLog("\n");
 
     return true;

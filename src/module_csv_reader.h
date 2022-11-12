@@ -79,8 +79,10 @@ class CSV_Reader : public SaveFileInfo
         CSV_Reader(const char *);
         ~CSV_Reader();
         bool LoadCSVFile();
+        bool ParseFile();
+        void PrintResults();
     private:
-        map<unsigned int, string> GetFields(string);
+        // map<unsigned int, string> GetFields(string);
         bool ExtractFields(string, map<unsigned int, string> &);
 
         bool SetFieldTypes(string);

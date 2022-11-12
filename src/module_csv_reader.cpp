@@ -26,13 +26,13 @@ CSV_Reader::~CSV_Reader()
 
 bool CSV_Reader::LoadCSVFile()
 {
-    Log->WriteLog("Reading file '%s'... ", _fileName);
+    Log->WriteLog("Reloading '%s' as text file... ", _fileName);
 
     // Abrimos el Archivo como solo lectura
     ifstream input(_fileName, ifstream::in);
     if (!input.is_open())
     {
-        Log->WriteLogNoTime("FAILED: Unable to open file.\n", _fileName);
+        Log->WriteLogNoTime("FAILED: Unable to reopen file.\n", _fileName);
         Log->WriteLog("\n");
         return false;
     }
@@ -64,25 +64,35 @@ bool CSV_Reader::LoadCSVFile()
         return false;
     }
 
-    Log->WriteLog("DONE\n");
-
-    Log->WriteLog("Parsing file... \n");
-    if (!CheckFieldsOfEachRecordAndSaveAllData())
-        return false;
-
-    Log->WriteLog("DONE\n");
-
+    Log->WriteLogNoTime("DONE.\n");
 
     return true;
 }
 
-map<unsigned int, string> CSV_Reader::GetFields(string text)
+bool CSV_Reader::ParseFile()
+{
+    Log->WriteLog("Parsing CSV file... ");
+
+    if (!CheckFieldsOfEachRecordAndSaveAllData())
+        return false;
+
+    Log->WriteLogNoTime("DONE.\n");
+
+    return true;
+}
+
+void CSV_Reader::PrintResults()
+{
+
+}
+
+/*map<unsigned int, string> CSV_Reader::GetFields(string text)
 {
     map<unsigned int, string> mapFields;
     ExtractFields(text, mapFields);
 
     return mapFields;
-}
+}*/
 
 bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &mapFields)
 {
@@ -127,14 +137,12 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
                 unsigned int min = x;
                 unsigned int max = originalText.size() < 30 ? originalText.size() : 30;
                 Log->WriteLogNoTime("FAILED: Unexpected start of string in field '%u' Expected ',' at row %u before '%s'\n", mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
-                Log->WriteLog("\n");
                 return false;
             }
 
             if (isFirstRecord && isLastRecord)
             {
                 Log->WriteLogNoTime("FAILED: Missing \" of string at first field. If you want to put an empty text just leave it empty.\n");
-                Log->WriteLog("\n");
                 // Puede ser un warning y se agrega el texto y se continua con el for
                 // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
                 // continue;
@@ -144,7 +152,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
             if (!isFirstRecord && isLastRecord)
             {
                 Log->WriteLogNoTime("FAILED: Missing \" of string at last field (%u). If you want to put an empty text just leave it empty.\n", mapFields.size() + 1);
-                Log->WriteLog("\n");
                 // Puede ser un warning y se agrega el texto y se continua con el for
                 // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
                 // continue;
@@ -170,7 +177,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
                         unsigned int min = _temp < 0 ? 0 : _temp;
                         unsigned int max = z - min + 1;
                         Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at row %u after '%s'\n", mapFields.size() + 1, z + 2, originalText.substr(min, max).c_str());
-                        Log->WriteLog("\n");
                         return false;
                     }
 
@@ -205,7 +211,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
                     unsigned int min = _temp < 0 ? 0 : _temp;
                     unsigned int max = originalText.size() - _temp;
                     Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
-                    Log->WriteLog("\n");
                     return false;
                 }
             }
@@ -233,11 +238,13 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
     if (FirstLine.empty())
     {
         Log->WriteLogNoTime("FAILED: First line can't be empty. Must contain field types with comma separated like: int,uint,float,ufloat,byte,ubyte,string,bool\n");
-        Log->WriteLog("\n");
         return false;
     }
 
-    auto fieldNames = GetFields(FirstLine);
+    map<unsigned int, string> fieldNames;
+
+    if (!ExtractFields(FirstLine, fieldNames))
+        return false;
 
     for (auto it = fieldNames.begin(); it != fieldNames.end(); ++it)
     {
@@ -279,13 +286,11 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
         else if (it->second.empty())
         {
             Log->WriteLogNoTime("FAILED: Name of field '%u' can't be empty.\n", it->first + 1);
-            Log->WriteLog("\n");
             return false;
         }
         else
         {
             Log->WriteLogNoTime("FAILED: In Field '%u' Unknown type '%s'.\n", it->first + 1, it->second.c_str());
-            Log->WriteLog("\n");
             return false;
         }
     }
@@ -341,7 +346,6 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     if (fieldValue.empty())
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't be empty. If you want to leave it empty, put value of '0' instead.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -351,7 +355,6 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     if (!isFloat && DotFirst != -1)
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contain dot symbol '.'\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -360,28 +363,24 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
         if (DotFirst != -1 && DotSecond != -1 && DotFirst != DotSecond)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contains more than one dot symbol '.'\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == 0 && (fieldValue.size() - 1) == 0)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be the only character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == 0)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be at the start of field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == (fieldValue.size() - 1))
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
     }
@@ -392,7 +391,6 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     if ((isBool || isUnsigned) && NegativeFirst != -1)
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contain negative symbol '-' in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        return false;
     }
 
     if (!isBool && !isUnsigned)
@@ -400,28 +398,24 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
         if (NegativeFirst != -1 && NegativeSecond != -1 && NegativeFirst != NegativeSecond)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contains more than one negative symbol '-' in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst > 0)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' only can be at the start of field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst == 0 && (fieldValue.size() - 1) == 0)
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' can't be the only character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst == (fieldValue.size() - 1))
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-            Log->WriteLog("\n");
             return false;
         }
     }
@@ -438,7 +432,6 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
             continue;
 
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Contains a non numeric value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
 
         return false;
     }
@@ -448,21 +441,18 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     if (fieldType == type_BOOL && (testValue < 0 || testValue > 1))
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only '0' or '1'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
         return false;
     }
 
     if (fieldType == type_BYTE && (testValue < -127 || testValue > 255))
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only between '-127' and '127'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
         return false;
     }
 
     if (fieldType == type_UBYTE && (testValue < 0 || testValue > 255))
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only between '0' and '255'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-        Log->WriteLog("\n");
         return false;
     }
 
@@ -475,11 +465,14 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
     vector<structRecord> Records;
     for (auto itRecords = _mapRecordsData.begin(); itRecords != _mapRecordsData.end(); itRecords++, currentRecord++)
     {
-        map<unsigned int, string> fieldsOfCurrentRecord = GetFields(itRecords->second);
+        map<unsigned int, string> fieldsOfCurrentRecord;
+
+        if (!ExtractFields(itRecords->second, fieldsOfCurrentRecord))
+            return false;
+
         if (fieldsOfCurrentRecord.size() != _totalFields)
         {
             Log->WriteLogNoTime("FAILED: Expected '%u' fields not '%u' fields in line '%u'.\n", _totalFields, fieldsOfCurrentRecord.size(), itRecords->first + 1);
-            Log->WriteLog("\n");
             return false;
         }
 
