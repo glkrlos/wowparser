@@ -4,20 +4,22 @@
 #include "pch.h"
 #include "shared.h"
 
-struct structRecord
+struct structField
 {
-    enumFieldTypes fieldType;
-    string fieldValue;
+    unsigned int ID;
+    enumFieldTypes Type;
+    string Value;
 };
 
-struct structFileInfo
+struct structRecord
 {
-    const char* fileName;
-    unsigned int recordSize;
-    unsigned int totalRecords;
-    unsigned int totalFields;
-    unsigned int stringSize;
-    string stringTexts;
+    unsigned int ID;
+    vector<structField> Field;
+};
+
+struct structFileData
+{
+    vector<structRecord> Record;
 };
 
 class SaveFileInfo
@@ -25,20 +27,16 @@ class SaveFileInfo
     public:
         SaveFileInfo()
         {
-            _structFileInfo.stringTexts = '\0';
-            _structFileInfo.stringSize = 1;
+            _stringTexts = '\0';
+            _stringSize = 1;
         }
-        void SetFileName(const char *fileName) { _structFileInfo.fileName = fileName; }
-        void SetRecordSize(unsigned int recordSize) { _structFileInfo.recordSize = recordSize; }
-        void SetTotalFields(unsigned int totalFields) { _structFileInfo.totalFields = totalFields; }
-        void SetTotalRecords(unsigned int totalRecords) { _structFileInfo.totalRecords = totalRecords; }
         void SetUniqueStringTexts(string Text)
         {
             if (!Text.empty() && !GetUniqueStringTextsPosition(Text))
             {
-                unsigned int currentStringPos = _structFileInfo.stringTexts.size();
-                _structFileInfo.stringTexts.append(Text + '\0');
-                _structFileInfo.stringSize += Text.size() + 1;
+                unsigned int currentStringPos = _stringTexts.size();
+                _stringTexts.append(Text + '\0');
+                _stringSize += Text.size() + 1;
                 _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
             }
         }
@@ -56,20 +54,21 @@ class SaveFileInfo
         void GetUniqueStringTexts()
         {
             string Text = "";
-            for (unsigned int currentChar = 1; currentChar < _structFileInfo.stringTexts.size(); currentChar++)
+            for (unsigned int currentChar = 1; currentChar < _stringTexts.size(); currentChar++)
             {
-                if (_structFileInfo.stringTexts[currentChar] == '\0')
+                if (_stringTexts[currentChar] == '\0')
                 {
                     SetUniqueStringTexts(Text);
                     Text.clear();
                     continue;
                 }
 
-                Text += _structFileInfo.stringTexts[currentChar];
+                Text += _stringTexts[currentChar];
             }
         }
     protected:
-        structFileInfo _structFileInfo;
+        unsigned int _stringSize;
+        string _stringTexts;
         map<string, unsigned int> _uniqueStringTexts;
 };
 
@@ -80,20 +79,23 @@ class CSV_Reader : public SaveFileInfo
         ~CSV_Reader();
         bool LoadCSVFile();
     private:
-        bool ExtractFields(string, map<unsigned int, string> &);
         map<unsigned int, string> GetFields(string);
+        bool ExtractFields(string, map<unsigned int, string> &);
+
         bool SetFieldTypes(string);
         enumFieldTypes GetFieldType(unsigned int);
-        bool CheckFieldsOfEachRecordAndSaveAllData(map<unsigned int, string>);
-        bool CheckFieldValue(unsigned int, enumFieldTypes, string, unsigned int);
         const char* GetFieldTypeName(enumFieldTypes);
+
+        bool CheckFieldValue(unsigned int, enumFieldTypes, string, unsigned int);
+        bool CheckFieldsOfEachRecordAndSaveAllData();
     protected:
-        const char * fileName;
-        unsigned int recordSize;
-        unsigned int totalRecords;
-        unsigned int totalFields;
-        map<unsigned int, map<unsigned int, structRecord>> fileData;
-        vector<enumFieldTypes> fieldTypes;
+        const char * _fileName = NULL;
+        unsigned int _recordSize = 0;
+        unsigned int _totalRecords = 0;
+        unsigned int _totalFields = 0;
+        map<unsigned int, structFileData> _fileData;
+        vector<enumFieldTypes> _fieldTypes;
+        map<unsigned int, string> _mapRecordsData;
 };
 
 #endif
