@@ -5,11 +5,11 @@ CSV_Reader::CSV_Reader(const char *fileName)
     _fileName = fileName;
 
     _recordSize = 0;
-    _totalRecords = 0;
     _totalFields = 0;
 
     _fileData.clear();
     _fieldTypes.clear();
+    _mapRecordsData.clear();
 }
 
 CSV_Reader::~CSV_Reader()
@@ -17,53 +17,61 @@ CSV_Reader::~CSV_Reader()
     _fileName = NULL;
 
     _recordSize = 0;
-    _totalRecords = 0;
     _totalFields = 0;
 
     _fileData.clear();
     _fieldTypes.clear();
+    _mapRecordsData.clear();
 }
 
 bool CSV_Reader::LoadCSVFile()
 {
-    // abrimos el archivo de texto como solo lectura
+    Log->WriteLog("Reading file '%s'... ", _fileName);
+
+    // Abrimos el Archivo como solo lectura
     ifstream input(_fileName, ifstream::in);
     if (!input.is_open())
     {
-        printf("ERROR: Can't open file '%s' (File exists?).\n", _fileName);
+        Log->WriteLogNoTime("FAILED: Unable to open file.\n", _fileName);
+        Log->WriteLog("\n");
         return false;
     }
 
-    // si el archivo existe entonces mostramos el mensaje
-    printf("Loading file '%s'...\n", _fileName);
-
     // la primera linea no puede estar vacia nunca
-    string FirstLine = "";
-    getline(input, FirstLine);
+    string TextLine = "";
+    getline(input, TextLine);
 
-    if (!SetFieldTypes(FirstLine))
+    // Establecemos el tipo de Fields
+    if (!SetFieldTypes(TextLine))
     {
         input.close();
         return false;
     }
 
-    string RestOfFileData = "";
+    TextLine = "";
 
     unsigned int RecordID = 0;
-    while (getline(input, RestOfFileData))
-        _mapRecordsData.insert(pair<unsigned int, string>(RecordID++, RestOfFileData));
+    while (getline(input, TextLine))
+        _mapRecordsData.insert(pair<unsigned int, string>(RecordID++, TextLine));
 
     // cerramos el archivo pues ya no lo necesitamos mas
     input.close();
 
     if (_mapRecordsData.empty())
     {
-        printf("ERROR: '%s': No records found.\n", _fileName);
+        Log->WriteLogNoTime("FAILED: No records found.\n");
+        Log->WriteLog("\n");
         return false;
     }
 
+    Log->WriteLog("DONE\n");
+
+    Log->WriteLog("Parsing file... \n");
     if (!CheckFieldsOfEachRecordAndSaveAllData())
         return false;
+
+    Log->WriteLog("DONE\n");
+
 
     return true;
 }
@@ -118,25 +126,29 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
             {
                 unsigned int min = x;
                 unsigned int max = originalText.size() < 30 ? originalText.size() : 30;
-                printf("ERROR: '%s': Unexpected start of string in field '%u'\n\tExpected ',' at row %u before '%s'\n",
-                    _fileName, mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
+                Log->WriteLogNoTime("FAILED: Unexpected start of string in field '%u' Expected ',' at row %u before '%s'\n", mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
+                Log->WriteLog("\n");
                 return false;
             }
 
             if (isFirstRecord && isLastRecord)
             {
-                printf("WARNING: '%s': Missing \" of string at first field.\n\tIf you want to put an empty text just leave it empty.\n",
-                    _fileName);
-                mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                continue;
+                Log->WriteLogNoTime("FAILED: Missing \" of string at first field. If you want to put an empty text just leave it empty.\n");
+                Log->WriteLog("\n");
+                // Puede ser un warning y se agrega el texto y se continua con el for
+                // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+                // continue;
+                return false;
             }
 
             if (!isFirstRecord && isLastRecord)
             {
-                printf("WARNING: '%s': Missing \" of string at last field (%u).\n\tIf you want to put an empty text just leave it empty.\n",
-                    _fileName, mapFields.size() + 1);
-                mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                continue;
+                Log->WriteLogNoTime("FAILED: Missing \" of string at last field (%u). If you want to put an empty text just leave it empty.\n", mapFields.size() + 1);
+                Log->WriteLog("\n");
+                // Puede ser un warning y se agrega el texto y se continua con el for
+                // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+                // continue;
+                return false;
             }
 
             for (unsigned int z = x + 1; z < originalText.size(); z++)
@@ -157,8 +169,8 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
                         int _temp = z - 30;
                         unsigned int min = _temp < 0 ? 0 : _temp;
                         unsigned int max = z - min + 1;
-                        printf("ERROR: '%s': Unexpected end of string in field '%u'\n\tExpected ',' at row %u after '%s'\n",
-                            _fileName, mapFields.size() + 1, z + 2, originalText.substr(min, max).c_str());
+                        Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at row %u after '%s'\n", mapFields.size() + 1, z + 2, originalText.substr(min, max).c_str());
+                        Log->WriteLog("\n");
                         return false;
                     }
 
@@ -192,8 +204,8 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
                     int _temp = originalText.size() - 30;
                     unsigned int min = _temp < 0 ? 0 : _temp;
                     unsigned int max = originalText.size() - _temp;
-                    printf("ERROR: '%s': Unexpected end of line of string in field '%u'\n\tExpected '\"' at row %u before '%s'\n",
-                        _fileName, mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
+                    Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
+                    Log->WriteLog("\n");
                     return false;
                 }
             }
@@ -220,7 +232,8 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
 {
     if (FirstLine.empty())
     {
-        printf("ERROR: '%s': First line can't be empty. Must contain field types\n\tLike: int,uint,float,ufloat,byte,ubyte,string,bool\n\n", _fileName);
+        Log->WriteLogNoTime("FAILED: First line can't be empty. Must contain field types with comma separated like: int,uint,float,ufloat,byte,ubyte,string,bool\n");
+        Log->WriteLog("\n");
         return false;
     }
 
@@ -265,16 +278,19 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
         }
         else if (it->second.empty())
         {
-            printf("ERROR: '%s': Name of field '%u' can't be empty.\n", _fileName, it->first + 1);
+            Log->WriteLogNoTime("FAILED: Name of field '%u' can't be empty.\n", it->first + 1);
+            Log->WriteLog("\n");
             return false;
         }
         else
         {
-            printf("ERROR: '%s': In Field '%u' Unknown type '%s'.\n", _fileName, it->first + 1, it->second.c_str());
+            Log->WriteLogNoTime("FAILED: In Field '%u' Unknown type '%s'.\n", it->first + 1, it->second.c_str());
+            Log->WriteLog("\n");
             return false;
         }
     }
 
+    // Establecemos el total de Fields conforme a lo leido en la primera linea
     _totalFields = fieldNames.size();
 
     return true;
@@ -324,9 +340,8 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
 
     if (fieldValue.empty())
     {
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tCan't be empty. If you want to leave it empty, put value of '0' instead.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
-
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't be empty. If you want to leave it empty, put value of '0' instead.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
         return false;
     }
 
@@ -335,8 +350,8 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
 
     if (!isFloat && DotFirst != -1)
     {
-        printf("ERROR: '%s':Field '%u' Type '%s' Line '%u'\n\tCan't contain dot symbol '.'\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contain dot symbol '.'\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
         return false;
     }
 
@@ -344,29 +359,29 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     {
         if (DotFirst != -1 && DotSecond != -1 && DotFirst != DotSecond)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tCan't contains more than one dot symbol '.'\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contains more than one dot symbol '.'\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == 0 && (fieldValue.size() - 1) == 0)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tDot symbol '.' can't be the only character in field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be the only character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == 0)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tDot symbol '.' can't be at the start of field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be at the start of field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (DotFirst == (fieldValue.size() - 1))
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tDot symbol '.' can't be the last character in field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
     }
@@ -376,8 +391,7 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
 
     if ((isBool || isUnsigned) && NegativeFirst != -1)
     {
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tCan't contain negative symbol '-' in field value.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contain negative symbol '-' in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
         return false;
     }
 
@@ -385,29 +399,29 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
     {
         if (NegativeFirst != -1 && NegativeSecond != -1 && NegativeFirst != NegativeSecond)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tCan't contains more than one negative symbol '-' in field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Can't contains more than one negative symbol '-' in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst > 0)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tNegative symbol '-' only can be at the start of field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' only can be at the start of field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst == 0 && (fieldValue.size() - 1) == 0)
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tNegative symbol '-' can't be the only character in field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' can't be the only character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
         if (NegativeFirst == (fieldValue.size() - 1))
         {
-            printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tNegative symbol '-' can't be the last character in field value.\n",
-                _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+            Log->WriteLog("\n");
             return false;
         }
     }
@@ -423,8 +437,8 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
             (fieldValue[currentChar] == '2') || (fieldValue[currentChar] == '6'))
             continue;
 
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tContains a non numeric value.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Contains a non numeric value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
 
         return false;
     }
@@ -433,22 +447,22 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
 
     if (fieldType == type_BOOL && (testValue < 0 || testValue > 1))
     {
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tValue can be only '0' or '1'.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only '0' or '1'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
         return false;
     }
 
     if (fieldType == type_BYTE && (testValue < -127 || testValue > 255))
     {
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tValue can be only between '-127' and '127'.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only between '-127' and '127'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
         return false;
     }
 
     if (fieldType == type_UBYTE && (testValue < 0 || testValue > 255))
     {
-        printf("ERROR: '%s': Field '%u' Type '%s' Line '%u'\n\tValue can be only between '0' and '255'.\n",
-            _fileName, fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only between '0' and '255'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
+        Log->WriteLog("\n");
         return false;
     }
 
@@ -464,8 +478,8 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
         map<unsigned int, string> fieldsOfCurrentRecord = GetFields(itRecords->second);
         if (fieldsOfCurrentRecord.size() != _totalFields)
         {
-            printf("ERROR: '%s': Expected '%u' fields not '%u' fields in line '%u'.\n",
-                _fileName, _totalFields, fieldsOfCurrentRecord.size(), itRecords->first + 1);
+            Log->WriteLogNoTime("FAILED: Expected '%u' fields not '%u' fields in line '%u'.\n", _totalFields, fieldsOfCurrentRecord.size(), itRecords->first + 1);
+            Log->WriteLog("\n");
             return false;
         }
 
@@ -480,11 +494,12 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
                 return false;
         }
 
-        // salvamos la informacion desde aqui
+        // Guardamos la informacion desde aqui
         vector<structField> Fields;
         unsigned int currentField = 0;
         for (auto itFields = fieldsOfCurrentRecord.begin(); itFields != fieldsOfCurrentRecord.end(); itFields++, currentField++)
         {
+            /// Guardamos primero los Fields osea las columnas del registro actual
             structField sField;
             sField.ID = currentField;
             sField.Type = GetFieldType(itFields->first);
@@ -500,6 +515,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
             Fields.push_back(sField);
         }
 
+        /// Guardamos el Registro actual con todos los Fields previamente almacenados en el vector
         structRecord Record;
         Record.ID = currentRecord;
         Record.Field = Fields;
@@ -507,11 +523,10 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
         Records.push_back(Record);
     }
 
+    // Guardamos todos los Registros del archivo actual al mapa
     structFileData FileData;
     FileData.Record = Records;
-    _fileData.insert(pair<unsigned int, structFileData>(0, FileData));
-
-    _totalRecords = _fileData.size();
+    _fileData.insert(pair<string, structFileData>(_fileName, FileData));
 
     return true;
 }

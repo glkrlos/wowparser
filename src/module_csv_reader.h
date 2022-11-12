@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
+#include "log.h"
 
 struct structField
 {
@@ -91,9 +92,8 @@ class CSV_Reader : public SaveFileInfo
     protected:
         const char * _fileName = NULL;
         unsigned int _recordSize = 0;
-        unsigned int _totalRecords = 0;
         unsigned int _totalFields = 0;
-        map<unsigned int, structFileData> _fileData;
+        map<string, structFileData> _fileData;
         vector<enumFieldTypes> _fieldTypes;
         map<unsigned int, string> _mapRecordsData;
 };
