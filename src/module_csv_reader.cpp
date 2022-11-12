@@ -444,7 +444,7 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
         return false;
     }
 
-    if (fieldType == type_BYTE && (testValue < -127 || testValue > 255))
+    if (fieldType == type_BYTE && (testValue < -127 || testValue > 127))
     {
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Value can be only between '-127' and '127'.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
         return false;
