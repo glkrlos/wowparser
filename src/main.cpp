@@ -7,10 +7,10 @@ void print_header()
 {
     Log->WriteLogAndPrint("WoWParser Version 3.0 for %s (Revision: %s)\n", _OS, _REVISION);
     Log->WriteLogAndPrint("Hash: %s\tDate: %s\n", _HASH, _DATE);
-    Log->WriteLogEmptyLineAndPrint();
+    Log->WriteLogAndPrint("\n");
     Log->WriteLogAndPrint("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     Log->WriteLogAndPrint("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
-    Log->WriteLogEmptyLineAndPrint();
+    Log->WriteLogAndPrint("\n");
 
     Log->WriteLog("====================================LOG FILE START====================================\n");
 }
@@ -56,7 +56,7 @@ void pass3_checkheadersanddataconsistency()
     if (FindFiles->ListEmpty())
         return;
 
-    Log->WriteLogEmptyLine();
+    Log->WriteLog("\n");
     Log->WriteLogAndPrint("-----> Checking header and data consistency of each file added to parse it...\n");
 
     /// Enviamos la lista de archivos

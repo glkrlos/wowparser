@@ -447,7 +447,7 @@ bool module_parser::ParseBinaryFile()
             Log->WriteLog("FAILED: Unexpected error.\n");
     }
 
-    Log->WriteLogEmptyLine();
+    Log->WriteLog("\n");
 
     return true;
 }
@@ -457,7 +457,7 @@ bool module_parser::ParseCSVFile()
     if (_inputFile) fclose(_inputFile);
 
     Log->WriteLog("Not implemented yet.\n");
-    Log->WriteLogEmptyLine();
+    Log->WriteLog("\n");
 
     return true;
 }

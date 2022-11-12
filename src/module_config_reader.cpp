@@ -59,7 +59,7 @@ bool Config_Reader::LoadConfiguarionFile()
 
     Log->WriteLogNoTimeAndPrint("OK\n");
 
-    Log->WriteLogEmptyLine();
+    Log->WriteLog("\n");
     Log->WriteLog("-----> Checking XML attributes of files to parse...\n");
 
     unsigned int fileID = 1;
