@@ -448,7 +448,7 @@ bool module_parser::ParseBinaryFile()
             // CreateSQLFile();
         }
         else
-            Log->WriteLog("FAILED: Unexpected error.\n");
+            Log->WriteLogNoTime("FAILED: Unexpected error.\n");
     }
 
     Log->WriteLog("\n");
@@ -588,6 +588,9 @@ bool module_parser::PredictFieldTypes()
             {
                 unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
 
+                if (!value)
+                    continue;
+
                 auto it = TotalTextsPredicted.find(value);
 
                 if (it != TotalTextsPredicted.end())
@@ -610,7 +613,7 @@ bool module_parser::PredictFieldTypes()
         }
 
         /// Si no hubo prediccion de strings entonces intentamos buscas mas a fondo
-        if (TotalTextsPredicted.empty() && !AllStringsInTable.empty())
+        if (TotalTextsPredicted.size() != AllStringsInTable.size())
         {
             /// Volvemos a checar los bool ya que nos faltan strings por realocar, solo se toman encuenta los bool = 1
             unsigned int contamosbool = 0;
@@ -626,6 +629,8 @@ bool module_parser::PredictFieldTypes()
                         contamosbool++;
                 }
             }
+
+            unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
 
             /// Si la suma total de contamosbool + totaltextpredicted = allstringsintable, siginifica que los strings faltantes fueron contados como bool
             if ((TotalTextsPredicted.size() + contamosbool) == AllStringsInTable.size())
@@ -652,9 +657,6 @@ bool module_parser::PredictFieldTypes()
             /// Y si no se predijeron strings, entonces vamos a sacar la diferencia y buscar todos los strings restantes
             else
             {
-                unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
-                Log->WriteLog("\nStrings Actuales: %u, Totales: %u, Faltantes: %u, Bool Contados: %u\n", TotalTextsPredicted.size(), AllStringsInTable.size(), stringsFaltantes, contamosbool);
-
                 /// Si solo hay un bool, entonces por default es el que falta
                 if (contamosbool > 1)
                 {
