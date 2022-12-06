@@ -576,6 +576,135 @@ bool module_parser::PredictFieldTypes()
                 _sFile.FormatedFieldTypes[currentField] = type_STRING;
             }
         }
+
+        /// Para los casos cuando el valor fue 1 y obviamente se quedaron en BOOL, hay que rectificarlos solo si el total de strings es diferente al origen
+        map<unsigned int, int> TotalTextsPredicted;
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            if (_sFile.FormatedFieldTypes[currentField] != type_STRING)
+                continue;
+
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+            {
+                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+
+                auto it = TotalTextsPredicted.find(value);
+
+                if (it != TotalTextsPredicted.end())
+                    continue;
+
+                TotalTextsPredicted.insert(pair<unsigned int, int>(value, 0));
+            }
+        }
+
+        map<string, unsigned int> AllStringsInTable;
+        for (unsigned int x = 1; x < _stringSize; x++)
+        {
+            string text = reinterpret_cast<char*>(_stringTable + x);
+            x += text.size() + 1;
+            auto it = AllStringsInTable.find(text);
+            if (it != AllStringsInTable.end() || text.empty())
+                continue;
+
+            AllStringsInTable.insert(pair<string, unsigned int>(text, x));
+        }
+
+        /// Si no hubo prediccion de strings entonces intentamos buscas mas a fondo
+        if (TotalTextsPredicted.empty() && !AllStringsInTable.empty())
+        {
+            /// Volvemos a checar los bool ya que nos faltan strings por realocar, solo se toman encuenta los bool = 1
+            unsigned int contamosbool = 0;
+            for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+            {
+                if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                    continue;
+
+                for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+                {
+                    unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                    if (value == 1)
+                        contamosbool++;
+                }
+            }
+
+            /// Si la suma total de contamosbool + totaltextpredicted = allstringsintable, siginifica que los strings faltantes fueron contados como bool
+            if ((TotalTextsPredicted.size() + contamosbool) == AllStringsInTable.size())
+            {
+                for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+                {
+                    if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                        continue;
+
+                    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+                    {
+                        unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                        if (value == 1)
+                            _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                    }
+                }
+            }
+            else if ((TotalTextsPredicted.size() + contamosbool) < AllStringsInTable.size())
+            {
+                Log->WriteLogNoTime("FAILED: Unable to predict one or more string fields.\n");
+                return false;
+            }
+
+            /// Y si no se predijeron strings, entonces vamos a sacar la diferencia y buscar todos los strings restantes
+            else
+            {
+                unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
+                Log->WriteLog("\nStrings Actuales: %u, Totales: %u, Faltantes: %u, Bool Contados: %u\n", TotalTextsPredicted.size(), AllStringsInTable.size(), stringsFaltantes, contamosbool);
+
+                /// Si solo hay un bool, entonces por default es el que falta
+                if (contamosbool > 1)
+                {
+                    /// Aqui omitimos la primer coincidencia y cambiamos a string hasta que no falten strings por predecir
+                    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+                    {
+                        if (!stringsFaltantes)
+                            break;
+
+                        // Omitimos el primer field pues se supone que hay mas de 1 bool que debe ser string
+                        if (_sFile.FormatedFieldTypes[currentField] != type_BOOL || currentField == 0)
+                            continue;
+
+                        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+                        {
+                            if (!stringsFaltantes)
+                                break;
+
+                            unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                            if (value == 1)
+                            {
+                                _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                                stringsFaltantes--;
+                            }
+                        }
+                    }
+                }
+                else if (contamosbool == 1)
+                {
+                    /// Aqui establecemos el unico bool a tipo string
+                    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+                    {
+                        if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                            continue;
+
+                        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+                        {
+                            unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                            if (value == 1)
+                                _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                        }
+                    }
+                }
+                else
+                {
+                    Log->WriteLogNoTime("FAILED: Unable to predict one or more string fields.\n");
+                    return false;
+                }
+            }
+        }
     }
 
     // 04 - Unsigned/Signed Int System
@@ -615,9 +744,10 @@ bool module_parser::PredictFieldTypes()
             _countUIntFields++;
     }
 
-    if ((_countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields) != _totalFields)
+    unsigned int sumatotalfields = _countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields;
+    if (sumatotalfields != _totalFields)
     {
-        Log->WriteLogNoTime("FAILED: One or more fields are not parsed correctly. Conctact Developer to fix it.\n");
+        Log->WriteLogNoTime("FAILED: One or more fields are not predicted correctly. Conctact Developer to fix it.\n");
         return false;
     }
 
