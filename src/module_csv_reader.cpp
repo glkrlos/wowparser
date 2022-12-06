@@ -220,18 +220,20 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
 
         if (originalText[x] == ',')
         {
-            if (isFirstChar || isLastChar)
+            if (isFirstChar)
             {
                 mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-
-                if (isLastChar)
-                    break;
-
                 continue;
             }
 
             mapFields.insert(pair<unsigned int, string>(fieldID++, _fieldData));
             _fieldData.clear();
+
+            if (isLastChar)
+            {
+                mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+                break;
+            }
 
             continue;
         }
