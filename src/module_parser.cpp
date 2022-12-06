@@ -295,7 +295,7 @@ bool module_parser::CreateDBCFile()
 
     if (_stringTexts.size() != _stringSize)
     {
-        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        Log->WriteLogNoTime("FAILED: Mismatched comparison of strings.");
         Log->WriteLog("\n");
         return false;
     }
@@ -304,7 +304,8 @@ bool module_parser::CreateDBCFile()
     fopen_s(&output, outputFileNameDBC.c_str(), "wb");
     if (!output)
     {
-        printf("ERROR: '%s': Can't create DBC file.\n", outputFileNameDBC.c_str());
+        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        Log->WriteLog("\n");
         return false;
     }
 

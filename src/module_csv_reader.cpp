@@ -130,7 +130,7 @@ void CSV_Reader::CreateDBCFile()
 
     if (_stringTexts.size() != _stringSize)
     {
-        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        Log->WriteLogNoTime("FAILED: Mismatched comparison of strings.\n");
         return;
     }
 
@@ -138,7 +138,7 @@ void CSV_Reader::CreateDBCFile()
     fopen_s(&output, outputFileNameDBC.c_str(), "wb");
     if (!output)
     {
-        printf("ERROR: '%s': Can't create DBC file.\n", outputFileNameDBC.c_str());
+        Log->WriteLogNoTime("FAILED: Unable to create file.\n");
         return;
     }
 
