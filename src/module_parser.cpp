@@ -255,7 +255,7 @@ bool module_parser::CreateCSVFile()
                 fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
 
             if (currentField + 1 < _totalFields)
-                fprintf(output, "\t");
+                fprintf(output, ",");
         }
 
         if (currentRecord + 1 < _totalRecords)
