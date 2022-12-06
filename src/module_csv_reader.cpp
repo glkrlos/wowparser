@@ -201,14 +201,6 @@ void CSV_Reader::CreateDBCFile()
     return;
 }
 
-/*map<unsigned int, string> CSV_Reader::GetFields(string text)
-{
-    map<unsigned int, string> mapFields;
-    ExtractFields(text, mapFields);
-
-    return mapFields;
-}*/
-
 bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &mapFields)
 {
     unsigned int fieldID = 0;
@@ -224,7 +216,7 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
         bool isFirstRecord = (x == 0);
         bool isLastRecord = (x + 1) >= originalText.size();
 
-        if (originalText[x] == ',')
+        if (originalText[x] == '\t')
         {
             if (isFirstRecord)
             {
@@ -243,95 +235,50 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
 
             continue;
         }
-        else if (originalText[x] == '"')
+        else if (originalText[x] == '|' &&
+            originalText[x + 1] == '|' &&
+            originalText[x + 2] == '|' &&
+            originalText[x + 3] == '|' &&
+            originalText[x + 4] == 'r' &&
+            originalText[x + 5] == '|' &&
+            originalText[x + 6] == '|' &&
+            originalText[x + 7] == '|' &&
+            originalText[x + 8] == '|')
         {
-            string _stringField = "";
-
-            if (!isFirstRecord && originalText[x - 1] != ',')
-            {
-                unsigned int min = x;
-                unsigned int max = originalText.size() < 30 ? originalText.size() : 30;
-                Log->WriteLogNoTime("FAILED: Unexpected start of string in field '%u' Expected ',' at row %u before '%s'\n", mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
-                return false;
-            }
-
-            if (isFirstRecord && isLastRecord)
-            {
-                Log->WriteLogNoTime("FAILED: Missing \" of string at first field. If you want to put an empty text just leave it empty.\n");
-                // Puede ser un warning y se agrega el texto y se continua con el for
-                // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                // continue;
-                return false;
-            }
-
-            if (!isFirstRecord && isLastRecord)
-            {
-                Log->WriteLogNoTime("FAILED: Missing \" of string at last field (%u). If you want to put an empty text just leave it empty.\n", mapFields.size() + 1);
-                // Puede ser un warning y se agrega el texto y se continua con el for
-                // mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                // continue;
-                return false;
-            }
-
-            for (unsigned int z = x + 1; z < originalText.size(); z++)
-            {
-                bool isNotLastStringRecord = (z + 1) < originalText.size();
-                bool isLastStringRecord = (z + 1) >= originalText.size();
-
-                if (originalText[z] == '"')
-                {
-                    if (originalText[z + 1] == '"')
-                    {
-                        _stringField += '"';
-                        z++;
-                        continue;
-                    }
-                    else if (originalText[z + 1] != ',' && isNotLastStringRecord)
-                    {
-                        int _temp = z - 30;
-                        unsigned int min = _temp < 0 ? 0 : _temp;
-                        unsigned int max = z - min + 1;
-                        Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at row %u after '%s'\n", mapFields.size() + 1, z + 2, originalText.substr(min, max).c_str());
-                        return false;
-                    }
-
-                    _fieldData = _stringField;
-                    x = z;
-
-                    break;
-                }
-                else if (originalText[z] == '\\')
-                {
-                    if (originalText[z + 1] == 'n')
-                    {
-                        z++;
-                        _stringField += '\n';
-                        continue;
-                    }
-                    else if (originalText[z + 1] == 'r')
-                    {
-                        z++;
-                        _stringField += '\r';
-                        continue;
-                    }
-
-                    _stringField += '\\';
-                }
-                else
-                    _stringField += originalText[z];
-
-                if (isLastStringRecord)
-                {
-                    int _temp = originalText.size() - 30;
-                    unsigned int min = _temp < 0 ? 0 : _temp;
-                    unsigned int max = originalText.size() - _temp;
-                    Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
-                    return false;
-                }
-            }
+            x += 8;
+            _fieldData += '\r';
+            continue;
         }
-        else
-            _fieldData += originalText[x];
+        else if (originalText[x] == '{' &&
+                originalText[x + 1] == '{' &&
+                originalText[x + 2] == '{' &&
+                originalText[x + 3] == '{' &&
+                originalText[x + 4] == 'n' &&
+                originalText[x + 5] == '}' &&
+                originalText[x + 6] == '}' &&
+                originalText[x + 7] == '}' &&
+                originalText[x + 8] == '}')
+        {
+            x += 8;
+            _fieldData += '\n';
+            continue;
+        }
+        else if (originalText[x] == '¿' && 
+                originalText[x + 1] == '¿' &&
+                originalText[x + 2] == '¿' &&
+                originalText[x + 3] == '¿' &&
+                originalText[x + 4] == 't' &&
+                originalText[x + 5] == '¿' &&
+                originalText[x + 6] == '¿' &&
+                originalText[x + 7] == '¿' &&
+                originalText[x + 8] == '¿')
+        {
+            x += 8;
+            _fieldData += '\t';
+            continue;
+        }
+
+        _fieldData += originalText[x];
 
         isLastRecord = (x + 1) >= originalText.size();
 
@@ -341,8 +288,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
             _fieldData.clear();
             break;
         }
-
-        continue;
     }
 
     return true;

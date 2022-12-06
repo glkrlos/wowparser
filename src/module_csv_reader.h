@@ -83,7 +83,6 @@ class CSV_Reader : public SaveFileInfo
         void PrintResults();
         void CreateDBCFile();
     private:
-        // map<unsigned int, string> GetFields(string);
         bool ExtractFields(string, map<unsigned int, string> &);
 
         bool SetFieldTypes(string);
