@@ -300,22 +300,22 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
 
                     break;
                 }
-                else if (originalText[z] == '|')
+                else if (originalText[z] == '\\')
                 {
-                    if (originalText[z + 1] == '|')
+                    if (originalText[z + 1] == 'n')
                     {
                         z++;
                         _stringField += '\n';
                         continue;
                     }
-                    else if (originalText[z + 1] == ']')
+                    else if (originalText[z + 1] == 'r')
                     {
                         z++;
                         _stringField += '\r';
                         continue;
                     }
 
-                    //_stringField += '\\';
+                    _stringField += '\\';
                 }
                 else
                     _stringField += originalText[z];
