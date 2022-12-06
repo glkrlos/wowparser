@@ -6,6 +6,7 @@ CSV_Reader::CSV_Reader(const char *fileName)
 
     _recordSize = 0;
     _totalFields = 0;
+    _totalRecords = 0;
 
     _fileData.clear();
     _fieldTypes.clear();
@@ -18,6 +19,7 @@ CSV_Reader::~CSV_Reader()
 
     _recordSize = 0;
     _totalFields = 0;
+    _totalRecords = 0;
 
     _fileData.clear();
     _fieldTypes.clear();
@@ -118,6 +120,85 @@ void CSV_Reader::PrintResults()
 
     if (_countUIntFields)
         Log->WriteLog("Total unsigned int Fields: '%u'\n", _countUIntFields);
+}
+
+void CSV_Reader::CreateDBCFile()
+{
+    string outputFileNameDBC = _fileName;
+    outputFileNameDBC.append(".dbc");
+    Log->WriteLog("Creating DBC file '%s'... ", outputFileNameDBC.c_str());
+
+    if (_stringTexts.size() != _stringSize)
+    {
+        Log->WriteLogNoTime("FAILED: Unable to create file.");
+        return;
+    }
+
+    FILE *output;
+    fopen_s(&output, outputFileNameDBC.c_str(), "wb");
+    if (!output)
+    {
+        printf("ERROR: '%s': Can't create DBC file.\n", outputFileNameDBC.c_str());
+        return;
+    }
+
+    fwrite("WDBC", 4, 1, output);
+    fwrite(&_totalRecords, sizeof(_totalRecords), 1, output);
+    fwrite(&_totalFields, sizeof(_totalFields), 1, output);
+    fwrite(&_recordSize, sizeof(_recordSize), 1, output);
+    fwrite(&_stringSize, sizeof(_stringSize), 1, output);
+
+    auto currentFile = _fileData.begin();
+
+    for (auto Records = currentFile->second.Record.begin(); Records != currentFile->second.Record.end(); Records++)
+    {
+        for (auto Fields = Records->Field.begin(); Fields != Records->Field.end(); Fields++)
+        {
+            if (Fields->Type == type_FLOAT)
+            {
+                float value = (float)atof(Fields->Value.c_str());
+                fwrite(&value, 4, 1, output);
+            }
+            else if (Fields->Type == type_BOOL)
+            {
+                unsigned int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 4, 1, output);
+            }
+            else if (Fields->Type == type_BYTE)
+            {
+                int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 1, 1, output);
+            }
+            else if (Fields->Type == type_UBYTE)
+            {
+                unsigned int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 1, 1, output);
+            }
+            else if (Fields->Type == type_INT)
+            {
+                int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 4, 1, output);
+            }
+            else if (Fields->Type == type_UINT)
+            {
+                unsigned int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 4, 1, output);
+            }
+            else
+            {
+                unsigned int value = atoi(Fields->Value.c_str());
+                fwrite(&value, 4, 1, output);
+            }
+        }
+    }
+
+    fwrite(_stringTexts.c_str(), _stringTexts.size(), 1, output);
+
+    fclose(output);
+
+    Log->WriteLogNoTime("DONE.\n");
+
+    return;
 }
 
 /*map<unsigned int, string> CSV_Reader::GetFields(string text)
@@ -554,6 +635,8 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
     structFileData FileData;
     FileData.Record = Records;
     _fileData.insert(pair<string, structFileData>(_fileName, FileData));
+
+    _totalRecords = Records.size();
 
     return true;
 }

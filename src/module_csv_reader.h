@@ -81,6 +81,7 @@ class CSV_Reader : public SaveFileInfo
         bool LoadCSVFile();
         bool ParseFile();
         void PrintResults();
+        void CreateDBCFile();
     private:
         // map<unsigned int, string> GetFields(string);
         bool ExtractFields(string, map<unsigned int, string> &);
@@ -95,6 +96,7 @@ class CSV_Reader : public SaveFileInfo
         const char * _fileName = NULL;
         unsigned int _recordSize = 0;
         unsigned int _totalFields = 0;
+        unsigned int _totalRecords = 0;
         map<string, structFileData> _fileData;
         vector<enumFieldTypes> _fieldTypes;
         map<unsigned int, string> _mapRecordsData;
