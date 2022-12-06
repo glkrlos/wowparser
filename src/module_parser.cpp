@@ -532,32 +532,12 @@ bool module_parser::PredictFieldTypes()
         }
     }
 
-    // 02 - Bool System
-    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-    {
-        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-            continue;
-
-        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-        {
-            int intValue = GetRecord(currentRecord).GetInt(currentField);
-
-            if (intValue < 0 || intValue > 1)
-            {
-                _sFile.FormatedFieldTypes[currentField] = type_NONE;
-                break;
-            }
-
-            _sFile.FormatedFieldTypes[currentField] = type_BOOL;
-        }
-    }
-
     // 03 - String System
     if (_stringSize > 1)
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_BOOL)
+            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
                 continue;
 
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -571,6 +551,26 @@ bool module_parser::PredictFieldTypes()
 
                 _sFile.FormatedFieldTypes[currentField] = type_STRING;
             }
+        }
+    }
+
+    // 02 - Bool System
+    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+    {
+        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_STRING)
+            continue;
+
+        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+        {
+            int intValue = GetRecord(currentRecord).GetInt(currentField);
+
+            if (intValue < 0 || intValue > 1)
+            {
+                _sFile.FormatedFieldTypes[currentField] = type_NONE;
+                break;
+            }
+
+            _sFile.FormatedFieldTypes[currentField] = type_BOOL;
         }
     }
 
