@@ -219,13 +219,13 @@ bool module_parser::CreateCSVFile()
 
                         if (_stringTable[x] == '\r')
                         {
-                            outText.append("\\r");
+                            outText.append("|]");
                             continue;
                         }
 
                         if (_stringTable[x] == '\n')
                         {
-                            outText.append("\\n");
+                            outText.append("||");
                             continue;
                         }
 
