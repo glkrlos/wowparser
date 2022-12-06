@@ -195,7 +195,7 @@ bool module_parser::CreateCSVFile()
         }
 
         if (currentField + 1 < _totalFields)
-            fprintf(output, "\t");
+            fprintf(output, ",");
     }
     fprintf(output, "\n");
 
@@ -208,11 +208,14 @@ bool module_parser::CreateCSVFile()
                 unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                 if (value)
                 {
-                    string outText = "";
+                    string outText = "\"";
                     for (unsigned int x = value; x < _stringSize; x++)
                     {
                         if (!_stringTable[x])
                             break;
+
+                        if (_stringTable[x] == '"')
+                            outText.append("\"");
 
                         if (_stringTable[x] == '\r')
                         {
@@ -228,13 +231,13 @@ bool module_parser::CreateCSVFile()
 
                         if (_stringTable[x] == '\t')
                         {
-                            outText.append("真真t真真");
+                            outText.append("[[[[t]]]]");
                             continue;
                         }
 
                         outText.append(Shared->ToStr(_stringTable[x]));
                     }
-                    outText.append("");
+                    outText.append("\"");
                     fprintf(output, "%s", outText.c_str());
                 }
             }

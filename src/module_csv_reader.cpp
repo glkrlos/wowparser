@@ -213,81 +213,151 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
     string _fieldData = "";
     for (unsigned int x = 0; x < originalText.size(); x++)
     {
-        bool isFirstRecord = (x == 0);
-        bool isLastRecord = (x + 1) >= originalText.size();
+        bool isFirstChar = (x == 0);
+        bool isLastChar = (x + 1) >= originalText.size();
+        bool isOnlyOneChar = isFirstChar && isLastChar;
+        bool isOnlyLastChar = !isFirstChar && isLastChar;
 
-        if (originalText[x] == '\t')
+        if (originalText[x] == ',')
         {
-            if (isFirstRecord)
+            if (isFirstChar || isLastChar)
             {
                 mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+
+                if (isLastChar)
+                    break;
+
                 continue;
             }
 
             mapFields.insert(pair<unsigned int, string>(fieldID++, _fieldData));
             _fieldData.clear();
 
-            if (isLastRecord)
+            continue;
+        }
+        else if (originalText[x] == '"')
+        {
+            if (!isFirstChar && originalText[x - 1] != ',')
             {
-                mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                break;
+                unsigned int min = x;
+                unsigned int max = originalText.size() < 30 ? originalText.size() : 30;
+                Log->WriteLogNoTime("FAILED: Unexpected start of string in field '%u' Expected ',' at row %u before '%s'\n", mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
+                return false;
             }
 
-            continue;
-        }
-        else if (originalText[x] == '|' &&
-            originalText[x + 1] == '|' &&
-            originalText[x + 2] == '|' &&
-            originalText[x + 3] == '|' &&
-            originalText[x + 4] == 'r' &&
-            originalText[x + 5] == '|' &&
-            originalText[x + 6] == '|' &&
-            originalText[x + 7] == '|' &&
-            originalText[x + 8] == '|')
-        {
-            x += 8;
-            _fieldData += '\r';
-            continue;
-        }
-        else if (originalText[x] == '{' &&
-                originalText[x + 1] == '{' &&
-                originalText[x + 2] == '{' &&
-                originalText[x + 3] == '{' &&
-                originalText[x + 4] == 'n' &&
-                originalText[x + 5] == '}' &&
-                originalText[x + 6] == '}' &&
-                originalText[x + 7] == '}' &&
-                originalText[x + 8] == '}')
-        {
-            x += 8;
-            _fieldData += '\n';
-            continue;
-        }
-        else if (originalText[x] == '¿' && 
-                originalText[x + 1] == '¿' &&
-                originalText[x + 2] == '¿' &&
-                originalText[x + 3] == '¿' &&
-                originalText[x + 4] == 't' &&
-                originalText[x + 5] == '¿' &&
-                originalText[x + 6] == '¿' &&
-                originalText[x + 7] == '¿' &&
-                originalText[x + 8] == '¿')
-        {
-            x += 8;
-            _fieldData += '\t';
-            continue;
-        }
+            if (isOnlyOneChar)
+            {
+                Log->WriteLogNoTime("FAILED: Missing \" of string at first field. If you want to put an empty text just leave it empty.\n");
+                return false;
+                // Si despues cambio la forma de mostrar los errores, entonces lo dejo como Warning
+                //mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+                //continue;
+            }
 
-        _fieldData += originalText[x];
+            if (isOnlyLastChar)
+            {
+                Log->WriteLogNoTime("FAILED: Missing \" of string at last field (%u). If you want to put an empty text just leave it empty.\n", mapFields.size() + 1);
+                return false;
+                // Si despues cambio la forma de mostrar los errores, entonces lo dejo como Warning
+                //mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
+                //continue;
+            }
 
-        isLastRecord = (x + 1) >= originalText.size();
+            x++;
+            for (; x < originalText.size(); x++)
+            {
+                bool isNotLastStringChar = (x + 1) < originalText.size();
+                bool isLastStringChar = (x + 1) >= originalText.size();
 
-        if (isLastRecord)
+                /// Si hay una comilla pueden ocurrir dos cosas
+                if (originalText[x] == '"')
+                {
+                    /// Si el siguiente caracter es otra comilla, siginifica que siguiente solo es comilla doble
+                    if (originalText[x + 1] == '"')
+                    {
+                        _fieldData += '"';
+                        x++;
+                        continue;
+                    }
+                    /// Si el siguiente caracter no es coma y no es el ultimo record, entonces se vuelve invalida la terminacion del string
+                    else if (originalText[x + 1] != ',' && isNotLastStringChar)
+                    {
+                        int _temp = x - 30;
+                        unsigned int min = _temp < 0 ? 0 : _temp;
+                        unsigned int max = x - min + 1;
+                        Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at row %u after '%s'\n", mapFields.size() + 1, x + 2, originalText.substr(min, max).c_str());
+                        return false;
+                    }
+
+                    break;
+                }
+                else if (originalText[x] == '|' &&
+                     originalText[x + 1] == '|' &&
+                     originalText[x + 2] == '|' &&
+                     originalText[x + 3] == '|' &&
+                     originalText[x + 4] == 'r' &&
+                     originalText[x + 5] == '|' &&
+                     originalText[x + 6] == '|' &&
+                     originalText[x + 7] == '|' &&
+                     originalText[x + 8] == '|')
+                {
+                    x += 8;
+                    _fieldData += '\r';
+                    continue;
+                }
+                else if (originalText[x] == '{' &&
+                     originalText[x + 1] == '{' &&
+                     originalText[x + 2] == '{' &&
+                     originalText[x + 3] == '{' &&
+                     originalText[x + 4] == 'n' &&
+                     originalText[x + 5] == '}' &&
+                     originalText[x + 6] == '}' &&
+                     originalText[x + 7] == '}' &&
+                     originalText[x + 8] == '}')
+                {
+                    x += 8;
+                    _fieldData += '\n';
+                    continue;
+                }
+                else if (originalText[x] == '[' &&
+                     originalText[x + 1] == '[' &&
+                     originalText[x + 2] == '[' &&
+                     originalText[x + 3] == '[' &&
+                     originalText[x + 4] == 't' &&
+                     originalText[x + 5] == ']' &&
+                     originalText[x + 6] == ']' &&
+                     originalText[x + 7] == ']' &&
+                     originalText[x + 8] == ']')
+                {
+                    x += 8;
+                    _fieldData += '\t';
+                    continue;
+                }
+                else
+                    _fieldData += originalText[x];
+
+                if (isLastStringChar)
+                {
+                    int _temp = originalText.size() - 30;
+                    unsigned int min = _temp < 0 ? 0 : _temp;
+                    unsigned int max = originalText.size() - _temp;
+                    Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
+                    return false;
+                }
+            }
+        }
+        else
+            _fieldData += originalText[x];
+
+        isLastChar = (x + 1) >= originalText.size();
+
+        if (isLastChar)
         {
             mapFields.insert(pair<unsigned int, string>(fieldID++, _fieldData));
             _fieldData.clear();
             break;
         }
+
     }
 
     return true;
