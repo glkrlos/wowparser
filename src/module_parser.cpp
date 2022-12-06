@@ -410,8 +410,6 @@ bool module_parser::ParseBinaryFile()
             CreateCSVFile();
             // CreateDBCFile();
         }
-        else
-            Log->WriteLog("FAILED: Unexpected error.\n");
     }
     else
     {
@@ -447,8 +445,6 @@ bool module_parser::ParseBinaryFile()
             // CreateDBCFile();
             // CreateSQLFile();
         }
-        else
-            Log->WriteLogNoTime("FAILED: Unexpected error.\n");
     }
 
     Log->WriteLog("\n");
@@ -630,8 +626,6 @@ bool module_parser::PredictFieldTypes()
                 }
             }
 
-            unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
-
             /// Si la suma total de contamosbool + totaltextpredicted = allstringsintable, siginifica que los strings faltantes fueron contados como bool
             if ((TotalTextsPredicted.size() + contamosbool) == AllStringsInTable.size())
             {
@@ -657,6 +651,9 @@ bool module_parser::PredictFieldTypes()
             /// Y si no se predijeron strings, entonces vamos a sacar la diferencia y buscar todos los strings restantes
             else
             {
+                unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
+                //Log->WriteLog("\nStrings Actuales: %u, Totales: %u, Faltantes: %u, Bool Contados: %u\n", TotalTextsPredicted.size(), AllStringsInTable.size(), stringsFaltantes, contamosbool);
+
                 /// Si solo hay un bool, entonces por default es el que falta
                 if (contamosbool > 1)
                 {
@@ -702,8 +699,9 @@ bool module_parser::PredictFieldTypes()
                 }
                 else
                 {
-                    Log->WriteLogNoTime("FAILED: Unable to predict one or more string fields.\n");
-                    return false;
+                    /// Nada que hacer, simplemente ignorarlo
+                    //Log->WriteLogNoTime("FAILED: contamosbool <= 0: Unable to predict one or more string fields.\n");
+                    //return false;
                 }
             }
         }
