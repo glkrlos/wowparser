@@ -5,8 +5,13 @@ char const* const ProgressBar::full  = "*";
 
 ProgressBar::~ProgressBar()
 {
-    printf("\r-----> Finished                                                               ");
+    printf("\r-----> Finished");
+
+    for (auto x = 0; x < 63; x++)
+        printf(empty);
+
     printf( "\n" );
+
     fflush(stdout);
 }
 
@@ -35,7 +40,12 @@ void ProgressBar::step(string filename)
     n = rec_no * indic_len / num_rec;
     if (n != rec_pos)
     {
-        printf("\r                                                  [");
+        printf("\r");
+
+        for (auto x = 0; x < 50; x++)
+            printf(empty);
+
+        printf("[");
 
         for (i = 0; i < n; i++) printf(full);
 
