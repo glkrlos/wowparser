@@ -6,15 +6,16 @@ cFindFiles::cFindFiles()
 
 void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
 {
-    barGoLink bar(fileNames.size());
+    ProgressBar bar(fileNames.size());
 
     for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
     {
+        bar.step(FileName->first.c_str());
+
         auto_ptr<module_parser> Parser(new module_parser(FileName->second));
         if (Parser->Load())
             Parser->ParseFile();
 
-        bar.step();
     }
 }
 

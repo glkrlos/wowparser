@@ -65,7 +65,6 @@ void pass3_checkheadersanddataconsistency()
 
 void print_end()
 {
-    Log->WriteLogAndPrint("-----> Finished\n");
     Log->WriteLog("====================================LOG FILE END====================================\n");
     printf("--Press any key to exit--\n");
     getch();
