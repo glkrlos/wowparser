@@ -5,12 +5,13 @@ char const* const ProgressBar::full  = "*";
 
 ProgressBar::~ProgressBar()
 {
-    printf("\r-----> Finished");
 
-    for (auto x = 0; x < 63; x++)
+    printf("\r");
+
+    for (auto x = 0; x < 78; x++)
         printf(empty);
 
-    printf( "\n" );
+    printf("\r");
 
     fflush(stdout);
 }
