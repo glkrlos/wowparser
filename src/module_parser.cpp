@@ -23,19 +23,38 @@ bool module_parser::Load()
 
     rewind(_inputFile);
 
-    _fileData = new unsigned char[_fileSize];
-    if (fread(_fileData, _fileSize, 1, _inputFile) != 1)
+    _wholeFileData = new unsigned char[_fileSize];
+    if (fread(_wholeFileData, _fileSize, 1, _inputFile) != 1)
     {
         Log->WriteLogNoTime("FAILED: Unable to read file.\n");
         Log->WriteLog("\n");
         return false;
     }
 
+    /// Cerramos el archivo pues ya no lo necesitamos mas
+    if (_inputFile)
+        fclose(_inputFile);
+
     if (NullPoniterToData())
     {
         Log->WriteLogNoTime("FATAL: DATA_READ_ERROR: null Pointer to file data. Report this to fix it.\n");
         Log->WriteLog("\n");
         return false;
+    }
+
+    // Para los archivos csv, si fuera solo la palabra "int" serian 3 bytes al menos
+    // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
+    if (((GetFileType() == csvFile || FileIsASCII()) && _fileSize < 3) || (!FileIsASCII() && _fileSize < 20))
+    {
+        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_fileType));
+        Log->WriteLog("\n");
+        return false;
+    }
+
+    if ((GetFileType() == csvFile || FileIsASCII()))
+    {
+        Log->WriteLogNoTime("DONE.\n");
+        Log->WriteLog("Parsing file... ");
     }
 
     if (!CheckStructure())
@@ -48,17 +67,63 @@ bool module_parser::Load()
 
 bool module_parser::CheckStructure()
 {
-    // Para los archivos csv, si fuera solo la palabra "int" serian 4 bytes al menos
-    // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
-    if ( ((GetFileType() == csvFile || FileIsASCII()) && _fileSize < 4) || (!FileIsASCII() && _fileSize < 20) )
-    {
-        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_sFile.Type));
-        Log->WriteLog("\n");
-        return false;
-    }
-
     if (GetFileType() == csvFile || FileIsASCII())
-        ; // Pasar a funcion csv_reader y comprobar el archivo
+    {
+        map<unsigned int, string> CSVDataMap;
+
+        unsigned int rowcount = 0;
+        string currentLine = "";
+        for (unsigned long x = 0; x < _fileSize; x++)
+        {
+            char c = static_cast<char>(_wholeFileData[x]);
+
+            if (c == 13)
+                continue;
+
+            bool isLastChar = (x + 1) >= _fileSize;
+
+            if (c == '\n' || isLastChar)
+            {
+                rowcount++;
+
+                if (currentLine.empty())
+                {
+                    Log->WriteLogNoTime("FAILED: Contains an empty line at Row '%u'.\n", rowcount);
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                if (isLastChar)
+                    currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
+
+                CSVDataMap.insert(pair<unsigned int, string>(rowcount, currentLine));
+                currentLine.clear();
+                continue;
+            }
+
+            currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
+        }
+
+        auto_ptr<CSV_Reader> CSVParser(new CSV_Reader(GetFileName(), CSVDataMap));
+
+        if (!CSVParser->CheckCSV())
+            return false;
+
+        if (!CSVParser->CheckFieldsOfEachRecordAndSaveAllData())
+            return false;
+
+        /// Header para archivos CSV es siempre 0 pues no es un archivo binario
+        _headerSize = 0;
+        /// El resto de valores si los proporciona la clase CSV_Reader
+        _totalFields = CSVParser->GetTotalTotalFields();
+        _totalRecords = CSVParser->GetTotalTotalRecords();
+        _recordSize = CSVParser->GetTotalRecordSize();
+        _stringSize = CSVParser->GetStringSize();
+        _fieldTypes = CSVParser->GetFieldTypes();
+        _stringTexts = CSVParser->GetStringTexts();
+        _uniqueStringTexts = CSVParser->GetUniqueStringTexts();
+        _extractedData = CSVParser->GetExtractedData();
+    }
     else
     {
         switch (GetFileTypeByHeader())
@@ -70,12 +135,12 @@ bool module_parser::CheckStructure()
                 _totalRecords = HeaderGetUInt();
                 _totalFields = HeaderGetUInt();
                 _recordSize = HeaderGetUInt();
-                _stringSize = HeaderGetUInt();
+                unsigned int ReadedStringSize = HeaderGetUInt();
 
-                unsigned int _dataBytes = _fileSize - _headerSize - _stringSize;
+                unsigned int _dataBytes = _fileSize - _headerSize - ReadedStringSize;
                 unsigned int _stringBytes = _fileSize - _headerSize - _dataBytes;
 
-                if ((_dataBytes != (_totalRecords * _recordSize)) || !_stringSize || (_stringBytes != _stringSize))
+                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReadedStringSize || (_stringBytes != ReadedStringSize))
                 {
                     Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
                     Log->WriteLog("\n");
@@ -89,16 +154,22 @@ bool module_parser::CheckStructure()
                     return false;
                 }
 
-                _dataBytes = _fileSize - _headerSize - _stringSize;
+                _dataBytes = _fileSize - _headerSize - ReadedStringSize;
                 _dataTable = new unsigned char [_dataBytes];
-                _dataTable = _fileData + _headerOffset;
+                _dataTable = _wholeFileData + _headerOffset;
 
                 _stringBytes = _fileSize - _headerSize - _dataBytes;
                 _stringTable = new unsigned char[_stringBytes];
-                _stringTable = _fileData + _headerOffset + _dataBytes;
+                _stringTable = _wholeFileData + _headerOffset + _dataBytes;
+
+                /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
+                SetUniqueStringTextsFromStringTable(_stringBytes);
                 break;
             }
             case db2File:
+                Log->WriteLogNoTime("FAILED: Temporarily disabled the parse of DB2 files.\n");
+                Log->WriteLog("\n");
+                return false;
                 /// 32 bytes del header o 48 bytes si el build > 12880
                 //char header[4];             // WDB2 db2
                 //unsigned int totalRecords;
@@ -125,6 +196,9 @@ bool module_parser::CheckStructure()
             case wdbnpccacheFile:
             case wdbpagetextcacheFile:
             case wdbquestcacheFile:
+                Log->WriteLogNoTime("FAILED: Temporarily disabled the parse of WDB files.\n");
+                Log->WriteLog("\n");
+                return false;
                 /// 24 bytes del header + 8 bytes del primer record y su el tamaño del record
                 //char header[4];
                 //unsigned int revision;
@@ -166,253 +240,30 @@ void module_parser::ParseFile()
         ParseBinaryFile();
 }
 
-bool module_parser::CreateCSVFile()
-{
-    string outputFileNameCSV = GetFileName();
-    outputFileNameCSV.append(".csv");
-    Log->WriteLog("Creating CSV file '%s'... ", outputFileNameCSV.c_str());
-
-    FILE *output = fopen(outputFileNameCSV.c_str(), "w");
-    if (!output)
-    {
-        Log->WriteLogNoTime("FAILED: Unable to create file.");
-        Log->WriteLog("\n");
-        return false;
-    }
-
-    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-    {
-        switch (_sFile.FormatedFieldTypes[currentField])
-        {
-            case type_FLOAT:  fprintf(output, "float"); break;
-            case type_BOOL:   fprintf(output, "bool"); break;
-            case type_BYTE:   fprintf(output, "byte"); break;
-            case type_UBYTE:  fprintf(output, "ubyte"); break;
-            case type_STRING: fprintf(output, "string"); break;
-            case type_INT:    fprintf(output, "int"); break;
-            case type_UINT:
-            default:          fprintf(output, "uint"); break;
-        }
-
-        if (currentField + 1 < _totalFields)
-            fprintf(output, ",");
-    }
-    fprintf(output, "\n");
-
-    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-    {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-        {
-            if (_stringSize > 1 && _sFile.FormatedFieldTypes[currentField] == type_STRING)
-            {
-                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
-                if (value)
-                {
-                    string outText = "\"";
-                    for (unsigned int x = value; x < _stringSize; x++)
-                    {
-                        if (!_stringTable[x])
-                            break;
-
-                        if (_stringTable[x] == '"')
-                            outText.append("\"");
-
-                        if (_stringTable[x] == '\r')
-                        {
-                            outText.append("||||r||||");
-                            continue;
-                        }
-
-                        if (_stringTable[x] == '\n')
-                        {
-                            outText.append("{{{{n}}}}");
-                            continue;
-                        }
-
-                        if (_stringTable[x] == '\t')
-                        {
-                            outText.append("[[[[t]]]]");
-                            continue;
-                        }
-
-                        outText.append(Shared->ToStr(_stringTable[x]));
-                    }
-                    outText.append("\"");
-                    fprintf(output, "%s", outText.c_str());
-                }
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-                fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
-                fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
-                fprintf(output, "%i", GetRecord(currentRecord).GetByte(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
-                fprintf(output, "%u", GetRecord(currentRecord).GetByte(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
-                fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
-                fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
-
-            if (currentField + 1 < _totalFields)
-                fprintf(output, ",");
-        }
-
-        if (currentRecord + 1 < _totalRecords)
-            fprintf(output, "\n");
-    }
-
-    fclose(output);
-
-    Log->WriteLogNoTime("DONE.\n");
-
-    return true;
-}
-
-bool module_parser::CreateDBCFile()
-{
-    string outputFileNameDBC = GetFileName();
-    outputFileNameDBC.append(".dbc");
-    Log->WriteLog("Creating DBC file '%s'... ", outputFileNameDBC.c_str());
-
-    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-    {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-        {
-            if (_stringSize > 1 && _sFile.FormatedFieldTypes[currentField] == type_STRING)
-            {
-                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
-                if (value)
-                {
-                    string outText = "";
-                    for (unsigned int x = value; x < _stringSize; x++)
-                    {
-                        if (!_stringTable[x])
-                            break;
-
-                        outText.append(Shared->ToStr(_stringTable[x]));
-                    }
-
-                    SetUniqueStringTexts(outText);
-                }
-            }
-        }
-    }
-
-    if (_stringTexts.size() != _stringSize)
-    {
-        Log->WriteLogNoTime("FAILED: Mismatched comparison of strings.");
-        Log->WriteLog("\n");
-        return false;
-    }
-
-    FILE *output;
-    fopen_s(&output, outputFileNameDBC.c_str(), "wb");
-    if (!output)
-    {
-        Log->WriteLogNoTime("FAILED: Unable to create file.");
-        Log->WriteLog("\n");
-        return false;
-    }
-
-    fwrite("WDBC", 4, 1, output);
-    fwrite(&_totalRecords, sizeof(_totalRecords), 1, output);
-    fwrite(&_totalFields, sizeof(_totalFields), 1, output);
-    fwrite(&_recordSize, sizeof(_recordSize), 1, output);
-    fwrite(&_stringSize, sizeof(_stringSize), 1, output);
-
-    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
-    {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-        {
-            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-            {
-                float value = GetRecord(currentRecord).GetFloat(currentField);
-                fwrite(&value, 4, 1, output);
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
-            {
-                unsigned int value = GetRecord(currentRecord).GetBool(currentField);
-                fwrite(&value, 4, 1, output);
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
-            {
-                int value = GetRecord(currentRecord).GetByte(currentField);
-                fwrite(&value, 1, 1, output);
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
-            {
-                unsigned int value = GetRecord(currentRecord).GetByte(currentField);
-                fwrite(&value, 1, 1, output);
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
-            {
-                int value = GetRecord(currentRecord).GetInt(currentField);
-                fwrite(&value, 4, 1, output);
-            }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
-            {
-                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
-                fwrite(&value, 4, 1, output);
-            }
-            else
-            {
-                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
-                fwrite(&value, 4, 1, output);
-            }
-        }
-    }
-
-    fwrite(_stringTexts.c_str(), _stringTexts.size(), 1, output);
-
-    fclose(output);
-
-    Log->WriteLogNoTime("DONE.\n");
-
-    return true;
-}
-
 bool module_parser::ParseBinaryFile()
 {
     if (IsPreFormatted())
     {
         Log->WriteLog("Parsing formated file...");
 
-        if (_totalFields != _sFile.FormatedTotalFields || _recordSize != _sFile.FormatedRecordSize)
+        if (_totalFields != _formatedTotalFields || _recordSize != _formatedRecordSize)
         {
             Log->WriteLogNoTime("FAILED: Formated structure mismatch.\n");
             Log->WriteLog("\n");
             return false;
         }
 
-        if (FormatedFile())
-        {
-            Log->WriteLogNoTime("DONE.\n");
+        SetFieldsOffset(_formatedFieldTypes);
 
-            if (_countFloatFields)
-                Log->WriteLog("Total float Fields: '%u'\n", _countFloatFields);
+        Log->WriteLogNoTime("DONE.\n");
 
-            if (_countStringFields)
-                Log->WriteLog("Total string Fields: '%u'\n", _countStringFields);
+        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_formatedFieldTypes, _totalFields, false));
 
-            if (_countBoolFields)
-                Log->WriteLog("Total bool Fields: '%u'\n", _countBoolFields);
+        if (!PrintInfo->PrintResults())
+            return false;
 
-            if (_countByteFields)
-                Log->WriteLog("Total byte Fields: '%u'\n", _countByteFields);
-
-            if (_countUByteFields)
-                Log->WriteLog("Total unsigned byte Fields: '%u'\n", _countUByteFields);
-
-            if (_countIntFields)
-                Log->WriteLog("Total int Fields: '%u'\n", _countIntFields);
-
-            if (_countUIntFields)
-                Log->WriteLog("Total unsigned int Fields: '%u'\n", _countUIntFields);
-
-            CreateCSVFile();
+            // CreateCSVFile();
             // CreateDBCFile();
-        }
     }
     else
     {
@@ -429,22 +280,12 @@ bool module_parser::ParseBinaryFile()
         {
             Log->WriteLogNoTime("DONE.\n");
 
-            if (_countFloatFields)
-                Log->WriteLog("Total float Fields Predicted: '%u'\n", _countFloatFields);
+            auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, true));
 
-            if (_countStringFields)
-                Log->WriteLog("Total string Fields Predicted: '%u'\n", _countStringFields);
+            if (!PrintInfo->PrintResults())
+                return false;
 
-            if (_countBoolFields)
-                Log->WriteLog("Total bool Fields Predicted: '%u'\n", _countBoolFields);
-
-            if (_countIntFields)
-                Log->WriteLog("Total int Fields Predicted: '%u'\n", _countIntFields);
-
-            if (_countUIntFields)
-                Log->WriteLog("Total unsigned int Fields Predicted: '%u'\n", _countUIntFields);
-
-            CreateCSVFile();
+            // CreateCSVFile();
             // CreateDBCFile();
             // CreateSQLFile();
         }
@@ -457,50 +298,12 @@ bool module_parser::ParseBinaryFile()
 
 bool module_parser::ParseCSVFile()
 {
-    if (_inputFile) fclose(_inputFile);
+    auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, false));
 
-    const auto_ptr<CSV_Reader> CSVReader(new CSV_Reader(GetFileName()));
-    if (CSVReader->LoadCSVFile())
-    {
-        if (CSVReader->ParseFile())
-        {
-            CSVReader->PrintResults();
-            CSVReader->CreateDBCFile();
-        }
-    }
+    if (!PrintInfo->PrintResults())
+        return false;
 
     Log->WriteLog("\n");
-
-    return true;
-}
-
-bool module_parser::FormatedFile()
-{
-    SetFieldsOffset();
-
-    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-    {
-        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-            _countFloatFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_STRING)
-            _countStringFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
-            _countBoolFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
-            _countByteFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
-            _countUByteFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_INT)
-            _countIntFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
-            _countUIntFields++;
-    }
-
-    if ((_countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields) != _totalFields)
-    {
-        Log->WriteLogNoTime("FAILED: One or more fields are not parsed correctly. Conctact Developer to fix it.\n");
-        return false;
-    }
 
     return true;
 }
@@ -509,7 +312,7 @@ bool module_parser::PredictFieldTypes()
 {
     // Establecemos field type NONE y extablecemos en donde empieza cada field para todos los fields
     SetFieldTypesToNONE();
-    SetFieldsOffset();
+    SetFieldsOffset(_fieldTypes);
 
     // Obtenemos los tipos de Fields
     // 01 - Float System
@@ -526,11 +329,11 @@ bool module_parser::PredictFieldTypes()
                 int isFloat3 = floatStringValue.find("-nan");
                 if (isFloat1 != -1 || isFloat2 != -1 || isFloat3 != -1)
                 {
-                    _sFile.FormatedFieldTypes[currentField] = type_NONE;
+                    _fieldTypes[currentField] = type_NONE;
                     break;
                 }
 
-                _sFile.FormatedFieldTypes[currentField] = type_FLOAT;
+                _fieldTypes[currentField] = type_FLOAT;
             }
         }
     }
@@ -538,7 +341,7 @@ bool module_parser::PredictFieldTypes()
     // 02 - Bool System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
+        if (_fieldTypes[currentField] == type_FLOAT)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -547,11 +350,11 @@ bool module_parser::PredictFieldTypes()
 
             if (intValue < 0 || intValue > 1)
             {
-                _sFile.FormatedFieldTypes[currentField] = type_NONE;
+                _fieldTypes[currentField] = type_NONE;
                 break;
             }
 
-            _sFile.FormatedFieldTypes[currentField] = type_BOOL;
+            _fieldTypes[currentField] = type_BOOL;
         }
     }
 
@@ -560,7 +363,7 @@ bool module_parser::PredictFieldTypes()
     {
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_BOOL)
+            if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL)
                 continue;
 
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -568,11 +371,11 @@ bool module_parser::PredictFieldTypes()
                 int intValue = GetRecord(currentRecord).GetUInt(currentField);
                 if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
                 {
-                    _sFile.FormatedFieldTypes[currentField] = type_INT;
+                    _fieldTypes[currentField] = type_INT;
                     break;
                 }
 
-                _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                _fieldTypes[currentField] = type_STRING;
             }
         }
 
@@ -580,7 +383,7 @@ bool module_parser::PredictFieldTypes()
         map<unsigned int, int> TotalTextsPredicted;
         for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
         {
-            if (_sFile.FormatedFieldTypes[currentField] != type_STRING)
+            if (_fieldTypes[currentField] != type_STRING)
                 continue;
 
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -599,26 +402,14 @@ bool module_parser::PredictFieldTypes()
             }
         }
 
-        map<string, unsigned int> AllStringsInTable;
-        for (unsigned int x = 1; x < _stringSize; x++)
-        {
-            string text = reinterpret_cast<char*>(_stringTable + x);
-            x += text.size() + 1;
-            auto it = AllStringsInTable.find(text);
-            if (it != AllStringsInTable.end() || text.empty())
-                continue;
-
-            AllStringsInTable.insert(pair<string, unsigned int>(text, x));
-        }
-
         /// Si no hubo prediccion de strings entonces intentamos buscas mas a fondo
-        if (TotalTextsPredicted.size() != AllStringsInTable.size())
+        if (TotalTextsPredicted.size() != _uniqueStringTexts.size())
         {
             /// Volvemos a checar los bool ya que nos faltan strings por realocar, solo se toman encuenta los bool = 1
             unsigned int contamosbool = 0;
             for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
             {
-                if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                if (_fieldTypes[currentField] != type_BOOL)
                     continue;
 
                 for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -630,22 +421,22 @@ bool module_parser::PredictFieldTypes()
             }
 
             /// Si la suma total de contamosbool + totaltextpredicted = allstringsintable, siginifica que los strings faltantes fueron contados como bool
-            if ((TotalTextsPredicted.size() + contamosbool) == AllStringsInTable.size())
+            if ((TotalTextsPredicted.size() + contamosbool) == _uniqueStringTexts.size())
             {
                 for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
                 {
-                    if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                    if (_fieldTypes[currentField] != type_BOOL)
                         continue;
 
                     for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
                     {
                         unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                         if (value == 1)
-                            _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                            _fieldTypes[currentField] = type_STRING;
                     }
                 }
             }
-            else if ((TotalTextsPredicted.size() + contamosbool) < AllStringsInTable.size())
+            else if ((TotalTextsPredicted.size() + contamosbool) < _uniqueStringTexts.size())
             {
                 Log->WriteLogNoTime("FAILED: Unable to predict one or more string fields.\n");
                 return false;
@@ -654,8 +445,8 @@ bool module_parser::PredictFieldTypes()
             /// Y si no se predijeron strings, entonces vamos a sacar la diferencia y buscar todos los strings restantes
             else
             {
-                unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - AllStringsInTable.size();
-                //Log->WriteLog("\nStrings Actuales: %u, Totales: %u, Faltantes: %u, Bool Contados: %u\n", TotalTextsPredicted.size(), AllStringsInTable.size(), stringsFaltantes, contamosbool);
+                unsigned int stringsFaltantes = (TotalTextsPredicted.size() + contamosbool) - _uniqueStringTexts.size();
+                //Log->WriteLog("\nStrings Actuales: %u, Totales: %u, Faltantes: %u, Bool Contados: %u\n", TotalTextsPredicted.size(), _uniqueStringTexts.size(), stringsFaltantes, contamosbool);
 
                 /// Si solo hay un bool, entonces por default es el que falta
                 if (contamosbool > 1)
@@ -667,7 +458,7 @@ bool module_parser::PredictFieldTypes()
                             break;
 
                         // Omitimos el primer field pues se supone que hay mas de 1 bool que debe ser string
-                        if (_sFile.FormatedFieldTypes[currentField] != type_BOOL || currentField == 0)
+                        if (_fieldTypes[currentField] != type_BOOL || currentField == 0)
                             continue;
 
                         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -678,7 +469,7 @@ bool module_parser::PredictFieldTypes()
                             unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                             if (value == 1)
                             {
-                                _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                                _fieldTypes[currentField] = type_STRING;
                                 stringsFaltantes--;
                             }
                         }
@@ -689,14 +480,14 @@ bool module_parser::PredictFieldTypes()
                     /// Aqui establecemos el unico bool a tipo string
                     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
                     {
-                        if (_sFile.FormatedFieldTypes[currentField] != type_BOOL)
+                        if (_fieldTypes[currentField] != type_BOOL)
                             continue;
 
                         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
                         {
                             unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
                             if (value == 1)
-                                _sFile.FormatedFieldTypes[currentField] = type_STRING;
+                                _fieldTypes[currentField] = type_STRING;
                         }
                     }
                 }
@@ -713,7 +504,7 @@ bool module_parser::PredictFieldTypes()
     // 04 - Unsigned/Signed Int System
     for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
     {
-        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT || _sFile.FormatedFieldTypes[currentField] == type_BOOL || _sFile.FormatedFieldTypes[currentField] == type_STRING)
+        if (_fieldTypes[currentField] == type_FLOAT || _fieldTypes[currentField] == type_BOOL || _fieldTypes[currentField] == type_STRING)
             continue;
 
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
@@ -721,37 +512,12 @@ bool module_parser::PredictFieldTypes()
             int intValue = GetRecord(currentRecord).GetInt(currentField);
             if (intValue < 0)
             {
-                _sFile.FormatedFieldTypes[currentField] = type_INT;
+                _fieldTypes[currentField] = type_INT;
                 break;
             }
 
-            _sFile.FormatedFieldTypes[currentField] = type_UINT;
+            _fieldTypes[currentField] = type_UINT;
         }
-    }
-
-    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
-    {
-        if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-            _countFloatFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_STRING)
-            _countStringFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
-            _countBoolFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
-            _countByteFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
-            _countUByteFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_INT)
-            _countIntFields++;
-        if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
-            _countUIntFields++;
-    }
-
-    unsigned int sumatotalfields = _countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields;
-    if (sumatotalfields != _totalFields)
-    {
-        Log->WriteLogNoTime("FAILED: One or more fields are not predicted correctly. Conctact Developer to fix it.\n");
-        return false;
     }
 
     return true;

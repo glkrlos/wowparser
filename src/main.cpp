@@ -64,12 +64,15 @@ void pass3_checkheadersanddataconsistency()
     const auto_ptr<module_parser> Parser(FindFiles->ExportData());
 
     Parser->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+
+    /// If Check headers, entonces ponemos
+    /// Parsing Files....
 }
 
 void print_end()
 {
     Log->WriteLogAndPrint("-----> Finished\n");
-    Log->WriteLog("====================================LOG FILE END====================================\n");
+    Log->WriteLog("=====================================LOG FILE END=====================================\n");
     printf("--Press any key to exit--\n");
     getch();
 }

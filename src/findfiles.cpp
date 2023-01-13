@@ -51,7 +51,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 {
                     if (Shared->CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
-                        structFile File;
+                        structFileInfo File;
                         File.FileName = dirName;
                         File.Structure = structure;
                         File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
@@ -67,7 +67,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
             }
             else if (Shared->CompareTexts(lowerCaseOriginalFileName, filename))
             {
-                structFile File;
+                structFileInfo File;
                 File.FileName = dirName;
                 File.Structure = structure;
                 File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
@@ -165,7 +165,7 @@ string cFindFiles::GetFileExtension(string fileName)
     return fileName.substr(fileName.rfind(".") + 1, fileName.size());
 }
 
-void cFindFiles::AddFileToListIfNotExist(string fileName, structFile File)
+void cFindFiles::AddFileToListIfNotExist(string fileName, structFileInfo File)
 {
     auto Found = fileNames.find(fileName);
 
@@ -177,7 +177,7 @@ void cFindFiles::AddFileToListIfNotExist(string fileName, structFile File)
         return;
     }
 
-    fileNames.insert(pair<string, structFile>(fileName, File));
+    fileNames.insert(pair<string, structFileInfo>(fileName, File));
 
     return;
 }

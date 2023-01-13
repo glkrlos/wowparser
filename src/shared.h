@@ -35,15 +35,38 @@ enum enumFileType
     wdbquestcacheFile = 14,
 };
 
-struct structFile
+struct structField
+{
+    unsigned int ID;
+    enumFieldTypes Type;
+    string Value;
+};
+
+struct structRecord
+{
+    unsigned int ID;
+    vector<structField> Field;
+};
+
+struct structFileData
+{
+    vector<structRecord> Record;
+};
+
+struct structFileInfo
 {
     public:
-        structFile()
+        structFileInfo()
         {
             FileName.clear();
             Type = unkFile;
             Structure.clear();
+            isRecursivelySearched = false;
+            isSearchedByExtension = false;
+            XMLFileID = 0;
             FormatedFieldTypes.clear();
+            FormatedTotalFields = 0;
+            FormatedRecordSize = 0;
         }
 
         string FileName;
@@ -53,8 +76,77 @@ struct structFile
         bool isSearchedByExtension = false;
         unsigned int XMLFileID = 0;
         vector<enumFieldTypes> FormatedFieldTypes;
-        unsigned int FormatedTotalFields = 0;
-        unsigned int FormatedRecordSize = 0;
+        unsigned int FormatedTotalFields;
+        unsigned int FormatedRecordSize;
+};
+
+class SaveFileInfo
+{
+    public:
+        SaveFileInfo()
+        {
+            _recordSize = 0;
+            _totalFields = 0;
+            _totalRecords = 0;
+
+            _fieldTypes.clear();
+            _savedData.clear();
+
+            _stringTexts = '\0';
+            _stringSize = 1;
+        }
+        ~SaveFileInfo()
+        {
+            _recordSize = 0;
+            _totalFields = 0;
+            _totalRecords = 0;
+
+            _fieldTypes.clear();
+            _savedData.clear();
+
+            _stringTexts.clear();
+            _stringSize = 0;
+        }
+        unsigned int GetTotalTotalFields() { return _totalFields; }
+        unsigned int GetTotalTotalRecords() { return _totalRecords; }
+        unsigned int GetTotalRecordSize() { return _recordSize; }
+        unsigned int GetStringSize() { return _stringSize; }
+        vector<enumFieldTypes> GetFieldTypes() { return _fieldTypes; }
+        string GetStringTexts() { return _stringTexts; }
+        map<string, unsigned int> GetUniqueStringTexts() { return _uniqueStringTexts; }
+        map<string, structFileData> GetExtractedData() { return _savedData; }
+
+        void SetUniqueStringTexts(string Text)
+        {
+            if (!Text.empty() && !GetUniqueTextPosition(Text))
+            {
+                unsigned int currentStringPos = _stringTexts.size();
+                _stringTexts.append(Text + '\0');
+                _stringSize += Text.size() + 1;
+                _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
+            }
+        }
+        unsigned int GetUniqueTextPosition(string Text)
+        {
+            if (!Text.empty())
+            {
+                auto it = _uniqueStringTexts.find(Text);
+                if (it != _uniqueStringTexts.end())
+                    return (it->second);
+            }
+
+            return 0;
+        }
+    protected:
+        unsigned int _recordSize;
+        unsigned int _totalFields;
+        unsigned int _totalRecords;
+        vector<enumFieldTypes> _fieldTypes;
+        map<string, structFileData> _savedData;
+
+        unsigned int _stringSize;
+        string _stringTexts;
+        map<string, unsigned int> _uniqueStringTexts;
 };
 
 template <typename T> class CSingleton

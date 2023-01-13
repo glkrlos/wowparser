@@ -6,23 +6,90 @@
 #include "module_csv_reader.h"
 #include "ProgressBar.h"
 
-class module_parser
+class PrintFileInfo
 {
     public:
-        module_parser(map<string, structFile> files) : _ListOfAllFilesToParse(files) {}
-        module_parser(structFile sFile)
+        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, bool predicted) : FieldTypes(eFT), TotalFields(totalFields), Predicted(predicted) { }
+        bool PrintFileInfo::PrintResults()
         {
-            _sFile = sFile;
-            _stringTexts = '\0';
+            for (auto it = FieldTypes.begin(); it != FieldTypes.end(); ++it)
+            {
+                switch (*it)
+                {
+                    case type_FLOAT:    _countFloatFields++; break;
+                    case type_STRING:   _countStringFields++; break;
+                    case type_BOOL:     _countBoolFields++; break;
+                    case type_BYTE:     _countByteFields++; break;
+                    case type_UBYTE:    _countUByteFields++; break;
+                    case type_INT:      _countIntFields++; break;
+                    case type_UINT:     _countUIntFields++; break;
+                    default: break;
+                }
+            }
+
+            if ((_countFloatFields + _countStringFields + _countBoolFields + _countByteFields + _countUByteFields + _countIntFields + _countUIntFields) != TotalFields)
+            {
+                Log->WriteLogNoTime("FAILED: One or more fields are not %s correctly. Conctact Developer to fix it.\n", Predicted ? "predicted" : "parsed");
+                return false;
+            }
+
+            if (_countFloatFields)
+                Log->WriteLog("Total float Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countFloatFields);
+
+            if (_countStringFields)
+                Log->WriteLog("Total string Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countStringFields);
+
+            if (_countBoolFields)
+                Log->WriteLog("Total bool Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countBoolFields);
+
+            if (_countByteFields)
+                Log->WriteLog("Total byte Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countByteFields);
+
+            if (_countUByteFields)
+                Log->WriteLog("Total unsigned byte Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countUByteFields);
+
+            if (_countIntFields)
+                Log->WriteLog("Total int Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countIntFields);
+
+            if (_countUIntFields)
+                Log->WriteLog("Total unsigned int Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countUIntFields);
+
+            return true;
+        }
+    private:
+    protected:
+        unsigned int _countFloatFields = 0;
+        unsigned int _countStringFields = 0;
+        unsigned int _countBoolFields = 0;
+        unsigned int _countByteFields = 0;
+        unsigned int _countUByteFields = 0;
+        unsigned int _countIntFields = 0;
+        unsigned int _countUIntFields = 0;
+        vector<enumFieldTypes> FieldTypes;
+        unsigned int TotalFields = 0;
+        bool Predicted = false;
+};
+
+class module_parser : public SaveFileInfo
+{
+    public:
+        module_parser(map<string, structFileInfo> files) : _ListOfAllFilesToParse(files) {}
+        module_parser(structFileInfo sFile)
+        {
+            _fileName = sFile.FileName;
+            _fileType = sFile.Type;
+            _formatedFieldTypes = sFile.FormatedFieldTypes;
+            _formatedTotalFields = sFile.FormatedTotalFields;
+            _formatedRecordSize = sFile.FormatedRecordSize;
         }
         ~module_parser()
         {
             _header.clear();
 
-            if (_fileData)
+            if (_wholeFileData)
             {
-                delete _fileData;
-                _fileData = NULL;
+                delete _wholeFileData;
+                _wholeFileData = NULL;
             }
 
             if (_inputFile) fclose(_inputFile);
@@ -34,11 +101,10 @@ class module_parser
         bool ParseBinaryFile();
         bool ParseCSVFile();
         bool CheckStructure();
-        bool FormatedFile();
         bool PredictFieldTypes();
-        bool IsPreFormatted() { return !_sFile.FormatedFieldTypes.empty(); }
-        const char *GetFileName() { return _sFile.FileName.c_str(); }
-        enumFileType GetFileType() { return _sFile.Type; }
+        bool IsPreFormatted() { return !_formatedFieldTypes.empty(); }
+        const char *GetFileName() { return _fileName.c_str(); }
+        enumFileType GetFileType() { return _fileType; }
         bool FileIsASCII()
         {
             if (_FirstTimeAksType)
@@ -48,10 +114,10 @@ class module_parser
                 bool binary = false;
                 for (unsigned long x = 0; x < _fileSize; x++)
                 {
-                    if (static_cast<char>(_fileData[x]) == '\n' || static_cast<char>(_fileData[x]) == '\r')
+                    if (static_cast<char>(_wholeFileData[x]) == '\n' || static_cast<char>(_wholeFileData[x]) == '\r')
                         continue;
 
-                    if (!isprint(static_cast<char>(_fileData[x])))
+                    if (!isprint(static_cast<char>(_wholeFileData[x])))
                     {
                         binary = true;
                         break;
@@ -104,25 +170,25 @@ class module_parser
 
             return unkFile;
         }
-        bool NullPoniterToData() { return !_fileData; }
-        char HeaderGetChar() { return static_cast<char>(_fileData[HeaderGetOffSet(1)]); }
-        unsigned int HeaderGetUInt() { return *reinterpret_cast<unsigned int*>(_fileData + HeaderGetOffSet(4)); }
+        bool NullPoniterToData() { return !_wholeFileData; }
+        char HeaderGetChar() { return static_cast<char>(_wholeFileData[HeaderGetOffSet(1)]); }
+        unsigned int HeaderGetUInt() { return *reinterpret_cast<unsigned int*>(_wholeFileData + HeaderGetOffSet(4)); }
         unsigned int HeaderGetOffSet(size_t size) { return (_headerOffset + size) <= _fileSize ? (_headerOffset += size) - size : 0; }
 
         void SetFieldTypesToNONE()
         {
-            _sFile.FormatedFieldTypes.clear();
+            _fieldTypes.clear();
             for (unsigned int x = 0; x < _totalFields; x++)
-                _sFile.FormatedFieldTypes.push_back(type_NONE);
+                _fieldTypes.push_back(type_NONE);
         }
-        void SetFieldsOffset()
+        void SetFieldsOffset(vector<enumFieldTypes> FieldTypes)
         {
             _fieldsOffset = new unsigned int[_totalFields];
             _fieldsOffset[0] = 0;
             for (unsigned int i = 1; i < _totalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
-                if (_sFile.FormatedFieldTypes[i - 1] == type_BYTE || _sFile.FormatedFieldTypes[i - 1] == type_UBYTE)
+                if (FieldTypes[i - 1] == type_BYTE || FieldTypes[i - 1] == type_UBYTE)
                     _fieldsOffset[i] += 1;
                 else
                     _fieldsOffset[i] += 4;
@@ -145,49 +211,34 @@ class module_parser
         };
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
         unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
-
-        bool CreateCSVFile();
-        bool CreateDBCFile();
-        void SetUniqueStringTexts(string Text)
+        void SetUniqueStringTextsFromStringTable(unsigned long currStringSize)
         {
-            if (!Text.empty() && !GetUniqueStringTextsPosition(Text))
+            string Text = "";
+            for (unsigned long currentChar = 1; currentChar < currStringSize; currentChar++)
             {
-                unsigned int currentStringPos = _stringTexts.size();
-                _stringTexts.append(Text + '\0');
-                //_stringSize += Text.size() + 1;
-                _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
-            }
-        }
-        unsigned int GetUniqueStringTextsPosition(string Text)
-        {
-            if (!Text.empty())
-            {
-                map<string, unsigned int>::iterator it = _uniqueStringTexts.find(Text);
-                if (it != _uniqueStringTexts.end())
-                    return (it->second);
-            }
+                char c = static_cast<char>(_stringTable[currentChar]);
+                if (c == '\0')
+                {
+                    SetUniqueStringTexts(Text);
+                    Text.clear();
+                    continue;
+                }
 
-            return 0;
+                Text.append(Shared->ToStr(c));
+            }
         }
     protected:
-        structFile _sFile;
+        string _fileName;
+        enumFileType _fileType;
+        vector<enumFieldTypes> _formatedFieldTypes;
+        unsigned int _formatedTotalFields;
+        unsigned int _formatedRecordSize;
 
         FILE *_inputFile = NULL;
-        unsigned char *_fileData = NULL;
+        unsigned char *_wholeFileData = NULL;
 
         unsigned long _fileSize = 0;
         unsigned int _headerSize = 0;
-        unsigned int _totalRecords = 0;
-        unsigned int _totalFields = 0;
-        unsigned int _recordSize = 0;
-        unsigned int _stringSize = 0;
-        unsigned int _countFloatFields = 0;
-        unsigned int _countStringFields = 0;
-        unsigned int _countBoolFields = 0;
-        unsigned int _countByteFields = 0;
-        unsigned int _countUByteFields = 0;
-        unsigned int _countIntFields = 0;
-        unsigned int _countUIntFields = 0;
 
         bool _FirstTimeGetHeader = true;
         bool _isASCIIFile = false;
@@ -196,16 +247,14 @@ class module_parser
         string _header;
         unsigned int _headerOffset = 0;
 
-        long _dataBytes = 0;
-        long _stringBytes = 0;
-        long _unkBytes = 0;
+        unsigned long _dataBytes = 0;
+        unsigned long _stringBytes = 0;
+        unsigned long _unkBytes = 0;
         unsigned int *_fieldsOffset = NULL;
         unsigned char *_dataTable = NULL;
         unsigned char *_stringTable = NULL;
 
-        map<string, unsigned int> _uniqueStringTexts;
-        string _stringTexts;
-
-        map<string, structFile> _ListOfAllFilesToParse;
+        map<string, structFileInfo> _ListOfAllFilesToParse;
+        map<string, structFileData> _extractedData;
 };
 #endif

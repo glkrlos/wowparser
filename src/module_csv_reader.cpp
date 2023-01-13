@@ -1,204 +1,44 @@
 #include "module_csv_reader.h"
 
-CSV_Reader::CSV_Reader(const char *fileName)
+CSV_Reader::CSV_Reader(const char *FileName, map<unsigned int, string> FileData)
 {
-    _fileName = fileName;
-
-    _recordSize = 0;
-    _totalFields = 0;
-    _totalRecords = 0;
-
-    _fileData.clear();
-    _fieldTypes.clear();
-    _mapRecordsData.clear();
+    _fileName = FileName;
+    _fileData = FileData;
 }
 
 CSV_Reader::~CSV_Reader()
 {
     _fileName = NULL;
-
-    _recordSize = 0;
-    _totalFields = 0;
-    _totalRecords = 0;
-
     _fileData.clear();
-    _fieldTypes.clear();
-    _mapRecordsData.clear();
 }
 
-bool CSV_Reader::LoadCSVFile()
+bool CSV_Reader::CheckCSV()
 {
-    Log->WriteLog("Reloading '%s' as text file... ", _fileName);
-
-    // Abrimos el Archivo como solo lectura
-    ifstream input(_fileName, ifstream::in);
-    if (!input.is_open())
+    /// Checamos si no esta vacio el mapa con toda la informacion
+    auto FirstLine = _fileData.begin();
+    if (FirstLine == _fileData.end())
     {
-        Log->WriteLogNoTime("FAILED: Unable to reopen file.\n", _fileName);
+        Log->WriteLogNoTime("FAILED: Unexpected empty data.\n");
         Log->WriteLog("\n");
         return false;
     }
 
-    // la primera linea no puede estar vacia nunca
-    string TextLine = "";
-    getline(input, TextLine);
-
-    // Establecemos el tipo de Fields
-    if (!SetFieldTypes(TextLine))
-    {
-        input.close();
+    /// Checamos y establecemos los tipos de fields de la primera linea
+    if (!SetFieldTypes(FirstLine->second))
         return false;
-    }
 
-    TextLine = "";
+    /// Borramos el primer registro pues el mapa se pasaria completo y causaria error
+    _fileData.erase(FirstLine);
 
-    unsigned int RecordID = 0;
-    while (getline(input, TextLine))
-        _mapRecordsData.insert(pair<unsigned int, string>(RecordID++, TextLine));
-
-    // cerramos el archivo pues ya no lo necesitamos mas
-    input.close();
-
-    if (_mapRecordsData.empty())
+    /// Checamos si tenemos mas lineas
+    if (_fileData.empty())
     {
         Log->WriteLogNoTime("FAILED: No records found.\n");
         Log->WriteLog("\n");
         return false;
     }
 
-    Log->WriteLogNoTime("DONE.\n");
-
     return true;
-}
-
-bool CSV_Reader::ParseFile()
-{
-    Log->WriteLog("Parsing CSV file... ");
-
-    if (!CheckFieldsOfEachRecordAndSaveAllData())
-        return false;
-
-    Log->WriteLogNoTime("DONE.\n");
-
-    return true;
-}
-
-void CSV_Reader::PrintResults()
-{
-    for (auto it = _fieldTypes.begin(); it != _fieldTypes.end(); ++it)
-    {
-        switch (*it)
-        {
-            case type_FLOAT:    _countFloatFields++; break;
-            case type_STRING:   _countStringFields++; break;
-            case type_BOOL:     _countBoolFields++; break;
-            case type_BYTE:     _countByteFields++; break;
-            case type_UBYTE:    _countUByteFields++; break;
-            case type_INT:      _countIntFields++; break;
-            case type_UINT:     _countUIntFields++; break;
-            default: break;
-        }
-    }
-
-    if (_countFloatFields)
-        Log->WriteLog("Total float Fields: '%u'\n", _countFloatFields);
-
-    if (_countStringFields)
-        Log->WriteLog("Total string Fields: '%u'\n", _countStringFields);
-
-    if (_countBoolFields)
-        Log->WriteLog("Total bool Fields: '%u'\n", _countBoolFields);
-
-    if (_countByteFields)
-        Log->WriteLog("Total byte Fields: '%u'\n", _countByteFields);
-
-    if (_countUByteFields)
-        Log->WriteLog("Total unsigned byte Fields: '%u'\n", _countUByteFields);
-
-    if (_countIntFields)
-        Log->WriteLog("Total int Fields: '%u'\n", _countIntFields);
-
-    if (_countUIntFields)
-        Log->WriteLog("Total unsigned int Fields: '%u'\n", _countUIntFields);
-}
-
-void CSV_Reader::CreateDBCFile()
-{
-    string outputFileNameDBC = _fileName;
-    outputFileNameDBC.append(".dbc");
-    Log->WriteLog("Creating DBC file '%s'... ", outputFileNameDBC.c_str());
-
-    if (_stringTexts.size() != _stringSize)
-    {
-        Log->WriteLogNoTime("FAILED: Mismatched comparison of strings.\n");
-        return;
-    }
-
-    FILE *output;
-    fopen_s(&output, outputFileNameDBC.c_str(), "wb");
-    if (!output)
-    {
-        Log->WriteLogNoTime("FAILED: Unable to create file.\n");
-        return;
-    }
-
-    fwrite("WDBC", 4, 1, output);
-    fwrite(&_totalRecords, sizeof(_totalRecords), 1, output);
-    fwrite(&_totalFields, sizeof(_totalFields), 1, output);
-    fwrite(&_recordSize, sizeof(_recordSize), 1, output);
-    fwrite(&_stringSize, sizeof(_stringSize), 1, output);
-
-    auto currentFile = _fileData.begin();
-
-    for (auto Records = currentFile->second.Record.begin(); Records != currentFile->second.Record.end(); Records++)
-    {
-        for (auto Fields = Records->Field.begin(); Fields != Records->Field.end(); Fields++)
-        {
-            if (Fields->Type == type_FLOAT)
-            {
-                float value = (float)atof(Fields->Value.c_str());
-                fwrite(&value, 4, 1, output);
-            }
-            else if (Fields->Type == type_BOOL)
-            {
-                unsigned int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 4, 1, output);
-            }
-            else if (Fields->Type == type_BYTE)
-            {
-                int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 1, 1, output);
-            }
-            else if (Fields->Type == type_UBYTE)
-            {
-                unsigned int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 1, 1, output);
-            }
-            else if (Fields->Type == type_INT)
-            {
-                int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 4, 1, output);
-            }
-            else if (Fields->Type == type_UINT)
-            {
-                unsigned int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 4, 1, output);
-            }
-            else
-            {
-                unsigned int value = atoi(Fields->Value.c_str());
-                fwrite(&value, 4, 1, output);
-            }
-        }
-    }
-
-    fwrite(_stringTexts.c_str(), _stringTexts.size(), 1, output);
-
-    fclose(output);
-
-    Log->WriteLogNoTime("DONE.\n");
-
-    return;
 }
 
 bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &mapFields)
@@ -595,7 +435,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
 {
     unsigned int currentRecord = 0;
     vector<structRecord> Records;
-    for (auto itRecords = _mapRecordsData.begin(); itRecords != _mapRecordsData.end(); itRecords++, currentRecord++)
+    for (auto itRecords = _fileData.begin(); itRecords != _fileData.end(); itRecords++, currentRecord++)
     {
         map<unsigned int, string> fieldsOfCurrentRecord;
 
@@ -632,7 +472,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
             if (sField.Type == type_STRING)
             {
                 SetUniqueStringTexts(itFields->second);
-                sField.Value = Shared->ToStr(GetUniqueStringTextsPosition(itFields->second));
+                sField.Value = Shared->ToStr(GetUniqueTextPosition(itFields->second));
             }
             else
                 sField.Value = itFields->second;
@@ -651,7 +491,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
     // Guardamos todos los Registros del archivo actual al mapa
     structFileData FileData;
     FileData.Record = Records;
-    _fileData.insert(pair<string, structFileData>(_fileName, FileData));
+    _savedData.insert(pair<string, structFileData>(_fileName, FileData));
 
     _totalRecords = Records.size();
 
