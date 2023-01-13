@@ -20,6 +20,29 @@ class Config_Reader
         Config_Reader();
         bool LoadConfiguarionFile();
     private:
+        bool IsValidFormat(string structure)
+        {
+            for (unsigned int x = 0; x < structure.size(); x++)
+            {
+                switch (structure[x])
+                {
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                    case 's':   // string
+                    case 'f':   // float
+                    case 'd':   // int
+                    case 'n':   // int
+                    case 'x':   // unk int
+                    case 'i':   // int
+                    case 'u':   // unsigned int
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return true;
+        }
     protected:
         XMLDocument XMLdoc;
 };

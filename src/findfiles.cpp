@@ -4,21 +4,6 @@ cFindFiles::cFindFiles()
 {
 }
 
-void cFindFiles::CheckHeadersAndDataConsistencyOfAllFilesAdded()
-{
-    ProgressBar bar(fileNames.size());
-
-    for (auto FileName = fileNames.begin(); FileName != fileNames.end(); FileName++)
-    {
-        bar.step(FileName->first.c_str());
-
-        auto_ptr<module_parser> Parser(new module_parser(FileName->second));
-        if (Parser->Load())
-            Parser->ParseFile();
-
-    }
-}
-
 enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
@@ -55,10 +40,10 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
         if (ent->d_type == DT_REG)
         {
             string lowerCaseOriginalFileName = ent->d_name;
-            transform(lowerCaseOriginalFileName.begin(), lowerCaseOriginalFileName.end(), lowerCaseOriginalFileName.begin(), ::tolower);
-            transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
-            transform(structure.begin(), structure.end(), structure.begin(), ::tolower);
-            transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
+            Shared->ToLowerCase(lowerCaseOriginalFileName);
+            Shared->ToLowerCase(filename);
+            Shared->ToLowerCase(structure);
+            Shared->ToLowerCase(fileExt);
 
             if (!fileExt.empty())
             {
@@ -73,9 +58,9 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                         File.isRecursivelySearched = recursive;
                         File.isSearchedByExtension = true;
                         File.XMLFileID = xmlFileID;
-                        File.FormatedFieldTypes = Shared->GetFormatedFieldTypes(structure);
-                        File.FormatedRecordSize = Shared->GetFormatedRecordSize(structure);
-                        File.FormatedTotalFields = Shared->GetFormatedTotalFields(structure);
+                        File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
+                        File.FormatedRecordSize = GetFormatedRecordSize(structure);
+                        File.FormatedTotalFields = GetFormatedTotalFields(structure);
                         AddFileToListIfNotExist(dirName, File);
                     }
                 }
@@ -89,9 +74,9 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 File.isRecursivelySearched = recursive;
                 File.isSearchedByExtension = false;
                 File.XMLFileID = xmlFileID;
-                File.FormatedFieldTypes = Shared->GetFormatedFieldTypes(structure);
-                File.FormatedRecordSize = Shared->GetFormatedRecordSize(structure);
-                File.FormatedTotalFields = Shared->GetFormatedTotalFields(structure);
+                File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
+                File.FormatedRecordSize = GetFormatedRecordSize(structure);
+                File.FormatedTotalFields = GetFormatedTotalFields(structure);
                 AddFileToListIfNotExist(dirName, File);
             }
         }

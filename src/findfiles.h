@@ -3,7 +3,6 @@
 
 #include "pch.h"
 #include "shared.h"
-#include <algorithm>
 #include "module_parser.h"
 
 #ifdef _WIN32
@@ -12,12 +11,13 @@
     #include <dirent.h>
 #endif
 
-#include "ProgressBar.h"
-
 class cFindFiles
 {
     public:
-        void CheckHeadersAndDataConsistencyOfAllFilesAdded();
+        module_parser *ExportData()
+        {
+            return new module_parser(fileNames);
+        }
         cFindFiles();
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
@@ -27,6 +27,65 @@ class cFindFiles
         bool HaveExtension(string fileName);
         string GetFileExtension(string fileName);
         void AddFileToListIfNotExist(string fileName, structFile File);
+        unsigned int GetFormatedTotalFields(string structure)
+        {
+            return structure.empty() ? 0 : structure.size();
+        }
+        unsigned int GetFormatedRecordSize(string structure)
+        {
+            unsigned int RecordSize = 0;
+
+            for (unsigned int x = 0; x < structure.size(); x++)
+            {
+                switch (structure[x])
+                {
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                        RecordSize += 1;
+                        break;
+                    default:
+                        RecordSize += 4;
+                        break;
+                }
+            }
+
+            return RecordSize;
+        }
+        vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
+        {
+            vector<enumFieldTypes> fieldTypes;
+            for (unsigned int x = 0; x < structure.size(); x++)
+            {
+                switch (structure[x])
+                {
+                    case 'X':   // unk byte
+                    case 'b':   // byte
+                        fieldTypes.push_back(type_BYTE);
+                        continue;
+                    case 's':   // string
+                        fieldTypes.push_back(type_STRING);
+                        continue;
+                    case 'f':   // float
+                        fieldTypes.push_back(type_FLOAT);
+                        continue;
+                    case 'd':   // int
+                    case 'n':   // int
+                    case 'x':   // unk int
+                    case 'i':   // int
+                        fieldTypes.push_back(type_INT);
+                        continue;
+                    case 'u':   // unsigned int
+                        fieldTypes.push_back(type_UINT);
+                        continue;
+                    default:
+                        fieldTypes.push_back(type_NONE);
+                        continue;
+                }
+            }
+
+            return fieldTypes;
+        }
+
     protected:
         map<string, structFile> fileNames;
 };

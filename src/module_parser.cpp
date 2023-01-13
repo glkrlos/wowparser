@@ -756,3 +756,18 @@ bool module_parser::PredictFieldTypes()
 
     return true;
 }
+
+void module_parser::CheckHeadersAndDataConsistencyOfAllFilesAdded()
+{
+    ProgressBar bar(_ListOfAllFilesToParse.size());
+
+    for (auto CurrentFileName = _ListOfAllFilesToParse.begin(); CurrentFileName != _ListOfAllFilesToParse.end(); CurrentFileName++)
+    {
+        bar.step(CurrentFileName->first.c_str());
+
+        auto_ptr<module_parser> Parser(new module_parser(CurrentFileName->second));
+        if (Parser->Load())
+            Parser->ParseFile();
+
+    }
+}

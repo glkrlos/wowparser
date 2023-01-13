@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "shared.h"
 #include "module_config_reader.h"
+#include "module_parser.h"
 
 void print_header()
 {
@@ -59,8 +60,10 @@ void pass3_checkheadersanddataconsistency()
     Log->WriteLog("\n");
     Log->WriteLogAndPrint("-----> Checking header and data consistency of each file added to parse it...\n");
 
-    /// Enviamos la lista de archivos
-    FindFiles->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+    /// Pasamos la lista de archivos al modulo Parser
+    const auto_ptr<module_parser> Parser(FindFiles->ExportData());
+
+    Parser->CheckHeadersAndDataConsistencyOfAllFilesAdded();
 }
 
 void print_end()

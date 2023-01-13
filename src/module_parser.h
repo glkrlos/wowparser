@@ -4,10 +4,12 @@
 #include "pch.h"
 #include "shared.h"
 #include "module_csv_reader.h"
+#include "ProgressBar.h"
 
 class module_parser
 {
     public:
+        module_parser(map<string, structFile> files) : _ListOfAllFilesToParse(files) {}
         module_parser(structFile sFile)
         {
             _sFile = sFile;
@@ -27,6 +29,7 @@ class module_parser
         }
         bool Load();
         void ParseFile();
+        void CheckHeadersAndDataConsistencyOfAllFilesAdded();
     private:
         bool ParseBinaryFile();
         bool ParseCSVFile();
@@ -202,5 +205,7 @@ class module_parser
 
         map<string, unsigned int> _uniqueStringTexts;
         string _stringTexts;
+
+        map<string, structFile> _ListOfAllFilesToParse;
 };
 #endif

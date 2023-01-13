@@ -95,7 +95,7 @@ bool Config_Reader::LoadConfiguarionFile()
         const char *_fileFormat = fileElement->Attribute("format");
         string FileFormat = _fileFormat ? _fileFormat : "";
 
-        if (!FileExtensionIsSet && !Shared->IsValidFormat(FileFormat))
+        if (!FileExtensionIsSet && IsValidFormat(FileFormat))
         {
             Log->WriteLog("\t WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", FileName.c_str(), fileID);
             continue;
