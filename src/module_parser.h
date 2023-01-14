@@ -207,13 +207,13 @@ class module_parser : public SaveFileInfo
         class RecordAccessor
         {
             public:
-                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float*>(_data + _info.GetOffset(FieldID)); }
-                int GetInt(size_t FieldID) const { return *reinterpret_cast<int*>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float *>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int *>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int *>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
                 char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
                 unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
-                const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info._stringTable + GetUInt(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char *>(_info._stringTable + GetUInt(FieldID)); }
             private:
                 RecordAccessor(module_parser &info, unsigned char *data) : _data(data), _info(info) { }
                 unsigned char *_data = NULL;
