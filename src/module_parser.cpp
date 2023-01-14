@@ -287,12 +287,9 @@ bool module_parser::ParseBinaryFile()
                 else if (_formatedFieldTypes[currentField] == type_BOOL)
                     sField.Value = Shared->ToStr(GetRecord(currentRecord).GetBool(currentField));
                 else if (_formatedFieldTypes[currentField] == type_BYTE)
-                {
                     sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
-                    //Log->WriteLog("\nSAVE FORMATED: string val: '%s' char val:'%d'\n", sField.Value.c_str(), GetRecord(currentRecord).GetByte(currentField));
-                }
                 else if (_formatedFieldTypes[currentField] == type_UBYTE)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUByte(currentField));
                 else if (_formatedFieldTypes[currentField] == type_INT)
                     sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
                 else if (_formatedFieldTypes[currentField] == type_UINT)
@@ -597,7 +594,7 @@ bool module_parser::PredictFieldTypes()
             else if (_fieldTypes[currentField] == type_BYTE)
                 sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
             else if (_fieldTypes[currentField] == type_UBYTE)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUByte(currentField));
             else if (_fieldTypes[currentField] == type_INT)
                 sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
             else if (_fieldTypes[currentField] == type_UINT)
