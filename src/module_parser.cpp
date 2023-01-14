@@ -86,23 +86,41 @@ bool module_parser::CheckStructure()
 
             bool isLastChar = (x + 1) >= _fileSize;
 
-            if (c == '\n' || isLastChar)
+            /// Si es nueva linea entonces
+            if (c == '\n')
             {
-                rowcount++;
-
-                if (currentLine.empty())
+                /// Si es la ultima letra y no esta vacio el string, agregamos y salimos
+                if (isLastChar && !currentLine.empty())
+                {
+                    rowcount++;
+                    CSVDataMap.insert(pair<unsigned int, string>(rowcount, currentLine));
+                    break;
+                }
+                /// Si no es la ultima letra y la linea esta vacia, entonces es error
+                else if (!isLastChar && currentLine.empty())
                 {
                     Log->WriteLogNoTime("FAILED: Contains an empty line at Row '%u'.\n", rowcount);
                     Log->WriteLog("\n");
                     return false;
                 }
-
-                if (isLastChar)
-                    currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
-
+                /// Cualquier otra cosa significa que ni es la ultima letra y ni esta vacio el string, agregamos y continuamos
+                rowcount++;
                 CSVDataMap.insert(pair<unsigned int, string>(rowcount, currentLine));
                 currentLine.clear();
                 continue;
+            }
+            /// Si es la ultima letra
+            else if (isLastChar)
+            {
+                /// Si la linea no esta vacia, agregamos y salimos
+                if (!currentLine.empty())
+                {
+                    rowcount++;
+                    CSVDataMap.insert(pair<unsigned int, string>(rowcount, currentLine));
+                    break;
+                }
+                /// Por consiguiente esta vacio el string y como es la ultima letra no necesitamos seguir
+                break;
             }
 
             currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
