@@ -316,8 +316,10 @@ bool module_parser::ParseBinaryFile()
         FileData.Record = Records;
         _extractedData.insert(pair<string, structFileData>(_fileName, FileData));
 
-        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
-        DBCWriter->CreateDBCFile();
+        //auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+        //DBCWriter->CreateDBCFile();
+        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_fileName, _formatedFieldTypes, _extractedData, _stringTexts));
+        CSVWriter->CreateCSVFile();
     }
     else
     {
@@ -339,8 +341,10 @@ bool module_parser::ParseBinaryFile()
             if (!PrintInfo->PrintResults())
                 return false;
 
-            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
-            DBCWriter->CreateDBCFile();
+            //auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+            //DBCWriter->CreateDBCFile();
+            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_fileName, _fieldTypes, _extractedData, _stringTexts));
+            CSVWriter->CreateCSVFile();
         }
     }
 

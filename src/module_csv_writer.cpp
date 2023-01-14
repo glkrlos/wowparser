@@ -13,10 +13,10 @@ bool CSV_Writer::CreateCSVFile()
         Log->WriteLog("\n");
         return false;
     }
-/*
-    for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+
+    for (auto currentField = _fieldTypes.begin(); currentField != _fieldTypes.end(); currentField++)
     {
-        switch (_fieldTypes[currentField])
+        switch (*currentField)
         {
             case type_FLOAT:  fprintf(output, "float"); break;
             case type_BOOL:   fprintf(output, "bool"); break;
@@ -28,74 +28,75 @@ bool CSV_Writer::CreateCSVFile()
             default:          fprintf(output, "uint"); break;
         }
 
-        if (currentField + 1 < _totalFields)
+        if (currentField + 1 != _fieldTypes.end())
             fprintf(output, ",");
     }
     fprintf(output, "\n");
 
-    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
+    auto currentFile = _savedData.begin();
+    for (auto Records = currentFile->second.Record.begin(); Records != currentFile->second.Record.end(); Records++)
     {
-        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        for (auto Fields = Records->Field.begin(); Fields != Records->Field.end(); Fields++)
         {
-            if (_stringSize > 1 && _sFile.FormatedFieldTypes[currentField] == type_STRING)
+            if (_stringTexts.size() > 1 && Fields->Type == type_STRING)
             {
-                unsigned int value = GetRecord(currentRecord).GetUInt(currentField);
+                unsigned int value = Fields->StringValue;
                 if (value)
                 {
                     string outText = "\"";
-                    for (unsigned int x = value; x < _stringSize; x++)
+                    for (unsigned int x = value; x < _stringTexts.size(); x++)
                     {
-                        if (!_stringTable[x])
+                        if (!_stringTexts[x])
                             break;
 
-                        if (_stringTable[x] == '"')
+                        if (_stringTexts[x] == '"')
                             outText.append("\"");
 
-                        if (_stringTable[x] == '\r')
+                        if (_stringTexts[x] == '\r')
                         {
                             outText.append("||||r||||");
                             continue;
                         }
 
-                        if (_stringTable[x] == '\n')
+                        if (_stringTexts[x] == '\n')
                         {
                             outText.append("{{{{n}}}}");
                             continue;
                         }
 
-                        if (_stringTable[x] == '\t')
+                        if (_stringTexts[x] == '\t')
                         {
                             outText.append("[[[[t]]]]");
                             continue;
                         }
 
-                        outText.append(Shared->ToStr(_stringTable[x]));
+                        outText.append(Shared->ToStr(_stringTexts[x]));
                     }
                     outText.append("\"");
                     fprintf(output, "%s", outText.c_str());
                 }
             }
-            else if (_sFile.FormatedFieldTypes[currentField] == type_FLOAT)
-                fprintf(output, "%f", GetRecord(currentRecord).GetFloat(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BOOL)
-                fprintf(output, "%u", GetRecord(currentRecord).GetBool(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_BYTE)
-                fprintf(output, "%i", GetRecord(currentRecord).GetByte(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UBYTE)
-                fprintf(output, "%u", GetRecord(currentRecord).GetByte(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_INT)
-                fprintf(output, "%i", GetRecord(currentRecord).GetInt(currentField));
-            else if (_sFile.FormatedFieldTypes[currentField] == type_UINT)
-                fprintf(output, "%u", GetRecord(currentRecord).GetUInt(currentField));
+            else if (Fields->Type == type_FLOAT)
+                fprintf(output, "%f", Fields->FloatValue);
+            else if (Fields->Type == type_BOOL)
+                fprintf(output, "%u", Fields->BoolValue);
+            else if (Fields->Type == type_BYTE)
+                fprintf(output, "%i", Fields->ByteValue);
+            else if (Fields->Type == type_UBYTE)
+                fprintf(output, "%u", Fields->UByteValue);
+            else if (Fields->Type == type_INT)
+                fprintf(output, "%i", Fields->IntValue);
+            else if (Fields->Type == type_UINT)
+                fprintf(output, "%u", Fields->UIntValue);
 
-            if (currentField + 1 < _totalFields)
+            if (Fields + 1 != Records->Field.end())
                 fprintf(output, ",");
         }
 
-        if (currentRecord + 1 < _totalRecords)
+        if (Records + 1 != currentFile->second.Record.end())
             fprintf(output, "\n");
     }
-    */
+
     fclose(output);
 
     Log->WriteLogNoTime("DONE.\n");
