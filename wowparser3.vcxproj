@@ -57,6 +57,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\md5.cpp" />
     <ClCompile Include="src\module_csv_reader.cpp" />
     <ClCompile Include="src\module_csv_writer.cpp" />
     <ClCompile Include="src\module_dbc_writer.cpp" />
@@ -70,6 +71,7 @@
     <ClCompile Include="src\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\md5.h" />
     <ClInclude Include="src\module_csv_reader.h" />
     <ClInclude Include="src\module_csv_writer.h" />
     <ClInclude Include="src\module_dbc_writer.h" />

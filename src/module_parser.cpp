@@ -42,6 +42,10 @@ bool module_parser::Load()
         return false;
     }
 
+    /// Generamos el hash del archivo
+    MD5 generatehash;
+    hash = generatehash(_wholeFileData, _fileSize);
+
     // Para los archivos csv, si fuera solo la palabra "int" serian 3 bytes al menos
     // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
     if (((GetFileType() == csvFile || FileIsASCII()) && _fileSize < 3) || (!FileIsASCII() && _fileSize < 20))
@@ -257,13 +261,61 @@ bool module_parser::ParseBinaryFile()
 
         Log->WriteLogNoTime("DONE.\n");
 
-        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_formatedFieldTypes, _totalFields, false));
+        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_formatedFieldTypes, _formatedTotalFields, _totalRecords, false, hash));
 
         if (!PrintInfo->PrintResults())
             return false;
 
-            // CreateCSVFile();
-            // CreateDBCFile();
+        // Guardamos la informacion al mapa map<string, structFileData> _extractedData
+        unsigned int currentRecordID = 0;
+        vector<structRecord> Records;
+
+        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++, currentRecordID++)
+        {
+            vector<structField> Fields;
+
+            for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+            {
+                structField sField;
+                sField.ID = currentField;
+                sField.Type = _formatedFieldTypes[currentField];
+
+                if (_formatedFieldTypes[currentField] == type_STRING)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+                else if (_formatedFieldTypes[currentField] == type_FLOAT)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetFloat(currentField));
+                else if (_formatedFieldTypes[currentField] == type_BOOL)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetBool(currentField));
+                else if (_formatedFieldTypes[currentField] == type_BYTE)
+                {
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                    //Log->WriteLog("\nSAVE FORMATED: string val: '%s' char val:'%d'\n", sField.Value.c_str(), GetRecord(currentRecord).GetByte(currentField));
+                }
+                else if (_formatedFieldTypes[currentField] == type_UBYTE)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                else if (_formatedFieldTypes[currentField] == type_INT)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
+                else if (_formatedFieldTypes[currentField] == type_UINT)
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+                else // type_STRING
+                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+
+                Fields.push_back(sField);
+            }
+
+            structRecord Record;
+            Record.ID = currentRecordID;
+            Record.Field = Fields;
+
+            Records.push_back(Record);
+        }
+
+        structFileData FileData;
+        FileData.Record = Records;
+        _extractedData.insert(pair<string, structFileData>(_fileName, FileData));
+
+        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+        DBCWriter->CreateDBCFile();
     }
     else
     {
@@ -280,14 +332,13 @@ bool module_parser::ParseBinaryFile()
         {
             Log->WriteLogNoTime("DONE.\n");
 
-            auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, true));
+            auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, true, hash));
 
             if (!PrintInfo->PrintResults())
                 return false;
 
-            // CreateCSVFile();
-            // CreateDBCFile();
-            // CreateSQLFile();
+            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+            DBCWriter->CreateDBCFile();
         }
     }
 
@@ -298,10 +349,13 @@ bool module_parser::ParseBinaryFile()
 
 bool module_parser::ParseCSVFile()
 {
-    auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, false));
+    auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, false, hash));
 
     if (!PrintInfo->PrintResults())
         return false;
+
+    auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+    DBCWriter->CreateDBCFile();
 
     Log->WriteLog("\n");
 
@@ -519,6 +573,51 @@ bool module_parser::PredictFieldTypes()
             _fieldTypes[currentField] = type_UINT;
         }
     }
+
+    // Guardamos la informacion al mapa map<string, structFileData> _extractedData
+    unsigned int currentRecordID = 0;
+    vector<structRecord> Records;
+
+    for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++, currentRecordID++)
+    {
+        vector<structField> Fields;
+
+        for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+        {
+            structField sField;
+            sField.ID = currentField;
+            sField.Type = _fieldTypes[currentField];
+
+            if (_fieldTypes[currentField] == type_STRING)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+            else if (_fieldTypes[currentField] == type_FLOAT)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetFloat(currentField));
+            else if (_fieldTypes[currentField] == type_BOOL)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetBool(currentField));
+            else if (_fieldTypes[currentField] == type_BYTE)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+            else if (_fieldTypes[currentField] == type_UBYTE)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+            else if (_fieldTypes[currentField] == type_INT)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
+            else if (_fieldTypes[currentField] == type_UINT)
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+            else
+                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+
+            Fields.push_back(sField);
+        }
+
+        structRecord Record;
+        Record.ID = currentRecordID;
+        Record.Field = Fields;
+
+        Records.push_back(Record);
+    }
+
+    structFileData FileData;
+    FileData.Record = Records;
+    _extractedData.insert(pair<string, structFileData>(_fileName, FileData));
 
     return true;
 }

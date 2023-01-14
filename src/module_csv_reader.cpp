@@ -475,7 +475,7 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
                 sField.Value = Shared->ToStr(GetUniqueTextPosition(itFields->second));
             }
             else
-                sField.Value = itFields->second;
+                sField.Value = Shared->ToStr(itFields->second);
 
             Fields.push_back(sField);
         }

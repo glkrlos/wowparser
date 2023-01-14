@@ -5,11 +5,13 @@
 #include "shared.h"
 #include "module_csv_reader.h"
 #include "ProgressBar.h"
+#include "md5.h"
+#include "module_dbc_writer.h"
 
 class PrintFileInfo
 {
     public:
-        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, bool predicted) : FieldTypes(eFT), TotalFields(totalFields), Predicted(predicted) { }
+        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, unsigned int totalRecords, bool predicted, string hash) : FieldTypes(eFT), TotalFields(totalFields), TotalRecords(totalRecords), Predicted(predicted), Hash(hash) { }
         bool PrintFileInfo::PrintResults()
         {
             for (auto it = FieldTypes.begin(); it != FieldTypes.end(); ++it)
@@ -54,6 +56,12 @@ class PrintFileInfo
             if (_countUIntFields)
                 Log->WriteLog("Total unsigned int Fields%s: '%u'\n", Predicted ? " Predicted" : "", _countUIntFields);
 
+            if (TotalRecords)
+                Log->WriteLog("Total records found: '%u'\n", TotalRecords);
+
+            if (!Hash.empty())
+                Log->WriteLog("MD5: %s\n", Hash.c_str());
+
             return true;
         }
     private:
@@ -67,7 +75,9 @@ class PrintFileInfo
         unsigned int _countUIntFields = 0;
         vector<enumFieldTypes> FieldTypes;
         unsigned int TotalFields = 0;
+        unsigned int TotalRecords = 0;
         bool Predicted = false;
+        string Hash;
 };
 
 class module_parser : public SaveFileInfo
@@ -202,6 +212,7 @@ class module_parser : public SaveFileInfo
                 unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int*>(_data + _info.GetOffset(FieldID)); }
                 unsigned int GetBool(size_t FieldID) const { return GetUInt(FieldID); }
                 char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
                 const char *GetString(size_t FieldID) const { return reinterpret_cast<char*>(_info._stringTable + GetUInt(FieldID)); }
             private:
                 RecordAccessor(module_parser &info, unsigned char *data) : _data(data), _info(info) { }
@@ -253,6 +264,8 @@ class module_parser : public SaveFileInfo
         unsigned int *_fieldsOffset = NULL;
         unsigned char *_dataTable = NULL;
         unsigned char *_stringTable = NULL;
+
+        string hash;
 
         map<string, structFileInfo> _ListOfAllFilesToParse;
         map<string, structFileData> _extractedData;
