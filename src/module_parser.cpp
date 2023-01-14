@@ -279,23 +279,28 @@ bool module_parser::ParseBinaryFile()
                 structField sField;
                 sField.ID = currentField;
                 sField.Type = _formatedFieldTypes[currentField];
+                sField.StringValue = 0;
+                sField.FloatValue = 0.0f;
+                sField.BoolValue = 0;
+                sField.ByteValue = 0;
+                sField.UByteValue = 0;
+                sField.IntValue = 0;
+                sField.UIntValue = 0;
 
-                if (_formatedFieldTypes[currentField] == type_STRING)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
-                else if (_formatedFieldTypes[currentField] == type_FLOAT)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetFloat(currentField));
+                if (_formatedFieldTypes[currentField] == type_FLOAT)
+                    sField.FloatValue = GetRecord(currentRecord).GetFloat(currentField);
                 else if (_formatedFieldTypes[currentField] == type_BOOL)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetBool(currentField));
+                    sField.BoolValue = GetRecord(currentRecord).GetBool(currentField);
                 else if (_formatedFieldTypes[currentField] == type_BYTE)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                    sField.ByteValue = GetRecord(currentRecord).GetByte(currentField);
                 else if (_formatedFieldTypes[currentField] == type_UBYTE)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUByte(currentField));
+                    sField.UByteValue = GetRecord(currentRecord).GetUByte(currentField);
                 else if (_formatedFieldTypes[currentField] == type_INT)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
+                    sField.IntValue = GetRecord(currentRecord).GetInt(currentField);
                 else if (_formatedFieldTypes[currentField] == type_UINT)
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+                    sField.UIntValue = GetRecord(currentRecord).GetUInt(currentField);
                 else // type_STRING
-                    sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+                    sField.StringValue = GetRecord(currentRecord).GetUInt(currentField);
 
                 Fields.push_back(sField);
             }
@@ -584,23 +589,28 @@ bool module_parser::PredictFieldTypes()
             structField sField;
             sField.ID = currentField;
             sField.Type = _fieldTypes[currentField];
+            sField.StringValue = 0;
+            sField.FloatValue = 0.0f;
+            sField.BoolValue = 0;
+            sField.ByteValue = 0;
+            sField.UByteValue = 0;
+            sField.IntValue = 0;
+            sField.UIntValue = 0;
 
-            if (_fieldTypes[currentField] == type_STRING)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
-            else if (_fieldTypes[currentField] == type_FLOAT)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetFloat(currentField));
+            if (_fieldTypes[currentField] == type_FLOAT)
+                sField.FloatValue = GetRecord(currentRecord).GetFloat(currentField);
             else if (_fieldTypes[currentField] == type_BOOL)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetBool(currentField));
+                sField.BoolValue = GetRecord(currentRecord).GetBool(currentField);
             else if (_fieldTypes[currentField] == type_BYTE)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetByte(currentField));
+                sField.ByteValue = GetRecord(currentRecord).GetByte(currentField);
             else if (_fieldTypes[currentField] == type_UBYTE)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUByte(currentField));
+                sField.UByteValue = GetRecord(currentRecord).GetUByte(currentField);
             else if (_fieldTypes[currentField] == type_INT)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetInt(currentField));
+                sField.IntValue = GetRecord(currentRecord).GetInt(currentField);
             else if (_fieldTypes[currentField] == type_UINT)
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
-            else
-                sField.Value = Shared->ToStr(GetRecord(currentRecord).GetUInt(currentField));
+                sField.UIntValue = GetRecord(currentRecord).GetUInt(currentField);
+            else // type_STRING
+                sField.StringValue = GetRecord(currentRecord).GetUInt(currentField);
 
             Fields.push_back(sField);
         }

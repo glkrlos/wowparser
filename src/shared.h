@@ -39,7 +39,13 @@ struct structField
 {
     unsigned int ID;
     enumFieldTypes Type;
-    string Value;
+    unsigned int StringValue;
+    unsigned int UIntValue;
+    int IntValue;
+    unsigned int BoolValue;
+    char ByteValue;
+    unsigned char UByteValue;
+    float FloatValue;
 };
 
 struct structRecord
@@ -136,6 +142,23 @@ class SaveFileInfo
             }
 
             return 0;
+        }
+        string GetUniqueTextFromPosition(unsigned int position)
+        {
+            if (!position)
+                return "";
+
+            string texttoreturn = "";
+            for (auto current = _uniqueStringTexts.begin(); current != _uniqueStringTexts.end(); current++)
+            {
+                if (current->second == position)
+                {
+                    texttoreturn = current->first;
+                    break;
+                }
+            }
+
+            return texttoreturn;
         }
     protected:
         unsigned int _recordSize;

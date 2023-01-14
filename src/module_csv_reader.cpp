@@ -468,14 +468,31 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
             structField sField;
             sField.ID = currentField;
             sField.Type = GetFieldType(itFields->first);
+            sField.StringValue = 0;
+            sField.FloatValue = 0.0f;
+            sField.BoolValue = 0;
+            sField.ByteValue = 0;
+            sField.UByteValue = 0;
+            sField.IntValue = 0;
+            sField.UIntValue = 0;
 
-            if (sField.Type == type_STRING)
+            if (sField.Type == type_FLOAT)
+                sField.FloatValue = (float)atof(itFields->second.c_str());
+            else if (sField.Type == type_BOOL)
+                sField.BoolValue = atoi(itFields->second.c_str());
+            else if (sField.Type == type_BYTE)
+                sField.ByteValue = atoi(itFields->second.c_str());
+            else if (sField.Type == type_UBYTE)
+                sField.UByteValue = atoi(itFields->second.c_str());
+            else if (sField.Type == type_INT)
+                sField.IntValue = atoi(itFields->second.c_str());
+            else if (sField.Type == type_UINT)
+                sField.UIntValue = atoi(itFields->second.c_str());
+            else /// type_STRING
             {
                 SetUniqueStringTexts(itFields->second);
-                sField.Value = Shared->ToStr(GetUniqueTextPosition(itFields->second));
+                sField.StringValue = GetUniqueTextPosition(itFields->second);
             }
-            else
-                sField.Value = Shared->ToStr(itFields->second);
 
             Fields.push_back(sField);
         }

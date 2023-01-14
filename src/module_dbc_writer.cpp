@@ -34,37 +34,38 @@ bool DBC_Writer::CreateDBCFile()
         {
             if (Fields->Type == type_FLOAT)
             {
-                float value = (float)atof(Fields->Value.c_str());
+                float value = Fields->FloatValue;
                 fwrite(&value, 4, 1, output);
             }
             else if (Fields->Type == type_BOOL)
             {
-                unsigned int value = atoi(Fields->Value.c_str());
+                int value = Fields->BoolValue;
                 fwrite(&value, 4, 1, output);
             }
             else if (Fields->Type == type_BYTE)
             {
-                char value = Fields->Value[0];
+                char value = Fields->ByteValue;
                 fwrite(&value, 1, 1, output);
             }
             else if (Fields->Type == type_UBYTE)
             {
-                unsigned char value = Fields->Value[0];
+                unsigned char value = Fields->UByteValue;
                 fwrite(&value, 1, 1, output);
             }
             else if (Fields->Type == type_INT)
             {
-                int value = atoi(Fields->Value.c_str());
+                int value = Fields->IntValue;
                 fwrite(&value, 4, 1, output);
             }
             else if (Fields->Type == type_UINT)
             {
-                unsigned int value = atoi(Fields->Value.c_str());
+                unsigned int value = Fields->UIntValue;
                 fwrite(&value, 4, 1, output);
             }
             else
+                /// String
             {
-                unsigned int value = atoi(Fields->Value.c_str());
+                unsigned int value = Fields->StringValue;
                 fwrite(&value, 4, 1, output);
             }
         }
