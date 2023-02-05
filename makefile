@@ -1,5 +1,7 @@
 DOREV := $(shell ./revision.sh)
 all:
-	g++ src/tinyxml2.cpp src/dbc_reader.cpp src/main.cpp -o bin/binaryreader
-	i586-mingw32msvc-c++ --no-warnings src/tinyxml2.cpp src/dbc_reader.cpp src/main.cpp -o bin/binaryreader.exe
+	g++ -m32 --no-warnings -std=c++11 -static -static-libgcc -static-libstdc++ src/findfiles.cpp src/log.cpp src/main.cpp src/md5.cpp src/module_config_reader.cpp src/module_csv_reader.cpp src/module_csv_writer.cpp src/module_dbc_writer.cpp src/module_parser.cpp src/pch.cpp src/ProgressBar.cpp src/tinyxml2.cpp -o bin/wowparser3_i386
+	g++ -m64 --no-warnings -std=c++11 -static -static-libgcc -static-libstdc++ src/findfiles.cpp src/log.cpp src/main.cpp src/md5.cpp src/module_config_reader.cpp src/module_csv_reader.cpp src/module_csv_writer.cpp src/module_dbc_writer.cpp src/module_parser.cpp src/pch.cpp src/ProgressBar.cpp src/tinyxml2.cpp -o bin/wowparser3_amd64
+	i586-mingw32msvc-c++ --no-warnings -std=c++11 -static -static-libgcc -static-libstdc++ src/findfiles.cpp src/log.cpp src/main.cpp src/md5.cpp src/module_config_reader.cpp src/module_csv_reader.cpp src/module_csv_writer.cpp src/module_dbc_writer.cpp src/module_parser.cpp src/pch.cpp src/ProgressBar.cpp src/tinyxml2.cpp -o bin/wowparser3_x86.exe
+	x86_64-w64-mingw32-g++ --no-warnings -std=c++11 -static -static-libgcc -static-libstdc++ src/findfiles.cpp src/log.cpp src/main.cpp src/md5.cpp src/module_config_reader.cpp src/module_csv_reader.cpp src/module_csv_writer.cpp src/module_dbc_writer.cpp src/module_parser.cpp src/pch.cpp src/ProgressBar.cpp src/tinyxml2.cpp -o bin/wowparser3_x64.exe
 	rm revision.h

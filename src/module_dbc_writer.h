@@ -3,7 +3,6 @@
 
 #include "pch.h"
 #include "shared.h"
-#include "log.h"
 
 class DBC_Writer
 {
@@ -27,10 +26,10 @@ class DBC_Writer
         ~DBC_Writer() { }
         bool CreateDBCFile();
     protected:
-        unsigned int _totalRecords = 0;
-        unsigned int _totalFields = 0;
-        unsigned int _recordSize = 0;
-        unsigned int _stringSize = 0;
+        unsigned int _totalRecords;
+        unsigned int _totalFields;
+        unsigned int _recordSize;
+        unsigned int _stringSize;
         string _stringTexts;
         string _fileName;
         map<string, structFileData> _savedData;

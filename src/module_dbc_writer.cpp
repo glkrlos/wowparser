@@ -13,7 +13,7 @@ bool DBC_Writer::CreateDBCFile()
     }
 
     FILE *output;
-    fopen_s(&output, outputFileNameDBC.c_str(), "wb");
+    output = fopen(outputFileNameDBC.c_str(), "wb");
     if (!output)
     {
         Log->WriteLogNoTime("FAILED: Unable to create file.\n");

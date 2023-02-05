@@ -6,9 +6,9 @@
 
 #include "md5.h"
 
-#ifndef _MSC_VER
-#include <endian.h>
-#endif
+//#ifndef _MSC_VER
+//#include <endian.h>
+//#endif
 
 
 /// same as reset()

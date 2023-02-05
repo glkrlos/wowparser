@@ -3,7 +3,6 @@
 
 #include "pch.h"
 #include "shared.h"
-#include "log.h"
 
 class CSV_Reader : public SaveFileInfo
 {

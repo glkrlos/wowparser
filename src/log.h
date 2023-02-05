@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "shared.h"
 
-#include <memory>
 #include <stdarg.h>
 #ifdef _WIN32
     #include <time.h>

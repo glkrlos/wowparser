@@ -12,8 +12,17 @@
 class PrintFileInfo
 {
     public:
-        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, unsigned int totalRecords, bool predicted, string hash) : FieldTypes(eFT), TotalFields(totalFields), TotalRecords(totalRecords), Predicted(predicted), Hash(hash) { }
-        bool PrintFileInfo::PrintResults()
+        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, unsigned int totalRecords, bool predicted, string hash) : FieldTypes(eFT), TotalFields(totalFields), TotalRecords(totalRecords), Predicted(predicted), Hash(hash)
+        {
+            _countFloatFields = 0;
+            _countStringFields = 0;
+            _countBoolFields = 0;
+            _countByteFields = 0;
+            _countUByteFields = 0;
+            _countIntFields = 0;
+            _countUIntFields = 0;
+        }
+        bool PrintResults()
         {
             for (auto it = FieldTypes.begin(); it != FieldTypes.end(); ++it)
             {
@@ -67,17 +76,17 @@ class PrintFileInfo
         }
     private:
     protected:
-        unsigned int _countFloatFields = 0;
-        unsigned int _countStringFields = 0;
-        unsigned int _countBoolFields = 0;
-        unsigned int _countByteFields = 0;
-        unsigned int _countUByteFields = 0;
-        unsigned int _countIntFields = 0;
-        unsigned int _countUIntFields = 0;
+        unsigned int _countFloatFields;
+        unsigned int _countStringFields;
+        unsigned int _countBoolFields;
+        unsigned int _countByteFields;
+        unsigned int _countUByteFields;
+        unsigned int _countIntFields;
+        unsigned int _countUIntFields;
         vector<enumFieldTypes> FieldTypes;
-        unsigned int TotalFields = 0;
-        unsigned int TotalRecords = 0;
-        bool Predicted = false;
+        unsigned int TotalFields;
+        unsigned int TotalRecords;
+        bool Predicted;
         string Hash;
 };
 
