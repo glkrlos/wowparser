@@ -83,29 +83,38 @@ bool module_parser::CheckStructure()
 
             if (c == 13)
                 continue;
-
             bool isLastChar = (x + 1) >= _fileSize;
 
-            if (c == '\n' || isLastChar)
+            if (c == '\n')
             {
-                rowcount++;
-
-                if (currentLine.empty() && !isLastChar)
+                if (currentLine.empty())
                 {
-                    Log->WriteLogNoTime("FAILED: Contains an empty line at Row '%u'.\n", rowcount);
+                    Log->WriteLogNoTime("FAILED: Contains an empty line at Row '%u'.\n", rowcount + 1);
                     Log->WriteLog("\n");
                     return false;
                 }
 
+                /// Si el ultimo char es \n entonces decidimos si lo hacemos totalmente estricto
                 if (isLastChar)
-                    currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
+                {
+                    Log->WriteLogNoTime("FAILED: Contains an empty line at Last Row.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
 
-                CSVDataMap.insert(pair<unsigned int, string>(rowcount, currentLine));
+                CSVDataMap.insert(pair<unsigned int, string>(rowcount++, currentLine));
                 currentLine.clear();
                 continue;
             }
 
             currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
+
+            if (isLastChar)
+            {
+                CSVDataMap.insert(pair<unsigned int, string>(rowcount++, currentLine));
+                currentLine.clear();
+                break;
+            }
         }
 
         auto_ptr<CSV_Reader> CSVParser(new CSV_Reader(GetFileName(), CSVDataMap));
