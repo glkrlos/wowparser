@@ -111,8 +111,6 @@ class module_parser : public SaveFileInfo
                 delete _wholeFileData;
                 _wholeFileData = NULL;
             }
-
-            if (_inputFile) fclose(_inputFile);
         }
         bool Load();
         void ParseFile();
