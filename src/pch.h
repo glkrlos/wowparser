@@ -10,6 +10,9 @@
 #include <sstream>
 #include <memory>
 
+#define _CODENAME "Zitacuaro"
+#define _VERSION "3.1"
+
 #ifdef __linux__
     #include "linux/getch.h"
     #define _OS "Linux"

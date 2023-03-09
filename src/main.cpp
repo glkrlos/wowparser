@@ -6,7 +6,7 @@
 
 void print_header()
 {
-    Log->WriteLogAndPrint("WoWParser Version 3.0 for %s %s (Revision: %s)\n", _OS, _ARQUITECTURA, _REVISION);
+    Log->WriteLogAndPrint("WoWParser Version %s (%s) for %s %s (Revision: %s)\n", _VERSION, _CODENAME, _OS, _ARQUITECTURA, _REVISION);
     Log->WriteLogAndPrint("Hash: %s\tDate: %s\n", _HASH, _DATE);
     Log->WriteLogAndPrint("\n");
     Log->WriteLogAndPrint("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");

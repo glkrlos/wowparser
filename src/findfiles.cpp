@@ -191,6 +191,8 @@ void cFindFiles::PrintAllFileNamesByFileType()
 
                         Log->WriteLogNoTime(" file format%s", contamostotalsalidas > 1 ? "s" : "");
                     }
+                    else
+                        Log->WriteLogNoTime(" with file information only");
 
                     Log->WriteLogNoTime(".\n");
 
