@@ -22,7 +22,7 @@ enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
         return unkFile;
 }
 
-void cFindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID)
+void cFindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;
@@ -61,6 +61,18 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                         File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
                         File.FormatedRecordSize = GetFormatedRecordSize(structure);
                         File.FormatedTotalFields = GetFormatedTotalFields(structure);
+                        File.outputFormats = outFormats;
+
+                        if (!File.outputFormats.isSetToCSV)
+                        {
+                            if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
+                                File.outputFormats.ToCSV = true;
+                            else
+                                File.outputFormats.ToCSV = false;
+                        }
+
+                        File.outputFormats.ToDBC = !File.outputFormats.isSetToDBC ? false : File.outputFormats.ToDBC;
+                        File.outputFormats.ToSQL = !File.outputFormats.isSetToSQL ? false : File.outputFormats.ToSQL;
                         AddFileToListIfNotExist(dirName, File);
                     }
                 }
@@ -77,12 +89,24 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
                 File.FormatedRecordSize = GetFormatedRecordSize(structure);
                 File.FormatedTotalFields = GetFormatedTotalFields(structure);
+                File.outputFormats = outFormats;
+
+                if (!File.outputFormats.isSetToCSV)
+                {
+                    if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
+                        File.outputFormats.ToCSV = true;
+                    else
+                        File.outputFormats.ToCSV = false;
+                }
+
+                File.outputFormats.ToDBC = !File.outputFormats.isSetToDBC ? false : File.outputFormats.ToDBC;
+                File.outputFormats.ToSQL = !File.outputFormats.isSetToSQL ? false : File.outputFormats.ToSQL;
                 AddFileToListIfNotExist(dirName, File);
             }
         }
 
         if (recursive)
-            FileToFind(dirName, filename, structure, recursive, fileExt, xmlFileID);
+            FileToFind(dirName, filename, structure, recursive, fileExt, outFormats, xmlFileID);
     }
     closedir(dir);
 }

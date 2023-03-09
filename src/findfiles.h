@@ -19,7 +19,7 @@ class cFindFiles
             return new module_parser(fileNames);
         }
         cFindFiles();
-        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, unsigned int xmlFileID = 0);
+        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
         bool ListEmpty();
     private:

@@ -22,14 +22,28 @@ void pass1_loadconfig()
 
     if (!Config->LoadConfiguarionFile())
     {
-        Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s %s\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile), Shared->GetFileExtensionByFileType(csvFile));
-        FindFiles->FileToFind(".", "", "", true, "dbc");
-        FindFiles->FileToFind(".", "", "", true, "db2");
-        FindFiles->FileToFind(".", "", "", true, "adb");
-        FindFiles->FileToFind(".", "", "", true, "csv");
+        Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile));
+
+        outputFormat outDBC;
+        outDBC.ToCSV = true;
+        outDBC.ToDBC = false;
+        outDBC.ToSQL = false;
+        FindFiles->FileToFind(".", "", "", true, "dbc", outDBC);
+
+        outputFormat outDB2;
+        outDBC.ToCSV = true;
+        outDBC.ToDBC = false;
+        outDBC.ToSQL = false;
+        FindFiles->FileToFind(".", "", "", true, "db2", outDB2);
+
+        outputFormat outADB;
+        outDBC.ToCSV = true;
+        outDBC.ToDBC = false;
+        outDBC.ToSQL = false;
+        FindFiles->FileToFind(".", "", "", true, "adb", outADB);
 
         if (FindFiles->ListEmpty())
-            Log->WriteLogAndPrint("No %s, %s, %s or %s files found using recursive mode.\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile), Shared->GetFileExtensionByFileType(csvFile));
+            Log->WriteLogAndPrint("No %s, %s, or %s files found using recursive mode.\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile));
 
         return;
     }

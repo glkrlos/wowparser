@@ -6,10 +6,11 @@
     <file extension="csv" />
     <file name="example1.csv.dbc" format="usibif" />
 </WoWParser3>
+
 <!--
 WoWParser 3 - XML Configuration File
 
-<file name="" extension="" recursive="" directory="" format=""/>
+<file name="" extension="" recursive="" directory="" format="" ToCSV="" ToDBC=""/>
 
 name=
 File name to be parsed
@@ -48,7 +49,15 @@ Set exact format for speficied file
         s       -> string
         f       -> float
 
+ToCSV=
+Will parse the file(s) to CSV file format.
+    * Default value is "true" if source is not a CSV file
 
+ToDBC=
+Will parse the file(s) to DBC file format.
+    * Default value is "false"
+
+************************************************************************************************************************************************
 Examples:
 
 Find specific file with recursive mode:

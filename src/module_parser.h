@@ -101,6 +101,7 @@ class module_parser : public SaveFileInfo
             _formatedFieldTypes = sFile.FormatedFieldTypes;
             _formatedTotalFields = sFile.FormatedTotalFields;
             _formatedRecordSize = sFile.FormatedRecordSize;
+            outputFormats = sFile.outputFormats;
         }
         ~module_parser()
         {
@@ -277,5 +278,6 @@ class module_parser : public SaveFileInfo
 
         map<string, structFileInfo> _ListOfAllFilesToParse;
         map<string, structFileData> _extractedData;
+        outputFormat outputFormats;
 };
 #endif

@@ -105,7 +105,12 @@ bool Config_Reader::LoadConfiguarionFile()
         if (!strcmp(tempDirectory.c_str(), "."))
             tempDirectory += "/";
 
-        FindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", fileID);
+        outputFormat outFormats;
+        outFormats.isSetToCSV = fileElement->QueryBoolAttribute("ToCSV", &outFormats.ToCSV) ? false : true;
+        outFormats.isSetToDBC = fileElement->QueryBoolAttribute("ToDBC", &outFormats.ToDBC) ? false : true;
+        outFormats.isSetToSQL = fileElement->QueryBoolAttribute("ToSQL", &outFormats.ToSQL) ? false : true;
+
+        FindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", outFormats, fileID);
     }
 
     Log->WriteLog("-----> All OK after checking XML attributes of files to parse.\n");

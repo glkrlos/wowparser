@@ -60,6 +60,16 @@ struct structFileData
     vector<structRecord> Record;
 };
 
+struct outputFormat
+{
+    bool ToCSV;
+    bool isSetToCSV;
+    bool ToDBC;
+    bool isSetToDBC;
+    bool ToSQL;
+    bool isSetToSQL;
+};
+
 struct structFileInfo
 {
     public:
@@ -85,6 +95,7 @@ struct structFileInfo
         vector<enumFieldTypes> FormatedFieldTypes;
         unsigned int FormatedTotalFields;
         unsigned int FormatedRecordSize;
+        outputFormat outputFormats;
 };
 
 class SaveFileInfo
