@@ -38,6 +38,18 @@ enum enumFileType
 
 struct structField
 {
+    structField()
+    {
+        ID = 0;
+        Type = type_NONE;
+        StringValue = 0;
+        UIntValue = 0;
+        IntValue = 0;
+        BoolValue = false;
+        ByteValue = 0;
+        UByteValue = 0;
+        FloatValue = 0.0f;
+    }
     unsigned int ID;
     enumFieldTypes Type;
     unsigned int StringValue;
@@ -62,18 +74,27 @@ struct structFileData
 
 struct outputFormat
 {
+    outputFormat()
+    {
+        ToCSV = false;
+        ToDBC = false;
+        ToSQL = false;
+        isSetToCSV = false;
+        isSetToDBC = false;
+        isSetToSQL = false;
+    }
     bool ToCSV;
-    bool isSetToCSV;
     bool ToDBC;
-    bool isSetToDBC;
     bool ToSQL;
+    bool isSetToCSV;
+    bool isSetToDBC;
     bool isSetToSQL;
 };
 
-struct structFileInfo
+struct structXMLFileInfo
 {
     public:
-        structFileInfo()
+        structXMLFileInfo()
         {
             FileName.clear();
             Type = unkFile;

@@ -25,21 +25,12 @@ void pass1_loadconfig()
         Log->WriteLog("Trying to find files in recursive mode with the following extensions: %s %s %s\n", Shared->GetFileExtensionByFileType(dbcFile), Shared->GetFileExtensionByFileType(db2File), Shared->GetFileExtensionByFileType(adbFile));
 
         outputFormat outDBC;
-        outDBC.ToCSV = true;
-        outDBC.ToDBC = false;
-        outDBC.ToSQL = false;
         FindFiles->FileToFind(".", "", "", true, "dbc", outDBC);
 
         outputFormat outDB2;
-        outDBC.ToCSV = true;
-        outDBC.ToDBC = false;
-        outDBC.ToSQL = false;
         FindFiles->FileToFind(".", "", "", true, "db2", outDB2);
 
         outputFormat outADB;
-        outDBC.ToCSV = true;
-        outDBC.ToDBC = false;
-        outDBC.ToSQL = false;
         FindFiles->FileToFind(".", "", "", true, "adb", outADB);
 
         if (FindFiles->ListEmpty())

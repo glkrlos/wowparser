@@ -51,57 +51,57 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 {
                     if (Shared->CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
-                        structFileInfo File;
-                        File.FileName = dirName;
-                        File.Structure = structure;
-                        File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
-                        File.isRecursivelySearched = recursive;
-                        File.isSearchedByExtension = true;
-                        File.XMLFileID = xmlFileID;
-                        File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
-                        File.FormatedRecordSize = GetFormatedRecordSize(structure);
-                        File.FormatedTotalFields = GetFormatedTotalFields(structure);
-                        File.outputFormats = outFormats;
+                        structXMLFileInfo XMLFileInfo;
+                        XMLFileInfo.FileName = dirName;
+                        XMLFileInfo.Structure = structure;
+                        XMLFileInfo.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
+                        XMLFileInfo.isRecursivelySearched = recursive;
+                        XMLFileInfo.isSearchedByExtension = true;
+                        XMLFileInfo.XMLFileID = xmlFileID;
+                        XMLFileInfo.FormatedFieldTypes = GetFormatedFieldTypes(structure);
+                        XMLFileInfo.FormatedRecordSize = GetFormatedRecordSize(structure);
+                        XMLFileInfo.FormatedTotalFields = GetFormatedTotalFields(structure);
+                        XMLFileInfo.outputFormats = outFormats;
 
-                        if (!File.outputFormats.isSetToCSV)
+                        if (!XMLFileInfo.outputFormats.isSetToCSV)
                         {
                             if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
-                                File.outputFormats.ToCSV = true;
+                                XMLFileInfo.outputFormats.ToCSV = true;
                             else
-                                File.outputFormats.ToCSV = false;
+                                XMLFileInfo.outputFormats.ToCSV = false;
                         }
 
-                        File.outputFormats.ToDBC = !File.outputFormats.isSetToDBC ? false : File.outputFormats.ToDBC;
-                        File.outputFormats.ToSQL = !File.outputFormats.isSetToSQL ? false : File.outputFormats.ToSQL;
-                        AddFileToListIfNotExist(dirName, File);
+                        XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
+                        XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? false : XMLFileInfo.outputFormats.ToSQL;
+                        AddFileToListIfNotExist(dirName, XMLFileInfo);
                     }
                 }
             }
             else if (Shared->CompareTexts(lowerCaseOriginalFileName, filename))
             {
-                structFileInfo File;
-                File.FileName = dirName;
-                File.Structure = structure;
-                File.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
-                File.isRecursivelySearched = recursive;
-                File.isSearchedByExtension = false;
-                File.XMLFileID = xmlFileID;
-                File.FormatedFieldTypes = GetFormatedFieldTypes(structure);
-                File.FormatedRecordSize = GetFormatedRecordSize(structure);
-                File.FormatedTotalFields = GetFormatedTotalFields(structure);
-                File.outputFormats = outFormats;
+                structXMLFileInfo XMLFileInfo;
+                XMLFileInfo.FileName = dirName;
+                XMLFileInfo.Structure = structure;
+                XMLFileInfo.Type = GetFileTypeByExtension(lowerCaseOriginalFileName);
+                XMLFileInfo.isRecursivelySearched = recursive;
+                XMLFileInfo.isSearchedByExtension = false;
+                XMLFileInfo.XMLFileID = xmlFileID;
+                XMLFileInfo.FormatedFieldTypes = GetFormatedFieldTypes(structure);
+                XMLFileInfo.FormatedRecordSize = GetFormatedRecordSize(structure);
+                XMLFileInfo.FormatedTotalFields = GetFormatedTotalFields(structure);
+                XMLFileInfo.outputFormats = outFormats;
 
-                if (!File.outputFormats.isSetToCSV)
+                if (!XMLFileInfo.outputFormats.isSetToCSV)
                 {
                     if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
-                        File.outputFormats.ToCSV = true;
+                        XMLFileInfo.outputFormats.ToCSV = true;
                     else
-                        File.outputFormats.ToCSV = false;
+                        XMLFileInfo.outputFormats.ToCSV = false;
                 }
 
-                File.outputFormats.ToDBC = !File.outputFormats.isSetToDBC ? false : File.outputFormats.ToDBC;
-                File.outputFormats.ToSQL = !File.outputFormats.isSetToSQL ? false : File.outputFormats.ToSQL;
-                AddFileToListIfNotExist(dirName, File);
+                XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
+                XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? false : XMLFileInfo.outputFormats.ToSQL;
+                AddFileToListIfNotExist(dirName, XMLFileInfo);
             }
         }
 
@@ -154,9 +154,45 @@ void cFindFiles::PrintAllFileNamesByFileType()
                         Log->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
 
                     if (current->second.isSearchedByExtension)
-                        Log->WriteLogNoTime(", and they will pass to predicted mode.");
+                        Log->WriteLogNoTime(", and they will pass to predicted mode");
 
-                    Log->WriteLogNoTime("\n");
+                    if (current->second.outputFormats.ToCSV || current->second.outputFormats.ToDBC || current->second.outputFormats.ToSQL)
+                    {
+                        Log->WriteLogNoTime(" with output to");
+
+                        unsigned int contamostotalsalidas = 0;
+
+                        if (current->second.outputFormats.ToCSV)
+                        {
+                            Log->WriteLogNoTime(" CSV");
+                            contamostotalsalidas++;
+                        }
+
+                        if (current->second.outputFormats.ToDBC)
+                        {
+                            if (current->second.outputFormats.ToCSV && current->second.outputFormats.ToSQL)
+                                Log->WriteLogNoTime(",");
+                            else if (current->second.outputFormats.ToCSV && !current->second.outputFormats.ToSQL)
+                                Log->WriteLogNoTime(" and");
+
+                            Log->WriteLogNoTime(" DBC");
+
+                            contamostotalsalidas++;
+                        }
+
+                        if (current->second.outputFormats.ToSQL)
+                        {
+                            if (current->second.outputFormats.ToCSV || current->second.outputFormats.ToDBC)
+                                Log->WriteLogNoTime(" and");
+
+                            Log->WriteLogNoTime(" SQL");
+                            contamostotalsalidas++;
+                        }
+
+                        Log->WriteLogNoTime(" file format%s", contamostotalsalidas > 1 ? "s" : "");
+                    }
+
+                    Log->WriteLogNoTime(".\n");
 
                     First = false;
                 }
@@ -189,7 +225,7 @@ string cFindFiles::GetFileExtension(string fileName)
     return fileName.substr(fileName.rfind(".") + 1, fileName.size());
 }
 
-void cFindFiles::AddFileToListIfNotExist(string fileName, structFileInfo File)
+void cFindFiles::AddFileToListIfNotExist(string fileName, structXMLFileInfo File)
 {
     auto Found = fileNames.find(fileName);
 
@@ -201,7 +237,7 @@ void cFindFiles::AddFileToListIfNotExist(string fileName, structFileInfo File)
         return;
     }
 
-    fileNames.insert(pair<string, structFileInfo>(fileName, File));
+    fileNames.insert(pair<string, structXMLFileInfo>(fileName, File));
 
     return;
 }

@@ -50,7 +50,7 @@ bool module_parser::Load()
     // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
     if (((GetFileType() == csvFile || FileIsASCII()) && _fileSize < 3) || (!FileIsASCII() && _fileSize < 20))
     {
-        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_fileType));
+        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_XMLFileInfo.Type));
         Log->WriteLog("\n");
         return false;
     }
@@ -259,18 +259,18 @@ bool module_parser::ParseBinaryFile()
     {
         Log->WriteLog("Parsing formated file...");
 
-        if (_totalFields != _formatedTotalFields || _recordSize != _formatedRecordSize)
+        if (_totalFields != _XMLFileInfo.FormatedTotalFields || _recordSize != _XMLFileInfo.FormatedRecordSize)
         {
             Log->WriteLogNoTime("FAILED: Formated structure mismatch.\n");
             Log->WriteLog("\n");
             return false;
         }
 
-        SetFieldsOffset(_formatedFieldTypes);
+        SetFormatedFieldsOffset();
 
         Log->WriteLogNoTime("DONE.\n");
 
-        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_formatedFieldTypes, _formatedTotalFields, _totalRecords, false, hash));
+        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_XMLFileInfo.FormatedFieldTypes, _XMLFileInfo.FormatedTotalFields, _totalRecords, false, hash));
 
         if (!PrintInfo->PrintResults())
             return false;
@@ -287,7 +287,7 @@ bool module_parser::ParseBinaryFile()
             {
                 structField sField;
                 sField.ID = currentField;
-                sField.Type = _formatedFieldTypes[currentField];
+                sField.Type = _XMLFileInfo.FormatedFieldTypes[currentField];
                 sField.StringValue = 0;
                 sField.FloatValue = 0.0f;
                 sField.BoolValue = 0;
@@ -296,17 +296,17 @@ bool module_parser::ParseBinaryFile()
                 sField.IntValue = 0;
                 sField.UIntValue = 0;
 
-                if (_formatedFieldTypes[currentField] == type_FLOAT)
+                if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_FLOAT)
                     sField.FloatValue = GetRecord(currentRecord).GetFloat(currentField);
-                else if (_formatedFieldTypes[currentField] == type_BOOL)
+                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BOOL)
                     sField.BoolValue = GetRecord(currentRecord).GetBool(currentField);
-                else if (_formatedFieldTypes[currentField] == type_BYTE)
+                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BYTE)
                     sField.ByteValue = GetRecord(currentRecord).GetByte(currentField);
-                else if (_formatedFieldTypes[currentField] == type_UBYTE)
+                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UBYTE)
                     sField.UByteValue = GetRecord(currentRecord).GetUByte(currentField);
-                else if (_formatedFieldTypes[currentField] == type_INT)
+                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_INT)
                     sField.IntValue = GetRecord(currentRecord).GetInt(currentField);
-                else if (_formatedFieldTypes[currentField] == type_UINT)
+                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UINT)
                     sField.UIntValue = GetRecord(currentRecord).GetUInt(currentField);
                 else // type_STRING
                     sField.StringValue = GetRecord(currentRecord).GetUInt(currentField);
@@ -323,17 +323,17 @@ bool module_parser::ParseBinaryFile()
 
         structFileData FileData;
         FileData.Record = Records;
-        _extractedData.insert(pair<string, structFileData>(_fileName, FileData));
+        _extractedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
-        if (outputFormats.ToDBC)
+        if (_XMLFileInfo.outputFormats.ToDBC)
         {
-            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
             DBCWriter->CreateDBCFile();
         }
 
-        if (outputFormats.ToCSV)
+        if (_XMLFileInfo.outputFormats.ToCSV)
         {
-            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_fileName, _formatedFieldTypes, _extractedData, _stringTexts));
+            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _extractedData, _stringTexts));
             CSVWriter->CreateCSVFile();
         }
     }
@@ -357,15 +357,15 @@ bool module_parser::ParseBinaryFile()
             if (!PrintInfo->PrintResults())
                 return false;
 
-            if (outputFormats.ToDBC)
+            if (_XMLFileInfo.outputFormats.ToDBC)
             {
-                auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+                auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
                 DBCWriter->CreateDBCFile();
             }
 
-            if (outputFormats.ToCSV)
+            if (_XMLFileInfo.outputFormats.ToCSV)
             {
-                auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_fileName, _fieldTypes, _extractedData, _stringTexts));
+                auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _extractedData, _stringTexts));
                 CSVWriter->CreateCSVFile();
             }
         }
@@ -383,15 +383,15 @@ bool module_parser::ParseCSVFile()
     if (!PrintInfo->PrintResults())
         return false;
 
-    if (outputFormats.ToDBC)
+    if (_XMLFileInfo.outputFormats.ToDBC)
     {
-        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _fileName, _extractedData));
+        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
         DBCWriter->CreateDBCFile();
     }
 
-    if (outputFormats.ToCSV)
+    if (_XMLFileInfo.outputFormats.ToCSV)
     {
-        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_fileName, _fieldTypes, _extractedData, _stringTexts));
+        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _extractedData, _stringTexts));
         CSVWriter->CreateCSVFile();
     }
 
@@ -404,7 +404,7 @@ bool module_parser::PredictFieldTypes()
 {
     // Establecemos field type NONE y extablecemos en donde empieza cada field para todos los fields
     SetFieldTypesToNONE();
-    SetFieldsOffset(_fieldTypes);
+    SetPredictedFieldsOffset();
 
     // Obtenemos los tipos de Fields
     // 01 - Float System
@@ -660,7 +660,7 @@ bool module_parser::PredictFieldTypes()
 
     structFileData FileData;
     FileData.Record = Records;
-    _extractedData.insert(pair<string, structFileData>(_fileName, FileData));
+    _extractedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
     return true;
 }

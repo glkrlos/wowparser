@@ -93,16 +93,8 @@ class PrintFileInfo
 class module_parser : public SaveFileInfo
 {
     public:
-        module_parser(map<string, structFileInfo> files) : _ListOfAllFilesToParse(files) {}
-        module_parser(structFileInfo sFile)
-        {
-            _fileName = sFile.FileName;
-            _fileType = sFile.Type;
-            _formatedFieldTypes = sFile.FormatedFieldTypes;
-            _formatedTotalFields = sFile.FormatedTotalFields;
-            _formatedRecordSize = sFile.FormatedRecordSize;
-            outputFormats = sFile.outputFormats;
-        }
+        module_parser(map<string, structXMLFileInfo> XMLFileInfo) : _ListOfAllFilesToParse(XMLFileInfo) {}
+        module_parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(XMLFileInfo) {}
         ~module_parser()
         {
             _header.clear();
@@ -121,9 +113,9 @@ class module_parser : public SaveFileInfo
         bool ParseCSVFile();
         bool CheckStructure();
         bool PredictFieldTypes();
-        bool IsPreFormatted() { return !_formatedFieldTypes.empty(); }
-        const char *GetFileName() { return _fileName.c_str(); }
-        enumFileType GetFileType() { return _fileType; }
+        bool IsPreFormatted() { return !_XMLFileInfo.FormatedFieldTypes.empty(); }
+        const char *GetFileName() { return _XMLFileInfo.FileName.c_str(); }
+        enumFileType GetFileType() { return _XMLFileInfo.Type; }
         bool FileIsASCII()
         {
             if (_FirstTimeAksType)
@@ -200,14 +192,22 @@ class module_parser : public SaveFileInfo
             for (unsigned int x = 0; x < _totalFields; x++)
                 _fieldTypes.push_back(type_NONE);
         }
-        void SetFieldsOffset(vector<enumFieldTypes> FieldTypes)
+        void SetPredictedFieldsOffset()
+        {
+            _fieldsOffset = new unsigned int[_totalFields];
+            _fieldsOffset[0] = 0;
+
+            for (unsigned int i = 1; i < _totalFields; ++i)
+                _fieldsOffset[i] = _fieldsOffset[i - 1] + 4;
+        }
+        void SetFormatedFieldsOffset()
         {
             _fieldsOffset = new unsigned int[_totalFields];
             _fieldsOffset[0] = 0;
             for (unsigned int i = 1; i < _totalFields; ++i)
             {
                 _fieldsOffset[i] = _fieldsOffset[i - 1];
-                if (FieldTypes[i - 1] == type_BYTE || FieldTypes[i - 1] == type_UBYTE)
+                if (_XMLFileInfo.FormatedFieldTypes[i - 1] == type_BYTE || _XMLFileInfo.FormatedFieldTypes[i - 1] == type_UBYTE)
                     _fieldsOffset[i] += 1;
                 else
                     _fieldsOffset[i] += 4;
@@ -248,11 +248,7 @@ class module_parser : public SaveFileInfo
             }
         }
     protected:
-        string _fileName;
-        enumFileType _fileType;
-        vector<enumFieldTypes> _formatedFieldTypes;
-        unsigned int _formatedTotalFields;
-        unsigned int _formatedRecordSize;
+        structXMLFileInfo _XMLFileInfo;
 
         FILE *_inputFile = NULL;
         unsigned char *_wholeFileData = NULL;
@@ -276,8 +272,7 @@ class module_parser : public SaveFileInfo
 
         string hash;
 
-        map<string, structFileInfo> _ListOfAllFilesToParse;
+        map<string, structXMLFileInfo> _ListOfAllFilesToParse;
         map<string, structFileData> _extractedData;
-        outputFormat outputFormats;
 };
 #endif

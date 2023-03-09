@@ -26,7 +26,7 @@ class cFindFiles
         enumFileType GetFileTypeByExtension(string FileName);
         bool HaveExtension(string fileName);
         string GetFileExtension(string fileName);
-        void AddFileToListIfNotExist(string fileName, structFileInfo File);
+        void AddFileToListIfNotExist(string fileName, structXMLFileInfo File);
         unsigned int GetFormatedTotalFields(string structure)
         {
             return structure.empty() ? 0 : structure.size();
@@ -87,7 +87,7 @@ class cFindFiles
         }
 
     protected:
-        map<string, structFileInfo> fileNames;
+        map<string, structXMLFileInfo> fileNames;
 };
 
 #define FindFiles CSingleton<cFindFiles>::Instance()
