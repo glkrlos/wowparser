@@ -241,32 +241,94 @@ bool module_parser::CheckStructure()
             case wdbnpccacheFile:
             case wdbpagetextcacheFile:
             case wdbquestcacheFile:
-                Log->WriteLogNoTime("FAILED: Temporarily disabled the parse of WDB files.\n");
+            {
+                _headerSize = 32;
+
+                if (_fileSize < _headerSize)
+                {
+                    Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_XMLFileInfo.Type));
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                unsigned int revision = HeaderGetUInt();
+                char locale1 = HeaderGetChar();
+                char locale2 = HeaderGetChar();
+                char locale3 = HeaderGetChar();
+                char locale4 = HeaderGetChar();
+                unsigned int maxRecordSize = HeaderGetUInt();
+                unsigned int unk1 = HeaderGetUInt();
+                unsigned int unk2 = HeaderGetUInt();
+
+                if (revision > 15595)
+                {
+                    Log->WriteLogNoTime("FAILED: Unable to parse beyond revision 15595\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                long currentFileSize = _fileSize - 24;
+                bool isFirstRecord = true;
+
+                while (true)
+                {
+                    unsigned int entry = 0;
+                    unsigned int recordSize = 0;
+
+                    if ((currentFileSize -= 8) >= 0)
+                    {
+                        entry = HeaderGetUInt();
+                        recordSize = HeaderGetUInt();
+
+                        if (isFirstRecord && (!entry || !recordSize))
+                        {
+                            Log->WriteLogNoTime("FAILED: No records found.\n");
+                            Log->WriteLog("\n");
+                            return false;
+                        }
+                        else if (!isFirstRecord && (!entry || !recordSize))
+                            break;
+
+                        isFirstRecord = false;
+
+                        // printf("FirstEntry: %u\n", entry);
+                        // printf("FirstEntryRecordSize: %u\n", recordSize);
+
+                        if ((currentFileSize -= recordSize) >= 0)
+                        {
+                            unsigned char *test = new unsigned char[recordSize];
+                            test = _wholeFileData + _headerOffset;
+                            _headerOffset += recordSize;
+                        }
+                        else
+                        {
+                            Log->WriteLogNoTime("FAILED: Corrupted file.\n");
+                            Log->WriteLog("\n");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        Log->WriteLogNoTime("FAILED: Unexpected End of file.\n");
+                        Log->WriteLog("\n");
+                        return false;
+                    }
+                }
+
+                /*
+                BDIW itemcache.wdb -> se abre de forma especial por que dependen de unos bytes las veces que lee otros bytes
+                BOMW creaturecache.wdb
+                BOGW gameobjectcache.wdb
+                BDNW itemnamecache.wdb
+                XTIW itemtextcache.wdb
+                CPNW npccache.wdb
+                XTPW pagetextcache.wdb
+                TSQW questcache.wdb
+                */
+                Log->WriteLogNoTime("Borrame y Temporalmente OK\n");
                 Log->WriteLog("\n");
                 return false;
-                /// 24 bytes del header + 8 bytes del primer record y su el tamaño del record
-                //char header[4];
-                //unsigned int revision;
-                //char locale[4];
-                //unsigned int maxRecordSize;
-                //unsigned int unk1;
-                //unsigned int unk2;
-                /*
-                    Para cada registro:
-                    unsigned int entry;
-                    unsigned int recordSize;
-                    unsigned char *restOfrecord; <- aqui hay que saber el formato para leerlo
-
-                    BDIW itemcache.wdb -> se abre de forma especial por que dependen de unos bytes las veces que lee otros bytes
-                    BOMW creaturecache.wdb
-                    BOGW gameobjectcache.wdb
-                    BDNW itemnamecache.wdb
-                    XTIW itemtextcache.wdb
-                    CPNW npccache.wdb
-                    XTPW pagetextcache.wdb
-                    TSQW questcache.wdb
-                */
-                break;
+            }
             default:
                 Log->WriteLogNoTime("FAILED: Unknown file.\n");
                 Log->WriteLog("\n");

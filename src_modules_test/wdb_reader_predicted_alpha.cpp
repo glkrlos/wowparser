@@ -187,3 +187,68 @@ int main(int argc, char *arg[])
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct structWDBFields
+{
+    string texto;
+    unsigned int posicion;
+    unsigned int longitud;
+};
+
+typedef vector<structWDBFields> WDBFields;
+
+vector<vector<structWDBFields>> mapWDBRecords;
+
+unsigned char *test = new unsigned char[recordSize];
+test = _wholeFileData + _headerOffset;
+_headerOffset += recordSize;
+
+WDBFields currentFieldsOfWDB;
+for (unsigned int x = 0; x < recordSize; x++)
+{
+    if (!static_cast<char>(test[x]) || static_cast<char>(test[x]) == '\n' || static_cast<char>(test[x]) == '\r' || !isprint(static_cast<char>(test[x])))
+        continue;
+
+    if (!static_cast<char>(test[x - 1]) && isprint(static_cast<char>(test[x + 1])) && isprint(static_cast<char>(test[x + 2])))
+    {
+        structWDBFields wdbfields;
+        wdbfields.texto = reinterpret_cast<char *>(test + x);
+        wdbfields.longitud = wdbfields.texto.size();
+        wdbfields.posicion = x;
+        currentFieldsOfWDB.push_back(wdbfields);
+    }
+}
+
+mapWDBRecords.push_back(currentFieldsOfWDB);
+
+map<unsigned int /*posicion*/, unsigned int /*numero de veces*/> countStrings;
+for (auto wdbrecord = mapWDBRecords.begin(); wdbrecord != mapWDBRecords.end(); wdbrecord++)
+{
+    for (auto wdbfield = wdbrecord->begin(); wdbfield != wdbrecord->end(); wdbfield++)
+    {
+        auto encontrar = countStrings.find(wdbfield->posicion);
+        if (encontrar != countStrings.end())
+            encontrar->second++;
+        else
+            countStrings.insert(pair<unsigned int, unsigned int>(wdbfield->posicion, 1));
+    }
+}
+
+Log->WriteLog("\n");
+for (auto encontrados = countStrings.begin(); encontrados != countStrings.end(); encontrados++)
+{
+    Log->WriteLog("Posicion %u, numero de veces: %u\n", encontrados->first, encontrados->second);
+}
