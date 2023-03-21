@@ -157,12 +157,14 @@ class SaveFileInfo
 
         void SetUniqueStringTexts(string Text)
         {
-            if (!Text.empty() && !GetUniqueTextPosition(Text))
+            if (!Text.empty())
             {
                 unsigned int currentStringPos = _stringTexts.size();
                 _stringTexts.append(Text + '\0');
                 _stringSize += Text.size() + 1;
-                _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
+
+                if (!GetUniqueTextPosition(Text))
+                    _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
             }
         }
         unsigned int GetUniqueTextPosition(string Text)

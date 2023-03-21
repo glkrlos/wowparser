@@ -3,6 +3,7 @@
 #include "shared.h"
 #include "module_config_reader.h"
 #include "module_parser.h"
+#include "ProgressBar.h"
 
 void print_header()
 {
@@ -65,11 +66,19 @@ void pass3_checkheadersanddataconsistency()
     Log->WriteLog("\n");
     Log->WriteLogAndPrint("-----> Checking header and data consistency of each file added to parse it...\n");
 
-    /// Pasamos la lista de archivos al modulo Parser
-    const auto_ptr<module_parser> Parser(FindFiles->ExportData());
+    /// Pasamos la lista de archivos a un mapa aqui
+    auto XMLFileInfo = FindFiles->XMLFileInfo();
+    ProgressBar bar(XMLFileInfo.size());
 
-    Parser->CheckHeadersAndDataConsistencyOfAllFilesAdded();
+    for (auto CurrentFileName = XMLFileInfo.begin(); CurrentFileName != XMLFileInfo.end(); CurrentFileName++)
+    {
+        bar.step(CurrentFileName->first.c_str());
 
+        unique_ptr<module_parser> Parser(new module_parser(CurrentFileName->second));
+        if (Parser->Load())
+            Parser->ParseFile();
+
+    }
     /// If Check headers, entonces ponemos
     /// Parsing Files....
 }

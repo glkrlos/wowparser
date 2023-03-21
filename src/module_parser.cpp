@@ -167,11 +167,9 @@ bool module_parser::CheckStructure()
                     return false;
                 }
 
-                _dataBytes = _fileSize - _headerSize - ReadedStringSize;
                 _dataTable = new unsigned char [_dataBytes];
                 _dataTable = _wholeFileData + _headerOffset;
 
-                _stringBytes = _fileSize - _headerSize - _dataBytes;
                 _stringTable = new unsigned char[_stringBytes];
                 _stringTable = _wholeFileData + _headerOffset + _dataBytes;
 
@@ -180,27 +178,61 @@ bool module_parser::CheckStructure()
                 break;
             }
             case db2File:
-                Log->WriteLogNoTime("FAILED: Temporarily disabled the parse of DB2 files.\n");
-                Log->WriteLog("\n");
-                return false;
-                /// 32 bytes del header o 48 bytes si el build > 12880
-                //char header[4];             // WDB2 db2
-                //unsigned int totalRecords;
-                //unsigned int totalFields;
-                //unsigned int recordSize;
-                //unsigned int stringSize;
-                //unsigned int tableHash;
-                //unsigned int build;
-                //unsigned int unk1;
+            {
+                _headerSize = 32;
+                _totalRecords = HeaderGetUInt();
+                _totalFields = HeaderGetUInt();
+                _recordSize = HeaderGetUInt();
+                unsigned int ReadedStringSize = HeaderGetUInt();
+                unsigned int tableHash = HeaderGetUInt();
+                unsigned int build = HeaderGetUInt();
+                unsigned int timestamp_last_written = HeaderGetUInt();
 
-                /// > 12880
-                /// int diff = maxIndexDB2 - unk2DB2 + 1;
-                /// fseek(input, diff * 4 + diff * 2, SEEK_CUR); // diff * 4: an index for rows, diff * 2: a memory allocation bank
-                //unsigned int unk2;
-                //unsigned int maxIndex;
-                //unsigned int locales;
-                //unsigned int unk3;
+                unsigned int diff = 0;
+                if (build > 12880)
+                {
+                    _headerSize += 16;
+                    unsigned int min_id = HeaderGetUInt();
+                    unsigned int max_id = HeaderGetUInt();
+                    unsigned int locales = HeaderGetUInt();
+                    unsigned int unk1 = HeaderGetUInt();
+
+                    if (max_id)
+                    {
+                        unsigned int _diffbase = max_id - min_id + 1;
+                        diff = _diffbase * 4 + _diffbase * 2;
+                        /// fseek(input, diff * 4 + diff * 2, SEEK_CUR); // diff * 4: an index for rows, diff * 2: a memory allocation bank
+                        /// Log->WriteLog("diff: %u", _diffbase * 4 + _diffbase * 2);
+                    }
+                }
+
+                unsigned int _dataBytes = _fileSize - _headerSize - ReadedStringSize - diff;
+                unsigned int _stringBytes = _fileSize - _headerSize - _dataBytes - diff;
+
+                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReadedStringSize || (_stringBytes != ReadedStringSize))
+                {
+                    Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                if (!_totalRecords || !_totalFields || !_recordSize)
+                {
+                    Log->WriteLogNoTime("FAILED: No records found.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                _dataTable = new unsigned char[_dataBytes];
+                _dataTable = _wholeFileData + _headerSize + diff;
+
+                _stringTable = new unsigned char[_stringBytes];
+                _stringTable = _wholeFileData + _headerSize + diff + _dataBytes;
+
+                /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
+                SetUniqueStringTextsFromStringTable(_stringBytes);
                 break;
+            }
             case wdbitemcacheFile:
             case wdbcreaturecacheFile:
             case wdbgameobjectcacheFile:
@@ -663,19 +695,4 @@ bool module_parser::PredictFieldTypes()
     _extractedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
     return true;
-}
-
-void module_parser::CheckHeadersAndDataConsistencyOfAllFilesAdded()
-{
-    ProgressBar bar(_ListOfAllFilesToParse.size());
-
-    for (auto CurrentFileName = _ListOfAllFilesToParse.begin(); CurrentFileName != _ListOfAllFilesToParse.end(); CurrentFileName++)
-    {
-        bar.step(CurrentFileName->first.c_str());
-
-        auto_ptr<module_parser> Parser(new module_parser(CurrentFileName->second));
-        if (Parser->Load())
-            Parser->ParseFile();
-
-    }
 }

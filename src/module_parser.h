@@ -4,7 +4,6 @@
 #include "pch.h"
 #include "shared.h"
 #include "module_csv_reader.h"
-#include "ProgressBar.h"
 #include "md5.h"
 #include "module_dbc_writer.h"
 #include "module_csv_writer.h"
@@ -93,7 +92,6 @@ class PrintFileInfo
 class module_parser : public SaveFileInfo
 {
     public:
-        module_parser(map<string, structXMLFileInfo> XMLFileInfo) : _ListOfAllFilesToParse(XMLFileInfo) {}
         module_parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(XMLFileInfo) {}
         ~module_parser()
         {
@@ -107,7 +105,6 @@ class module_parser : public SaveFileInfo
         }
         bool Load();
         void ParseFile();
-        void CheckHeadersAndDataConsistencyOfAllFilesAdded();
     private:
         bool ParseBinaryFile();
         bool ParseCSVFile();
@@ -272,7 +269,6 @@ class module_parser : public SaveFileInfo
 
         string hash;
 
-        map<string, structXMLFileInfo> _ListOfAllFilesToParse;
         map<string, structFileData> _extractedData;
 };
 #endif

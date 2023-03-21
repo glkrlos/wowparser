@@ -14,10 +14,7 @@
 class cFindFiles
 {
     public:
-        module_parser *ExportData()
-        {
-            return new module_parser(fileNames);
-        }
+        map<string, structXMLFileInfo> XMLFileInfo() { return fileNames; }
         cFindFiles();
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
