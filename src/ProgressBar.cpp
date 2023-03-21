@@ -5,7 +5,7 @@ char const* const ProgressBar::full  = "*";
 
 ProgressBar::~ProgressBar()
 {
-
+    _filename.clear();
     printf("\r");
 
     for (auto x = 0; x < 78; x++)
@@ -22,6 +22,9 @@ ProgressBar::ProgressBar( int row_count )
     rec_pos   = 0;
     indic_len = 20;
     num_rec   = row_count;
+    percent = 0.0f;
+    i = 0;
+    n = 0;
 
     for ( int i = 0; i < indic_len; i++ )
         printf( empty );
@@ -29,11 +32,35 @@ ProgressBar::ProgressBar( int row_count )
     printf("\r Loading list of files to parse, Please Wait....");
     fflush(stdout);
 }
-
-void ProgressBar::step(string filename)
+void ProgressBar::SetFileName(string filename)
 {
-    int i, n;
+    string _filename = "";
+    if (filename.size() > 34)
+    {
+        _filename.append("...");
+        _filename.append(filename.substr(filename.size() - 31));
+    }
+    else
+        _filename = filename;
 
+    printf("\r");
+
+    for (auto x = 0; x < 50; x++)
+        printf(empty);
+
+    printf("[");
+
+    for (i = 0; i < n; i++) printf(full);
+
+    for (; i < indic_len; i++) printf(empty);
+
+    printf("] %i%%  \r Loading file: %s", (int)percent, _filename.c_str());
+
+    fflush(stdout);
+}
+
+void ProgressBar::step()
+{
     if (num_rec == 0)
         return;
 
@@ -52,18 +79,9 @@ void ProgressBar::step(string filename)
 
         for (; i < indic_len; i++) printf(empty);
 
-        float percent = (((float)n / (float)indic_len) * 100);
+        percent = (((float)n / (float)indic_len) * 100);
 
-        string outText = "";
-        if (filename.size() > 34)
-        {
-            outText.append("...");
-            outText.append(filename.substr(filename.size() - 31));
-        }
-        else
-            outText = filename;
-
-        printf("] %i%%  \r Loading file: %s", (int)percent, outText.c_str());
+        printf("] %i%%  \r Loading file: %s", (int)percent, _filename.c_str());
 
         fflush(stdout);
 

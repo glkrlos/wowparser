@@ -72,11 +72,13 @@ void pass3_checkheadersanddataconsistency()
 
     for (auto CurrentFileName = XMLFileInfo.begin(); CurrentFileName != XMLFileInfo.end(); CurrentFileName++)
     {
-        bar.step(CurrentFileName->first.c_str());
+        bar.SetFileName(CurrentFileName->first);
 
         unique_ptr<module_parser> Parser(new module_parser(CurrentFileName->second));
         if (Parser->Load())
             Parser->ParseFile();
+
+        bar.step();
 
     }
     /// If Check headers, entonces ponemos

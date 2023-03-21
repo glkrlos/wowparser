@@ -12,10 +12,13 @@ class ProgressBar
     int rec_pos;
     int num_rec;
     int indic_len;
+    string _filename;
+    float percent;
+    int i, n;
 
     public:
-
-        void step( string filename );
+        void SetFileName(string filename);
+        void step( );
         ProgressBar( int );
         ~ProgressBar();
 };
