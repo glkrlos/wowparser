@@ -512,7 +512,7 @@ bool module_parser::PredictFieldTypes()
                 string floatStringValue = Shared->ToStr(floatValue);
                 int isFloat1 = floatStringValue.find("e");
                 int isFloat2 = floatStringValue.find("#");
-                int isFloat3 = floatStringValue.find("-nan");
+                int isFloat3 = floatStringValue.find("nan");
                 if (isFloat1 != -1 || isFloat2 != -1 || isFloat3 != -1)
                 {
                     _fieldTypes[currentField] = type_NONE;
