@@ -323,7 +323,7 @@ bool Parser::CheckStructure()
                             Fields.push_back(sEntry);
 
                             structField sRecordSyze;
-                            sRecordSyze.ID = 0;
+                            sRecordSyze.ID = 1;
                             sRecordSyze.Type = type_UINT;
                             sRecordSyze.StringValue = 0;
                             sRecordSyze.FloatValue = 0.0f;
