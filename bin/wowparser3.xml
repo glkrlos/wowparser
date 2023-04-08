@@ -78,6 +78,17 @@ Find files by extension with recursive mode starting in specified directory:
 Find files by extension without recursive mode in specified directory:
 <file extension="dbc" recursive="false" directory="./dbc/esMX" />
 
+WDB Files can be parsed only with specific structrue.
+Just the parse of itemcache.wdb is disabled for now.
+<file name="creaturecache.wdb" format="uussssssiiiiiiiiiiffbiiiiiii" />
+<file name="gameobjectcache.wdb" format="uuiisssssssiiiiiiiiiiiiiiiiiiiiiiiifiiiiii" />
+<file name="itemcache.wdb" format="uuiiissssiiiiiiiiiiiiiiiiiiiiixnnnnnnnnnnnnnnnnnnnniiffiffiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiisiiiiiiiiiiiiiiiiiiiiiiiiifiii" />
+<file name="itemnamecache.wdb" format="uusi" />
+<file name="itemtextcache.wdb" format="uus" />
+<file name="npccache.wdb" format="uufssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiii" />
+<file name="pagetextcache.wdb" format="uusi" />
+<file name="questcache.wdb" format="uuiiiiiiiiiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiffisssssiiiiiiiiiiiiiiiiiiiiiiiiiiiissss" />
+
 NOTES: * The program can't read byte fields without the specific format for that file.
        * The output of parsed files for now are always to CSV and SQL formats
 -->

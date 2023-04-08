@@ -43,8 +43,8 @@ bool Parser::Load()
     }
 
     /// Generamos el hash del archivo
-    MD5 generatehash;
-    hash = generatehash(_wholeFileData, _fileSize);
+    //MD5 generatehash;
+    //hash = generatehash(_wholeFileData, _fileSize);
 
     // Para los archivos csv, si fuera solo la palabra "int" serian 3 bytes al menos
     // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
@@ -230,7 +230,6 @@ bool Parser::CheckStructure()
                 SetStringTextsFromStringTable(_stringBytes);
                 break;
             }
-            case wdbitemcacheFile:
             case wdbcreaturecacheFile:
             case wdbgameobjectcacheFile:
             case wdbitemnamecacheFile:
@@ -239,6 +238,20 @@ bool Parser::CheckStructure()
             case wdbpagetextcacheFile:
             case wdbquestcacheFile:
             {
+                if (!_XMLFileInfo.FormatedTotalFields || !_XMLFileInfo.FormatedFieldTypes.size() || !_XMLFileInfo.FormatedRecordSize)
+                {
+                    Log->WriteLogNoTime("FAILED: Unable to parse without specified format.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                if (_XMLFileInfo.FormatedTotalFields != _XMLFileInfo.FormatedFieldTypes.size())
+                {
+                    Log->WriteLogNoTime("FAILED: Mismatch in total fields.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
                 unsigned int HeaderSize = 32;
 
                 if (_fileSize < HeaderSize)
@@ -249,6 +262,13 @@ bool Parser::CheckStructure()
                 }
 
                 unsigned int revision = HeaderGetUInt();
+                if (revision > 15595)
+                {
+                    Log->WriteLogNoTime("FAILED: Unable to parse beyond revision 15595.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
                 char locale1 = HeaderGetChar();
                 char locale2 = HeaderGetChar();
                 char locale3 = HeaderGetChar();
@@ -257,20 +277,15 @@ bool Parser::CheckStructure()
                 unsigned int unk1 = HeaderGetUInt();
                 unsigned int unk2 = HeaderGetUInt();
 
-                if (revision > 15595)
-                {
-                    Log->WriteLogNoTime("FAILED: Unable to parse beyond revision 15595\n");
-                    Log->WriteLog("\n");
-                    return false;
-                }
-
                 long currentFileSize = _fileSize - 24;
                 bool isFirstRecord = true;
 
+                vector<structRecord> Records;
+                unsigned int recordCount = 0;
                 while (true)
                 {
                     unsigned int entry = 0;
-                    unsigned int recordSize = 0;
+                    int recordSize = 0;
 
                     if ((currentFileSize -= 8) >= 0)
                     {
@@ -288,14 +303,120 @@ bool Parser::CheckStructure()
 
                         isFirstRecord = false;
 
-                        // printf("FirstEntry: %u\n", entry);
-                        // printf("FirstEntryRecordSize: %u\n", recordSize);
+                        //printf("Entry: %u\n", entry);
+                        //printf("RecordSize: %u\n", recordSize);
 
                         if ((currentFileSize -= recordSize) >= 0)
                         {
-                            unsigned char *test = new unsigned char[recordSize];
-                            test = _wholeFileData + _headerOffset;
+                            vector<structField> Fields;
+
+                            structField sEntry;
+                            sEntry.ID = 0;
+                            sEntry.Type = type_UINT;
+                            sEntry.StringValue = 0;
+                            sEntry.FloatValue = 0.0f;
+                            sEntry.BoolValue = 0;
+                            sEntry.ByteValue = 0;
+                            sEntry.UByteValue = 0;
+                            sEntry.IntValue = 0;
+                            sEntry.UIntValue = entry;
+                            Fields.push_back(sEntry);
+
+                            structField sRecordSyze;
+                            sRecordSyze.ID = 0;
+                            sRecordSyze.Type = type_UINT;
+                            sRecordSyze.StringValue = 0;
+                            sRecordSyze.FloatValue = 0.0f;
+                            sRecordSyze.BoolValue = 0;
+                            sRecordSyze.ByteValue = 0;
+                            sRecordSyze.UByteValue = 0;
+                            sRecordSyze.IntValue = 0;
+                            sRecordSyze.UIntValue = recordSize;
+                            Fields.push_back(sRecordSyze);
+
+                            unsigned char *currentRecordData = new unsigned char[recordSize];
+                            currentRecordData = _wholeFileData + _headerOffset;
                             _headerOffset += recordSize;
+
+                            int currentRecordOffSet = 0;
+                            for (unsigned int currentField = 2; currentField < _XMLFileInfo.FormatedFieldTypes.size(); currentField++)
+                            {
+                                structField sField;
+                                sField.ID = currentField;
+                                sField.Type = _XMLFileInfo.FormatedFieldTypes[currentField];
+                                sField.StringValue = 0;
+                                sField.FloatValue = 0.0f;
+                                sField.BoolValue = 0;
+                                sField.ByteValue = 0;
+                                sField.UByteValue = 0;
+                                sField.IntValue = 0;
+                                sField.UIntValue = 0;
+
+                                if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_FLOAT)
+                                {
+                                    sField.FloatValue = *reinterpret_cast<float *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 4;
+                                    recordSize -= 4;
+                                }
+                                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BOOL)
+                                {
+                                    sField.BoolValue = *reinterpret_cast<char *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 4;
+                                    recordSize -= 4;
+                                }
+                                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BYTE)
+                                {
+                                    sField.ByteValue = *reinterpret_cast<char *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 1;
+                                    recordSize -= 1;
+                                }
+                                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UBYTE)
+                                {
+                                    sField.UByteValue = *reinterpret_cast<unsigned char *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 1;
+                                    recordSize -= 1;
+                                }
+                                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_INT)
+                                {
+                                    sField.IntValue = *reinterpret_cast<int *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 4;
+                                    recordSize -= 4;
+                                }
+                                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UINT)
+                                {
+                                    sField.UIntValue = *reinterpret_cast<unsigned int *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += 4;
+                                    recordSize -= 4;
+                                }
+                                else /// type_STRING
+                                {
+                                    string StringValue = reinterpret_cast<char *>(currentRecordData + currentRecordOffSet);
+                                    currentRecordOffSet += StringValue.size() + 1;
+                                    recordSize -= StringValue.size() + 1;
+                                    SetUniqueStringTexts(StringValue);
+                                    sField.StringValue = GetUniqueTextPosition(StringValue);
+                                }
+
+                                Fields.push_back(sField);
+                                if ((recordSize > 0) && ((currentField + 1) >= _XMLFileInfo.FormatedFieldTypes.size()))
+                                {
+                                    Log->WriteLogNoTime("FAILED: You must read at least '%i' bytes more per record.\n", recordSize);
+                                    Log->WriteLog("\n");
+                                    return false;
+                                }
+                                else if ((recordSize < 0) && ((currentField + 1) >= _XMLFileInfo.FormatedFieldTypes.size()))
+                                {
+                                    Log->WriteLogNoTime("FAILED: Exceeded record size by '%d' bytes.\n", recordSize * -1);
+                                    Log->WriteLog("\n");
+                                    return false;
+                                }
+                            }
+
+                            structRecord Record;
+                            Record.ID = recordCount;
+                            Record.Field = Fields;
+                            Records.push_back(Record);
+                            recordCount++;
                         }
                         else
                         {
@@ -311,21 +432,19 @@ bool Parser::CheckStructure()
                         return false;
                     }
                 }
+                structFileData FileData;
+                FileData.Record = Records;
+                _savedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
-                /*
-                BDIW itemcache.wdb -> se abre de forma especial por que dependen de unos bytes las veces que lee otros bytes
-                BOMW creaturecache.wdb
-                BOGW gameobjectcache.wdb
-                BDNW itemnamecache.wdb
-                XTIW itemtextcache.wdb
-                CPNW npccache.wdb
-                XTPW pagetextcache.wdb
-                TSQW questcache.wdb
-                */
-                Log->WriteLogNoTime("Borrame y Temporalmente OK\n");
+                _totalFields = _XMLFileInfo.FormatedTotalFields;
+                _recordSize = _XMLFileInfo.FormatedRecordSize;
+                _totalRecords = Records.size();
+                break;
+            }
+            case wdbitemcacheFile:
+                Log->WriteLogNoTime("FAILED: The parse of the WDB itemcache file is temporarily disabled.\n");
                 Log->WriteLog("\n");
                 return false;
-            }
             default:
                 Log->WriteLogNoTime("FAILED: Unknown file.\n");
                 Log->WriteLog("\n");
@@ -366,55 +485,58 @@ bool Parser::ParseBinaryFile()
         if (!PrintInfo->PrintResults())
             return false;
 
-        // Guardamos la informacion al mapa map<string, structFileData> _extractedData
-        unsigned int currentRecordID = 0;
-        vector<structRecord> Records;
-
-        for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++, currentRecordID++)
+        if (_XMLFileInfo.Type != wdbFile)
         {
-            vector<structField> Fields;
+            // Guardamos la informacion al mapa map<string, structFileData> _extractedData
+            unsigned int currentRecordID = 0;
+            vector<structRecord> Records;
 
-            for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+            for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++, currentRecordID++)
             {
-                structField sField;
-                sField.ID = currentField;
-                sField.Type = _XMLFileInfo.FormatedFieldTypes[currentField];
-                sField.StringValue = 0;
-                sField.FloatValue = 0.0f;
-                sField.BoolValue = 0;
-                sField.ByteValue = 0;
-                sField.UByteValue = 0;
-                sField.IntValue = 0;
-                sField.UIntValue = 0;
+                vector<structField> Fields;
 
-                if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_FLOAT)
-                    sField.FloatValue = GetRecord(currentRecord).GetFloat(currentField);
-                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BOOL)
-                    sField.BoolValue = GetRecord(currentRecord).GetBool(currentField);
-                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BYTE)
-                    sField.ByteValue = GetRecord(currentRecord).GetByte(currentField);
-                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UBYTE)
-                    sField.UByteValue = GetRecord(currentRecord).GetUByte(currentField);
-                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_INT)
-                    sField.IntValue = GetRecord(currentRecord).GetInt(currentField);
-                else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UINT)
-                    sField.UIntValue = GetRecord(currentRecord).GetUInt(currentField);
-                else // type_STRING
-                    sField.StringValue = GetRecord(currentRecord).GetUInt(currentField);
+                for (unsigned int currentField = 0; currentField < _totalFields; currentField++)
+                {
+                    structField sField;
+                    sField.ID = currentField;
+                    sField.Type = _XMLFileInfo.FormatedFieldTypes[currentField];
+                    sField.StringValue = 0;
+                    sField.FloatValue = 0.0f;
+                    sField.BoolValue = 0;
+                    sField.ByteValue = 0;
+                    sField.UByteValue = 0;
+                    sField.IntValue = 0;
+                    sField.UIntValue = 0;
 
-                Fields.push_back(sField);
+                    if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_FLOAT)
+                        sField.FloatValue = GetRecord(currentRecord).GetFloat(currentField);
+                    else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BOOL)
+                        sField.BoolValue = GetRecord(currentRecord).GetBool(currentField);
+                    else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_BYTE)
+                        sField.ByteValue = GetRecord(currentRecord).GetByte(currentField);
+                    else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UBYTE)
+                        sField.UByteValue = GetRecord(currentRecord).GetUByte(currentField);
+                    else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_INT)
+                        sField.IntValue = GetRecord(currentRecord).GetInt(currentField);
+                    else if (_XMLFileInfo.FormatedFieldTypes[currentField] == type_UINT)
+                        sField.UIntValue = GetRecord(currentRecord).GetUInt(currentField);
+                    else // type_STRING
+                        sField.StringValue = GetRecord(currentRecord).GetUInt(currentField);
+
+                    Fields.push_back(sField);
+                }
+
+                structRecord Record;
+                Record.ID = currentRecordID;
+                Record.Field = Fields;
+
+                Records.push_back(Record);
             }
 
-            structRecord Record;
-            Record.ID = currentRecordID;
-            Record.Field = Fields;
-
-            Records.push_back(Record);
+            structFileData FileData;
+            FileData.Record = Records;
+            _savedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
         }
-
-        structFileData FileData;
-        FileData.Record = Records;
-        _savedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
         if (_XMLFileInfo.outputFormats.ToDBC)
         {
