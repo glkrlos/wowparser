@@ -131,8 +131,9 @@ class SaveFileInfo
             _fieldTypes.clear();
             _savedData.clear();
 
-            _stringTexts = '\0';
             _stringSize = 1;
+            _stringTexts = '\0';
+            _uniqueStringTexts.clear();
         }
         ~SaveFileInfo()
         {
@@ -143,68 +144,79 @@ class SaveFileInfo
             _fieldTypes.clear();
             _savedData.clear();
 
-            _stringTexts.clear();
             _stringSize = 0;
+            _stringTexts.clear();
+            _uniqueStringTexts.clear();
         }
-        unsigned int GetTotalTotalFields() { return _totalFields; }
-        unsigned int GetTotalTotalRecords() { return _totalRecords; }
-        unsigned int GetTotalRecordSize() { return _recordSize; }
+        unsigned int GetTotalFields() { return _totalFields; }
+        unsigned int GetTotalRecords() { return _totalRecords; }
+        unsigned int GetRecordSize() { return _recordSize; }
         unsigned int GetStringSize() { return _stringSize; }
         vector<enumFieldTypes> GetFieldTypes() { return _fieldTypes; }
         string GetStringTexts() { return _stringTexts; }
-        map<string, unsigned int> GetUniqueStringTexts() { return _uniqueStringTexts; }
+        map<string, vector<unsigned int>> GetUniqueStringTexts() { return _uniqueStringTexts; }
         map<string, structFileData> GetExtractedData() { return _savedData; }
-
         void SetUniqueStringTexts(string Text)
         {
-            if (!Text.empty())
+            if (!Text.empty() && !GetUniqueTextPosition(Text))
             {
-                unsigned int currentStringPos = _stringTexts.size();
+                unsigned int TextPosition = _stringTexts.size();
                 _stringTexts.append(Text + '\0');
                 _stringSize += Text.size() + 1;
 
-                if (!GetUniqueTextPosition(Text))
-                    _uniqueStringTexts.insert(pair<string, unsigned int>(Text, currentStringPos));
+                vector<unsigned int> VectorForTextPosition;
+                VectorForTextPosition.push_back(TextPosition);
+                _uniqueStringTexts.insert(pair<string, vector<unsigned int>>(Text, VectorForTextPosition));
             }
         }
         unsigned int GetUniqueTextPosition(string Text)
         {
             if (!Text.empty())
             {
-                auto it = _uniqueStringTexts.find(Text);
-                if (it != _uniqueStringTexts.end())
-                    return (it->second);
+                auto FindText = _uniqueStringTexts.find(Text);
+                if (FindText != _uniqueStringTexts.end())
+                    return *min_element(FindText->second.begin(), FindText->second.end());
             }
 
             return 0;
         }
-        string GetUniqueTextFromPosition(unsigned int position)
+        void SetUniqueStringTexts(string Text, unsigned int TextPosition)
         {
-            if (!position)
-                return "";
+            if (Text.empty())
+                return;
 
-            string texttoreturn = "";
-            for (auto current = _uniqueStringTexts.begin(); current != _uniqueStringTexts.end(); current++)
+            auto FindText = _uniqueStringTexts.find(Text);
+            if (FindText != _uniqueStringTexts.end())
             {
-                if (current->second == position)
+                auto FindPosition = find(FindText->second.begin(), FindText->second.end(), TextPosition);
+                if (FindPosition != FindText->second.end())
                 {
-                    texttoreturn = current->first;
-                    break;
+                    Text.clear();
+                    return;
                 }
+
+                FindText->second.push_back(TextPosition);
+                Text.clear();
+                return;
             }
 
-            return texttoreturn;
+            vector<unsigned int> VectorForTextPosition;
+            VectorForTextPosition.push_back(TextPosition);
+            _uniqueStringTexts.insert(pair<string, vector<unsigned int>>(Text, VectorForTextPosition));
+            Text.clear();
+            return;
         }
     protected:
         unsigned int _recordSize;
         unsigned int _totalFields;
         unsigned int _totalRecords;
+
         vector<enumFieldTypes> _fieldTypes;
         map<string, structFileData> _savedData;
 
         unsigned int _stringSize;
         string _stringTexts;
-        map<string, unsigned int> _uniqueStringTexts;
+        map<string, vector<unsigned int>> _uniqueStringTexts;
 };
 
 template <typename T> class CSingleton

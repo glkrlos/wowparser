@@ -1,6 +1,6 @@
 #include "module_parser.h"
 
-bool module_parser::Load()
+bool Parser::Load()
 {
     _inputFile = fopen(GetFileName(), "rb");
     if (!_inputFile)
@@ -69,7 +69,7 @@ bool module_parser::Load()
     return true;
 }
 
-bool module_parser::CheckStructure()
+bool Parser::CheckStructure()
 {
     if (GetFileType() == csvFile || FileIsASCII())
     {
@@ -125,17 +125,15 @@ bool module_parser::CheckStructure()
         if (!CSVParser->CheckFieldsOfEachRecordAndSaveAllData())
             return false;
 
-        /// Header para archivos CSV es siempre 0 pues no es un archivo binario
-        _headerSize = 0;
         /// El resto de valores si los proporciona la clase CSV_Reader
-        _totalFields = CSVParser->GetTotalTotalFields();
-        _totalRecords = CSVParser->GetTotalTotalRecords();
-        _recordSize = CSVParser->GetTotalRecordSize();
+        _totalFields = CSVParser->GetTotalFields();
+        _totalRecords = CSVParser->GetTotalRecords();
+        _recordSize = CSVParser->GetRecordSize();
         _stringSize = CSVParser->GetStringSize();
         _fieldTypes = CSVParser->GetFieldTypes();
         _stringTexts = CSVParser->GetStringTexts();
         _uniqueStringTexts = CSVParser->GetUniqueStringTexts();
-        _extractedData = CSVParser->GetExtractedData();
+        _savedData = CSVParser->GetExtractedData();
     }
     else
     {
@@ -144,16 +142,16 @@ bool module_parser::CheckStructure()
             case dbcFile:
             case adbFile:
             {
-                _headerSize = 20;
+                unsigned int HeaderSize = 20;
                 _totalRecords = HeaderGetUInt();
                 _totalFields = HeaderGetUInt();
                 _recordSize = HeaderGetUInt();
-                unsigned int ReadedStringSize = HeaderGetUInt();
+                unsigned int ReaderStringSize = HeaderGetUInt();
 
-                unsigned int _dataBytes = _fileSize - _headerSize - ReadedStringSize;
-                unsigned int _stringBytes = _fileSize - _headerSize - _dataBytes;
+                unsigned int _dataBytes = _fileSize - HeaderSize - ReaderStringSize;
+                unsigned int _stringBytes = _fileSize - HeaderSize - _dataBytes;
 
-                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReadedStringSize || (_stringBytes != ReadedStringSize))
+                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReaderStringSize || (_stringBytes != ReaderStringSize))
                 {
                     Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
                     Log->WriteLog("\n");
@@ -174,16 +172,16 @@ bool module_parser::CheckStructure()
                 _stringTable = _wholeFileData + _headerOffset + _dataBytes;
 
                 /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
-                SetUniqueStringTextsFromStringTable(_stringBytes);
+                SetStringTextsFromStringTable(_stringBytes);
                 break;
             }
             case db2File:
             {
-                _headerSize = 32;
+                unsigned int HeaderSize = 32;
                 _totalRecords = HeaderGetUInt();
                 _totalFields = HeaderGetUInt();
                 _recordSize = HeaderGetUInt();
-                unsigned int ReadedStringSize = HeaderGetUInt();
+                unsigned int ReaderStringSize = HeaderGetUInt();
                 unsigned int tableHash = HeaderGetUInt();
                 unsigned int build = HeaderGetUInt();
                 unsigned int timestamp_last_written = HeaderGetUInt();
@@ -191,7 +189,7 @@ bool module_parser::CheckStructure()
                 unsigned int diff = 0;
                 if (build > 12880)
                 {
-                    _headerSize += 16;
+                    HeaderSize += 16;
                     unsigned int min_id = HeaderGetUInt();
                     unsigned int max_id = HeaderGetUInt();
                     unsigned int locales = HeaderGetUInt();
@@ -206,10 +204,10 @@ bool module_parser::CheckStructure()
                     }
                 }
 
-                unsigned int _dataBytes = _fileSize - _headerSize - ReadedStringSize - diff;
-                unsigned int _stringBytes = _fileSize - _headerSize - _dataBytes - diff;
+                unsigned int _dataBytes = _fileSize - HeaderSize - ReaderStringSize - diff;
+                unsigned int _stringBytes = _fileSize - HeaderSize - _dataBytes - diff;
 
-                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReadedStringSize || (_stringBytes != ReadedStringSize))
+                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReaderStringSize || (_stringBytes != ReaderStringSize))
                 {
                     Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
                     Log->WriteLog("\n");
@@ -224,13 +222,12 @@ bool module_parser::CheckStructure()
                 }
 
                 _dataTable = new unsigned char[_dataBytes];
-                _dataTable = _wholeFileData + _headerSize + diff;
+                _dataTable = _wholeFileData + HeaderSize + diff;
 
                 _stringTable = new unsigned char[_stringBytes];
-                _stringTable = _wholeFileData + _headerSize + diff + _dataBytes;
+                _stringTable = _wholeFileData + HeaderSize + diff + _dataBytes;
 
-                /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
-                SetUniqueStringTextsFromStringTable(_stringBytes);
+                SetStringTextsFromStringTable(_stringBytes);
                 break;
             }
             case wdbitemcacheFile:
@@ -242,9 +239,9 @@ bool module_parser::CheckStructure()
             case wdbpagetextcacheFile:
             case wdbquestcacheFile:
             {
-                _headerSize = 32;
+                unsigned int HeaderSize = 32;
 
-                if (_fileSize < _headerSize)
+                if (_fileSize < HeaderSize)
                 {
                     Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_XMLFileInfo.Type));
                     Log->WriteLog("\n");
@@ -339,7 +336,7 @@ bool module_parser::CheckStructure()
     return true;
 }
 
-void module_parser::ParseFile()
+void Parser::ParseFile()
 {
     if (GetFileType() == csvFile || FileIsASCII())
         ParseCSVFile();
@@ -347,7 +344,7 @@ void module_parser::ParseFile()
         ParseBinaryFile();
 }
 
-bool module_parser::ParseBinaryFile()
+bool Parser::ParseBinaryFile()
 {
     if (IsPreFormatted())
     {
@@ -417,17 +414,17 @@ bool module_parser::ParseBinaryFile()
 
         structFileData FileData;
         FileData.Record = Records;
-        _extractedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
+        _savedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
         if (_XMLFileInfo.outputFormats.ToDBC)
         {
-            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
+            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
             DBCWriter->CreateDBCFile();
         }
 
         if (_XMLFileInfo.outputFormats.ToCSV)
         {
-            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _extractedData, _stringTexts));
+            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
             CSVWriter->CreateCSVFile();
         }
     }
@@ -453,13 +450,13 @@ bool module_parser::ParseBinaryFile()
 
             if (_XMLFileInfo.outputFormats.ToDBC)
             {
-                auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
+                auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
                 DBCWriter->CreateDBCFile();
             }
 
             if (_XMLFileInfo.outputFormats.ToCSV)
             {
-                auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _extractedData, _stringTexts));
+                auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
                 CSVWriter->CreateCSVFile();
             }
         }
@@ -470,7 +467,7 @@ bool module_parser::ParseBinaryFile()
     return true;
 }
 
-bool module_parser::ParseCSVFile()
+bool Parser::ParseCSVFile()
 {
     auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, false, hash));
 
@@ -479,13 +476,13 @@ bool module_parser::ParseCSVFile()
 
     if (_XMLFileInfo.outputFormats.ToDBC)
     {
-        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _extractedData));
+        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
         DBCWriter->CreateDBCFile();
     }
 
     if (_XMLFileInfo.outputFormats.ToCSV)
     {
-        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _extractedData, _stringTexts));
+        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
         CSVWriter->CreateCSVFile();
     }
 
@@ -494,7 +491,7 @@ bool module_parser::ParseCSVFile()
     return true;
 }
 
-bool module_parser::PredictFieldTypes()
+bool Parser::PredictFieldTypes()
 {
     // Establecemos field type NONE y extablecemos en donde empieza cada field para todos los fields
     SetFieldTypesToNONE();
@@ -754,7 +751,7 @@ bool module_parser::PredictFieldTypes()
 
     structFileData FileData;
     FileData.Record = Records;
-    _extractedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
+    _savedData.insert(pair<string, structFileData>(_XMLFileInfo.FileName, FileData));
 
     return true;
 }

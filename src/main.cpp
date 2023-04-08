@@ -74,12 +74,11 @@ void pass3_checkheadersanddataconsistency()
     {
         bar.SetFileName(CurrentFileName->first);
 
-        unique_ptr<module_parser> Parser(new module_parser(CurrentFileName->second));
-        if (Parser->Load())
-            Parser->ParseFile();
+        unique_ptr<Parser> ParserPointer(new Parser(CurrentFileName->second));
+        if (ParserPointer->Load())
+            ParserPointer->ParseFile();
 
         bar.step();
-
     }
     /// If Check headers, entonces ponemos
     /// Parsing Files....

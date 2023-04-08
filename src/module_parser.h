@@ -89,19 +89,83 @@ class PrintFileInfo
         string Hash;
 };
 
-class module_parser : public SaveFileInfo
+class DataAccessor : public SaveFileInfo
 {
     public:
-        module_parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(XMLFileInfo) {}
-        ~module_parser()
+        DataAccessor()
         {
-            _header.clear();
+            _fieldsOffset = NULL;
+            _dataTable = NULL;
+            _stringTable = NULL;
+        }
+        ~DataAccessor()
+        {
+        }
+        class RecordAccessor
+        {
+            public:
+                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float *>(_data + _info.GetOffset(FieldID)); }
+                int GetInt(size_t FieldID) const { return *reinterpret_cast<int *>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int *>(_data + _info.GetOffset(FieldID)); }
+                unsigned int GetBool(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
+                const char *GetString(size_t FieldID) const { return reinterpret_cast<char *>(_info._stringTable + GetUInt(FieldID)); }
+            private:
+                RecordAccessor(DataAccessor &info, unsigned char *data) : _data(data), _info(info) { }
+                unsigned char *_data = NULL;
+                DataAccessor &_info;
+                friend class DataAccessor;
+        };
+        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
+        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
+    protected:
+        unsigned int *_fieldsOffset;
+        unsigned char *_dataTable;
+        unsigned char *_stringTable;
+};
+
+class Parser : public DataAccessor
+{
+    public:
+        Parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(XMLFileInfo)
+        {
+            _inputFile = NULL;
+            _wholeFileData = NULL;
+
+            _fileSize = 0;
+
+            _FirstTimeGetHeader = true;
+            _isASCIIFile = false;
+            _FirstTimeAksType = true;
+
+            _headerMagic.clear();
+            _headerOffset = 0;
+
+            _stringsCount = 0;
+            hash.clear();
+        }
+        ~Parser()
+        {
+            _inputFile = NULL;
 
             if (_wholeFileData)
             {
                 delete _wholeFileData;
                 _wholeFileData = NULL;
             }
+
+            _fileSize = 0;
+
+            _FirstTimeGetHeader = false;
+            _isASCIIFile = false;
+            _FirstTimeAksType = false;
+
+            _headerMagic.clear();
+            _headerOffset = 0;
+
+            _stringsCount = 0;
+            hash.clear();
         }
         bool Load();
         void ParseFile();
@@ -144,36 +208,36 @@ class module_parser : public SaveFileInfo
         {
             if (_FirstTimeGetHeader)
             {
-                _header = "";
-                _header.append(Shared->ToStr(HeaderGetChar()));
-                _header.append(Shared->ToStr(HeaderGetChar()));
-                _header.append(Shared->ToStr(HeaderGetChar()));
-                _header.append(Shared->ToStr(HeaderGetChar()));
+                _headerMagic = "";
+                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
 
                 _FirstTimeGetHeader = false;
             }
 
-            if (Shared->CompareTexts(_header, "WDBC"))
+            if (Shared->CompareTexts(_headerMagic, "WDBC"))
                 return dbcFile;
-            else if (Shared->CompareTexts(_header, "WCH2"))
+            else if (Shared->CompareTexts(_headerMagic, "WCH2"))
                 return adbFile;
-            else if (Shared->CompareTexts(_header, "WDB2"))
+            else if (Shared->CompareTexts(_headerMagic, "WDB2"))
                 return db2File;
-            else if (Shared->CompareTexts(_header, "BDIW"))
+            else if (Shared->CompareTexts(_headerMagic, "BDIW"))
                 return wdbitemcacheFile;
-            else if (Shared->CompareTexts(_header, "BOMW"))
+            else if (Shared->CompareTexts(_headerMagic, "BOMW"))
                 return wdbcreaturecacheFile;
-            else if (Shared->CompareTexts(_header, "BOGW"))
+            else if (Shared->CompareTexts(_headerMagic, "BOGW"))
                 return wdbgameobjectcacheFile;
-            else if (Shared->CompareTexts(_header, "BDNW"))
+            else if (Shared->CompareTexts(_headerMagic, "BDNW"))
                 return wdbitemnamecacheFile;
-            else if (Shared->CompareTexts(_header, "XTIW"))
+            else if (Shared->CompareTexts(_headerMagic, "XTIW"))
                 return wdbitemtextcacheFile;
-            else if (Shared->CompareTexts(_header, "CPNW"))
+            else if (Shared->CompareTexts(_headerMagic, "CPNW"))
                 return wdbnpccacheFile;
-            else if (Shared->CompareTexts(_header, "XTPW"))
+            else if (Shared->CompareTexts(_headerMagic, "XTPW"))
                 return wdbpagetextcacheFile;
-            else if (Shared->CompareTexts(_header, "TSQW"))
+            else if (Shared->CompareTexts(_headerMagic, "TSQW"))
                 return wdbquestcacheFile;
 
             return unkFile;
@@ -210,65 +274,43 @@ class module_parser : public SaveFileInfo
                     _fieldsOffset[i] += 4;
             }
         }
-        class RecordAccessor
-        {
-            public:
-                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float *>(_data + _info.GetOffset(FieldID)); }
-                int GetInt(size_t FieldID) const { return *reinterpret_cast<int *>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int *>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetBool(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
-                const char *GetString(size_t FieldID) const { return reinterpret_cast<char *>(_info._stringTable + GetUInt(FieldID)); }
-            private:
-                RecordAccessor(module_parser &info, unsigned char *data) : _data(data), _info(info) { }
-                unsigned char *_data = NULL;
-                module_parser &_info;
-                friend class module_parser;
-        };
-        RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
-        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
-        void SetUniqueStringTextsFromStringTable(unsigned long currStringSize)
+        void SetStringTextsFromStringTable(unsigned int StringBytes)
         {
             string Text = "";
-            for (unsigned long currentChar = 1; currentChar < currStringSize; currentChar++)
+            for (unsigned long currentChar = 1; currentChar < StringBytes; currentChar++)
             {
                 char c = static_cast<char>(_stringTable[currentChar]);
                 if (c == '\0')
                 {
-                    SetUniqueStringTexts(Text);
+                    SetUniqueStringTexts(Text, currentChar - Text.size());
+                    _stringTexts.append(Text + '\0');
+                    _stringSize += Text.size() + 1;
                     Text.clear();
+                    _stringsCount++;
                     continue;
                 }
 
                 Text.append(Shared->ToStr(c));
             }
         }
+    private:
     protected:
         structXMLFileInfo _XMLFileInfo;
 
-        FILE *_inputFile = NULL;
-        unsigned char *_wholeFileData = NULL;
+        FILE *_inputFile;
+        unsigned char *_wholeFileData;
 
-        unsigned long _fileSize = 0;
-        unsigned int _headerSize = 0;
+        unsigned long _fileSize;
 
-        bool _FirstTimeGetHeader = true;
-        bool _isASCIIFile = false;
-        bool _FirstTimeAksType = true;
+        bool _FirstTimeGetHeader;
+        bool _isASCIIFile;
+        bool _FirstTimeAksType;
 
-        string _header;
-        unsigned int _headerOffset = 0;
+        string _headerMagic;
+        unsigned int _headerOffset;
 
-        unsigned long _dataBytes = 0;
-        unsigned long _stringBytes = 0;
-        unsigned long _unkBytes = 0;
-        unsigned int *_fieldsOffset = NULL;
-        unsigned char *_dataTable = NULL;
-        unsigned char *_stringTable = NULL;
+        unsigned int _stringsCount;
 
         string hash;
-
-        map<string, structFileData> _extractedData;
 };
 #endif

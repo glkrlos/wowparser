@@ -61,6 +61,7 @@
     <ClCompile Include="src\module_csv_reader.cpp" />
     <ClCompile Include="src\module_csv_writer.cpp" />
     <ClCompile Include="src\module_dbc_writer.cpp" />
+    <ClCompile Include="src\module_file_reader.cpp" />
     <ClCompile Include="src\module_parser.cpp" />
     <ClCompile Include="src\module_config_reader.cpp" />
     <ClCompile Include="src\findfiles.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="src\module_csv_reader.h" />
     <ClInclude Include="src\module_csv_writer.h" />
     <ClInclude Include="src\module_dbc_writer.h" />
+    <ClInclude Include="src\module_file_reader.h" />
     <ClInclude Include="src\module_parser.h" />
     <ClInclude Include="src\module_config_reader.h" />
     <ClInclude Include="src\findfiles.h" />
