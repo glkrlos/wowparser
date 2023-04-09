@@ -549,6 +549,12 @@ bool Parser::ParseBinaryFile()
             auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
             CSVWriter->CreateCSVFile();
         }
+
+        if (_XMLFileInfo.outputFormats.ToSQL)
+        {
+            auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
+            SQLWriter->CreateSQLFile();
+        }
     }
     else
     {
@@ -581,6 +587,12 @@ bool Parser::ParseBinaryFile()
                 auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
                 CSVWriter->CreateCSVFile();
             }
+
+            if (_XMLFileInfo.outputFormats.ToSQL)
+            {
+                auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+                SQLWriter->CreateSQLFile();
+            }
         }
     }
 
@@ -606,6 +618,12 @@ bool Parser::ParseCSVFile()
     {
         auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
         CSVWriter->CreateCSVFile();
+    }
+
+    if (_XMLFileInfo.outputFormats.ToSQL)
+    {
+        auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+        SQLWriter->CreateSQLFile();
     }
 
     Log->WriteLog("\n");

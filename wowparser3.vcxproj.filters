@@ -51,7 +51,7 @@
     <ClCompile Include="src\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\module_file_reader.cpp">
+    <ClCompile Include="src\module_sql_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="src\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\module_file_reader.h">
+    <ClInclude Include="src\module_sql_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,7 @@
 #include "md5.h"
 #include "module_dbc_writer.h"
 #include "module_csv_writer.h"
+#include "module_sql_writer.h"
 
 class PrintFileInfo
 {

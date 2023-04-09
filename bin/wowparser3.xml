@@ -51,11 +51,15 @@ Set exact format for speficied file
 
 ToCSV=
 Will parse the file(s) to CSV file format.
-    * Default value is "true" if source is not a CSV file
+    * Default value is "false"
 
 ToDBC=
 Will parse the file(s) to DBC file format.
     * Default value is "false"
+
+ToSQL=
+Will parse the file(s) to SQL file format.
+    * Default value is "true"
 
 ************************************************************************************************************************************************
 Examples:
@@ -80,6 +84,7 @@ Find files by extension without recursive mode in specified directory:
 
 WDB Files can be parsed only with specific structrue.
 Just the parse of itemcache.wdb is disabled for now.
+These Samples are for Version 3.3.5a (12340)
 <file name="creaturecache.wdb" format="uussssssiiiiiiiiiiffbiiiiiii" />
 <file name="gameobjectcache.wdb" format="uuiisssssssiiiiiiiiiiiiiiiiiiiiiiiifiiiiii" />
 <file name="itemcache.wdb" format="uuiiissssiiiiiiiiiiiiiiiiiiiiixnnnnnnnnnnnnnnnnnnnniiffiffiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiisiiiiiiiiiiiiiiiiiiiiiiiiifiii" />

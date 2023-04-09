@@ -66,13 +66,13 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                         if (!XMLFileInfo.outputFormats.isSetToCSV)
                         {
                             if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
-                                XMLFileInfo.outputFormats.ToCSV = true;
+                                XMLFileInfo.outputFormats.ToCSV = false;
                             else
                                 XMLFileInfo.outputFormats.ToCSV = false;
                         }
 
                         XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
-                        XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? false : XMLFileInfo.outputFormats.ToSQL;
+                        XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? true : XMLFileInfo.outputFormats.ToSQL;
                         AddFileToListIfNotExist(dirName, XMLFileInfo);
                     }
                 }
@@ -94,13 +94,13 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                 if (!XMLFileInfo.outputFormats.isSetToCSV)
                 {
                     if (GetFileTypeByExtension(lowerCaseOriginalFileName) != csvFile)
-                        XMLFileInfo.outputFormats.ToCSV = true;
+                        XMLFileInfo.outputFormats.ToCSV = false;
                     else
                         XMLFileInfo.outputFormats.ToCSV = false;
                 }
 
                 XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
-                XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? false : XMLFileInfo.outputFormats.ToSQL;
+                XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? true : XMLFileInfo.outputFormats.ToSQL;
                 AddFileToListIfNotExist(dirName, XMLFileInfo);
             }
         }

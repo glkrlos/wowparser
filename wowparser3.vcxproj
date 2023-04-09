@@ -100,12 +100,12 @@
     <ClCompile Include="src\module_csv_reader.cpp" />
     <ClCompile Include="src\module_csv_writer.cpp" />
     <ClCompile Include="src\module_dbc_writer.cpp" />
-    <ClCompile Include="src\module_file_reader.cpp" />
     <ClCompile Include="src\module_parser.cpp" />
     <ClCompile Include="src\module_config_reader.cpp" />
     <ClCompile Include="src\findfiles.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\module_sql_writer.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\ProgressBar.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
@@ -115,11 +115,11 @@
     <ClInclude Include="src\module_csv_reader.h" />
     <ClInclude Include="src\module_csv_writer.h" />
     <ClInclude Include="src\module_dbc_writer.h" />
-    <ClInclude Include="src\module_file_reader.h" />
     <ClInclude Include="src\module_parser.h" />
     <ClInclude Include="src\module_config_reader.h" />
     <ClInclude Include="src\findfiles.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\module_sql_writer.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\ProgressBar.h" />
     <ClInclude Include="src\shared.h" />
