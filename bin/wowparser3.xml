@@ -10,7 +10,7 @@
 <!--
 WoWParser 3 - XML Configuration File
 
-<file name="" extension="" recursive="" directory="" format="" ToCSV="" ToDBC=""/>
+<file name="" extension="" recursive="" directory="" format="" ToCSV="" ToDBC="" ToSQL=""/>
 
 name=
 File name to be parsed
