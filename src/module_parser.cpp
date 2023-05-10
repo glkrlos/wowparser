@@ -140,7 +140,6 @@ bool Parser::CheckStructure()
         switch (GetFileTypeByHeader())
         {
             case dbcFile:
-            case adbFile:
             {
                 unsigned int HeaderSize = 20;
                 _totalRecords = HeaderGetUInt();
@@ -165,7 +164,7 @@ bool Parser::CheckStructure()
                     return false;
                 }
 
-                _dataTable = new unsigned char [_dataBytes];
+                _dataTable = new unsigned char[_dataBytes];
                 _dataTable = _wholeFileData + _headerOffset;
 
                 _stringTable = new unsigned char[_stringBytes];
@@ -173,6 +172,55 @@ bool Parser::CheckStructure()
 
                 /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
                 SetStringTextsFromStringTable(_stringBytes);
+                break;
+            }
+            case adbFile:
+            {
+                unsigned int HeaderSize = 48;
+                _totalRecords = HeaderGetUInt();
+                _totalFields = HeaderGetUInt();
+                _recordSize = HeaderGetUInt();
+                unsigned int ReaderStringSize = HeaderGetUInt();
+                unsigned int TableHash = HeaderGetUInt();
+                unsigned int Build = HeaderGetUInt();
+                unsigned int unk1 = HeaderGetUInt();
+                unsigned int unk2 = HeaderGetUInt();
+                unsigned int unk3 = HeaderGetUInt();
+                unsigned int LocaleID = HeaderGetUInt();
+                unsigned int unk4 = HeaderGetUInt();
+
+                unsigned int _dataBytes = _fileSize - HeaderSize - ReaderStringSize;
+                unsigned int _stringBytes = _fileSize - HeaderSize - _dataBytes;
+
+                if ((_dataBytes != (_totalRecords * _recordSize)) || !ReaderStringSize || (_stringBytes != ReaderStringSize))
+                {
+                    Log->WriteLogNoTime("FAILED: Structure is damaged.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                if (!_totalRecords || !_totalFields || !_recordSize)
+                {
+                    Log->WriteLogNoTime("FAILED: No records found.\n");
+                    Log->WriteLog("\n");
+                    return false;
+                }
+
+                _dataTable = new unsigned char[_dataBytes];
+                _dataTable = _wholeFileData + _headerOffset;
+
+                // Los archivos de la version 6.x si no tienen strings es 2, sino entonces el numero normal
+                if (ReaderStringSize > 2)
+                {
+                    _stringTable = new unsigned char[_stringBytes];
+                    _stringTable = _wholeFileData + _headerOffset + _dataBytes;
+
+                    /// Estableciendo el valor de _stringSize, los datos de _stringTexts y _uniqueStringTexts
+                    SetStringTextsFromStringTable(_stringBytes);
+                }
+                else
+                    _stringSize = 1;
+
                 break;
             }
             case db2File:
