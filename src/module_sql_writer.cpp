@@ -14,8 +14,8 @@ bool SQL_Writer::CreateSQLFile()
         return false;
     }
 
-    fprintf(output, "DROP TABLE IF EXISTS `table`;\n");
-    fprintf(output, "CREATE TABLE `table` (\n");
+    fprintf(output, "DROP TABLE IF EXISTS `%s`;\n", _fileName.c_str());
+    fprintf(output, "CREATE TABLE `%s` (\n", _fileName.c_str());
     for (unsigned int currentField = 0;  currentField < _fieldTypes.size(); currentField++)
     {
         switch (_fieldTypes[currentField])
@@ -35,7 +35,7 @@ bool SQL_Writer::CreateSQLFile()
 
         fprintf(output, "\n");
     }
-    fprintf(output, ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='%s';\n\n", outputFileNameCSV.c_str());
+    fprintf(output, ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='%s';\n\n", _fileName.c_str());
 
 
     auto currentFile = _savedData.begin();
@@ -44,7 +44,7 @@ bool SQL_Writer::CreateSQLFile()
     for (auto Records = currentFile->second.Record.begin(); Records != currentFile->second.Record.end(); Records++, currentRecord++)
     {
         if (maxRows == 0)
-            fprintf(output, "INSERT INTO `table` VALUES\n");
+            fprintf(output, "INSERT INTO `%s` VALUES\n", _fileName.c_str());
 
         maxRows++;
 
@@ -65,6 +65,9 @@ bool SQL_Writer::CreateSQLFile()
 
                         if (_stringTexts[x] == '"')
                             outText.append("\"");
+
+                        if (_stringTexts[x] == '\\')
+                            outText += '\\';
 
                         if (_stringTexts[x] == '|' &&
                             _stringTexts[x + 1] == '|' &&
@@ -137,7 +140,7 @@ bool SQL_Writer::CreateSQLFile()
                 fprintf(output, ")");
         }
 
-        if (maxRows == 10000 && (currentRecord + 1 < currentFile->second.Record.size()))
+        if (maxRows == 1000 && (currentRecord + 1 < currentFile->second.Record.size()))
         {
             fprintf(output, ";\n\n");
             maxRows = 0;
