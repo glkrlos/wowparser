@@ -61,9 +61,9 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
     * Implemented in configuration find files using *.dbc for example.
     * Implemented creation of DBC files using recursive mode.
     Build 81:
-    *Fixed a bug where Predict System can't open some files because an incorrect error message of byte packed.
-    *Improved Predict String Fields from ADB, DB2 and DBC files (Report any bugs if any with this improvement).
-    *Improved Parse Strings Fields from CSV files, now display proper error messages in unexpected end of string or missing " at the end of string field.
+    * Fixed a bug where Predict System can't open some files because an incorrect error message of byte packed.
+    * Improved Predict String Fields from ADB, DB2 and DBC files (Report any bugs if any with this improvement).
+    * Improved Parse Strings Fields from CSV files, now display proper error messages in unexpected end of string or missing " at the end of string field.
     Build 85:
     * Fixed a crash if the only one field is set (string field) at parse CSV files.
     * Fixed a problem if the first field is a string, the rest of the fields can cause an incorrect error messages.
@@ -79,4 +79,10 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
     * Implement support to read ADB, DBC files.
     * Added Basic Support to predict integer, string and float field types (Predict float and string fields still not working good and byte fields not supported yet).
     * Added support to read files via arguments in command line.
-     *Implemented Read CSV files.
+    * Implemented Read CSV files.
+
+## How To Compile:
+    * Compile under Linux Debian 11
+    * 1. Install these packages with apt-get: build-essential autoconf libtool gcc g++ make cmake git wget p7zip-full libncurses5-dev zlib1g-dev libbz2-dev openssl libssl-dev mariadb-server mariadb-client libmariadb-dev-compat libmariadb-dev libmysql++-dev libreadline-dev libboost-dev libboost-thread-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-iostreams-dev screen mingw-w64 mingw-w64-common mingw-w64-i686-dev mingw-w64-tools mingw-w64-x86-64-dev g++-multilib libc6-dev-i386
+    * 2. make
+    * 3. Its all, you have all executables for 32 and 64 bits (Linux and Windows under bin directory).
