@@ -3,7 +3,7 @@
 Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
 ## WoWParser 3.1 (Zitacuaro):
-    * New Version 3.1 has been Released.
+    * New Version 3.1 Revision 220 has been Released.
     * New: For each new version of parser now will have a codename.
     * New: Enabled the parse of DB2 and WDB files. For WDB files requires maximum version 15595 to parse it. Just the parse of itemcache.wdb is disabled for now.
     * Now have 4 executables, two for Linux (i386 and AMD64) and two for Windows (x86 and x64), and is compiled under linux debian.
@@ -12,14 +12,12 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
     Testing:
     * Support to verify converted files.
-    * Support to parse data to ADB, DB2 and SQL file format.
     * Support to connect to a SQL Server. For read and write parsed files.
-    * Support to select the name and order of columns at the moment of parse files to a SQL Server.
-    * Support to connect to a SQL Server to save parsed information.
 
     Still in Development:
     * Creating support to predict field types in WDB files. (really hard to do that but i'm in progress)
     * Support to select name and order of columns in SQL file format.
+    * Support to select the name and order of columns at the moment of parse files to a SQL Server.
 
 ## WoWParser 3.0:
     * New Version 3.0 Revision 192 has been Released.
