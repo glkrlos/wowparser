@@ -11,7 +11,7 @@ void print_header()
     Log->WriteLogAndPrint("Hash: %s\tDate: %s\n", _HASH, _DATE);
     Log->WriteLogAndPrint("\n");
     Log->WriteLogAndPrint("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
-    Log->WriteLogAndPrint("Copyright(c) 2022 Carlos Ramzuel - Tlaxcala, Mexico.\n");
+    Log->WriteLogAndPrint("Copyright(c) 2023 Carlos Ramzuel - Tlaxcala, Mexico.\n");
     Log->WriteLogAndPrint("\n");
 
     Log->WriteLog("====================================LOG FILE START====================================\n");
