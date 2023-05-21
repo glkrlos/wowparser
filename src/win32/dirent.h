@@ -92,7 +92,11 @@
 # define S_IWRITE _S_IWRITE                    /* write permission */
 # define S_IEXEC  _S_IEXEC                     /* execute permission */
 #endif
+
+#if !defined(S_IFBLK)
 #define S_IFBLK   0                            /* block device */
+#endif
+
 #define S_IFLNK   0                            /* link */
 #define S_IFSOCK  0                            /* socket */
 
@@ -130,13 +134,28 @@
  * only defined for compatibility.  These macros should always return false
  * on Windows.
  */
+#if !defined(S_ISFIFO)
 #define	S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFFIFO)
+#endif
+
+#if !defined(S_ISDIR)
 #define	S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#endif
+
+#if !defined(S_ISREG)
 #define	S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
+#endif
+
 #define	S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
 #define	S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
+
+#if !defined(S_ISCHR)
 #define	S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
+#endif
+
+#if !defined(S_ISBLK)
 #define	S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
+#endif
 
 #ifdef __cplusplus
 extern "C" {

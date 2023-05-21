@@ -19,7 +19,7 @@ void print_header()
 
 void pass1_loadconfig()
 {
-    const auto_ptr<Config_Reader> Config(new Config_Reader);
+    const unique_ptr<Config_Reader> Config(new Config_Reader);
 
     if (!Config->LoadConfiguarionFile())
     {

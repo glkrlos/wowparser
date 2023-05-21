@@ -225,7 +225,7 @@ template <typename T> class CSingleton
         static T* Instance()
         {
             if (!m_instance.get())
-                m_instance = auto_ptr<T>(new T);
+                m_instance = unique_ptr<T>(new T);
 
             return m_instance.get();
         };
@@ -235,10 +235,10 @@ template <typename T> class CSingleton
     private:
         //CSingleton(CSingleton const&);
         //CSingleton& operator = (CSingleton const*);
-        static auto_ptr<T> m_instance;
+        static unique_ptr<T> m_instance;
 };
 
-template <typename T> auto_ptr<T> CSingleton<T>::m_instance;
+template <typename T> unique_ptr<T> CSingleton<T>::m_instance;
 
 class cShared
 {

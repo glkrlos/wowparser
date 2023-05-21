@@ -117,7 +117,7 @@ bool Parser::CheckStructure()
             }
         }
 
-        auto_ptr<CSV_Reader> CSVParser(new CSV_Reader(GetFileName(), CSVDataMap));
+        unique_ptr<CSV_Reader> CSVParser(new CSV_Reader(GetFileName(), CSVDataMap));
 
         if (!CSVParser->CheckCSV())
             return false;
@@ -528,7 +528,7 @@ bool Parser::ParseBinaryFile()
 
         Log->WriteLogNoTime("DONE.\n");
 
-        auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_XMLFileInfo.FormatedFieldTypes, _XMLFileInfo.FormatedTotalFields, _totalRecords, false, hash));
+        unique_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_XMLFileInfo.FormatedFieldTypes, _XMLFileInfo.FormatedTotalFields, _totalRecords, false, hash));
 
         if (!PrintInfo->PrintResults())
             return false;
@@ -588,19 +588,19 @@ bool Parser::ParseBinaryFile()
 
         if (_XMLFileInfo.outputFormats.ToDBC)
         {
-            auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
+            unique_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
             DBCWriter->CreateDBCFile();
         }
 
         if (_XMLFileInfo.outputFormats.ToCSV)
         {
-            auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
+            unique_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
             CSVWriter->CreateCSVFile();
         }
 
         if (_XMLFileInfo.outputFormats.ToSQL)
         {
-            auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
+            unique_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _XMLFileInfo.FormatedFieldTypes, _savedData, _stringTexts));
             SQLWriter->CreateSQLFile();
         }
     }
@@ -619,26 +619,26 @@ bool Parser::ParseBinaryFile()
         {
             Log->WriteLogNoTime("DONE.\n");
 
-            auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, true, hash));
+            unique_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, true, hash));
 
             if (!PrintInfo->PrintResults())
                 return false;
 
             if (_XMLFileInfo.outputFormats.ToDBC)
             {
-                auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
+                unique_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
                 DBCWriter->CreateDBCFile();
             }
 
             if (_XMLFileInfo.outputFormats.ToCSV)
             {
-                auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+                unique_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
                 CSVWriter->CreateCSVFile();
             }
 
             if (_XMLFileInfo.outputFormats.ToSQL)
             {
-                auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+                unique_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
                 SQLWriter->CreateSQLFile();
             }
         }
@@ -651,26 +651,26 @@ bool Parser::ParseBinaryFile()
 
 bool Parser::ParseCSVFile()
 {
-    auto_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, false, hash));
+    unique_ptr<PrintFileInfo> PrintInfo(new PrintFileInfo(_fieldTypes, _totalFields, _totalRecords, false, hash));
 
     if (!PrintInfo->PrintResults())
         return false;
 
     if (_XMLFileInfo.outputFormats.ToDBC)
     {
-        auto_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
+        unique_ptr<DBC_Writer> DBCWriter(new DBC_Writer(_totalRecords, _totalFields, _recordSize, _stringSize, _stringTexts, _XMLFileInfo.FileName, _savedData));
         DBCWriter->CreateDBCFile();
     }
 
     if (_XMLFileInfo.outputFormats.ToCSV)
     {
-        auto_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+        unique_ptr<CSV_Writer> CSVWriter(new CSV_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
         CSVWriter->CreateCSVFile();
     }
 
     if (_XMLFileInfo.outputFormats.ToSQL)
     {
-        auto_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
+        unique_ptr<SQL_Writer> SQLWriter(new SQL_Writer(_XMLFileInfo.FileName, _fieldTypes, _savedData, _stringTexts));
         SQLWriter->CreateSQLFile();
     }
 

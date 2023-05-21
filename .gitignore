@@ -1,8 +1,6 @@
+.vs/
 bin/
-Release/
-*.opensdf
-*.sdf
-*.suo
+x64/
+Win32/
 *.user
-*.opendb
 revision.h
