@@ -90,3 +90,14 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 ## License
 
 [MIT License](LICENSE)
+
+
+## Reporting issues
+
+Issues can be reported [here](https://github.com/glkrlos/wowparser/issues).
+
+## Submitting fixes or changes
+
+Fixes or changes can be request [here](https://github.com/glkrlos/wowparser/pulls).
+
+Before you submit a pull request, read file [CONTRIBUTING](CONTRIBUTING.md).
