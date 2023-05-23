@@ -1,7 +1,7 @@
 # Contributing
 
 Would you like to contribute? Excellent!
-Contributing is not just for fixing, but also for reporting bugs or unexpected crashes.
+Contributing is not just for fixing, but also for reporting bugs or new features.
 
 Creating Pull Requests:
 =======================
@@ -19,5 +19,4 @@ Required before sending a pull request:
 - From what commit hash
 - What have you done to verify that what you are proposing works and/or that the original code doesn't work or that you don't like it and why.
 - The changes you want to be made.
-- It’s all, just wait for verify your changes and then accept it if all is ok
 - That's all, just wait to verify your change proposal, and if everything goes well, your changes will be published in the official repository through a merge pull request.
