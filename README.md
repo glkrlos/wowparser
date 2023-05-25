@@ -12,7 +12,7 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
     Testing:
     * Support to verify converted files.
-    * Support to connect to a SQL Server. For read and write parsed files.
+    * Support to connect to a SQL Server. ForÂ read and write parsed files.
 
     Still in Development:
     * Creating support to predict field types in WDB files. (really hard to do that but i'm in progress)
@@ -20,7 +20,7 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
     * Support to select the name and order of columns at the moment of parse files to a SQL Server.
 
 ## WoWParser 3.0:
-    * New Version 3.0 Revision 192 has been Released.
+    * NewÂ Version 3.0 Revision 192 has been Released.
     * Temporarily disabled the parse of DB2 and WDB files because this will need more tests.
     * Predicting DBC and ADB files are now 100% efficient for non byte packed files.
     * Temporarily disabled the creation of SQL files because an unknown error.
@@ -40,7 +40,7 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
     * Revision is used instead of Build.
     * Compiled sources now include HASH and DATE from repository to know what Revision is.
     * No longer has two windows executables, now is all in one.
-    * Modules to read CSV, DBC, DB2, ADB files are totally redone. All the code are totally rewritten.
+    * Modules to read CSV, DBC, DB2, ADB files are totally redone.Â AllÂ the code are totally rewritten.
     * Reading CSV files now shows correct messages if expected data is wrong.
     * Predict field types now gets unsigned int fields.
 
