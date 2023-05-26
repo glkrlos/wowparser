@@ -14,6 +14,7 @@
 class cFindFiles
 {
     public:
+        static cFindFiles* Instance();
         map<string, structXMLFileInfo> XMLFileInfo() { return fileNames; }
         cFindFiles();
         void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID = 0);
@@ -87,5 +88,5 @@ class cFindFiles
         map<string, structXMLFileInfo> fileNames;
 };
 
-#define FindFiles CSingleton<cFindFiles>::Instance()
+#define FindFiles cFindFiles::Instance()
 #endif

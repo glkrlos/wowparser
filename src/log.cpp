@@ -8,6 +8,12 @@ cLog::cLog()
         fclose(logFile);
 }
 
+cLog* cLog::Instance()
+{
+    static cLog instance;
+    return &instance;
+}
+
 void cLog::WriteLog(const char* args, ...)
 {
     FILE *logFile = fopen(WoWParserLogOutPut, "a");

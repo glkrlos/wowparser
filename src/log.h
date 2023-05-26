@@ -15,11 +15,12 @@ class cLog
 {
     public:
         cLog();
+        static cLog* Instance();
         void WriteLog(const char* args, ...);
         void WriteLogNoTime(const char* args, ...);
         void WriteLogNoTimeAndPrint(const char* args, ...);
         void WriteLogAndPrint(const char* args, ...);
 };
 
-#define Log CSingleton<cLog>::Instance()
+#define Log cLog::Instance()
 #endif

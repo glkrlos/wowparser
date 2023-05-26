@@ -42,8 +42,6 @@ void pass1_loadconfig()
 
     if (FindFiles->ListEmpty())
         Log->WriteLogAndPrint("Configuration file loaded, but no files found.\n");
-
-    return;
 }
 
 void pass2_printfilestolog()
@@ -70,11 +68,11 @@ void pass3_checkheadersanddataconsistency()
     auto XMLFileInfo = FindFiles->XMLFileInfo();
     ProgressBar bar(XMLFileInfo.size());
 
-    for (auto CurrentFileName = XMLFileInfo.begin(); CurrentFileName != XMLFileInfo.end(); CurrentFileName++)
+    for (auto & CurrentFileName : XMLFileInfo)
     {
-        bar.SetFileName(CurrentFileName->first);
+        bar.SetFileName(CurrentFileName.first);
 
-        unique_ptr<Parser> ParserPointer(new Parser(CurrentFileName->second));
+        unique_ptr<Parser> ParserPointer(new Parser(CurrentFileName.second));
         if (ParserPointer->Load())
             ParserPointer->ParseFile();
 

@@ -4,6 +4,12 @@ cFindFiles::cFindFiles()
 {
 }
 
+cFindFiles* cFindFiles::Instance()
+{
+    static cFindFiles instance;
+    return &instance;
+}
+
 enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());

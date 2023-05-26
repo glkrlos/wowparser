@@ -218,31 +218,14 @@ class SaveFileInfo
         string _stringTexts;
         map<string, vector<unsigned int>> _uniqueStringTexts;
 };
-
-template <typename T> class CSingleton
-{
-    public:
-        static T* Instance()
-        {
-            if (!m_instance.get())
-                m_instance = unique_ptr<T>(new T);
-
-            return m_instance.get();
-        };
-    protected:
-        //CSingleton();
-        //~CSingleton();
-    private:
-        //CSingleton(CSingleton const&);
-        //CSingleton& operator = (CSingleton const*);
-        static unique_ptr<T> m_instance;
-};
-
-template <typename T> unique_ptr<T> CSingleton<T>::m_instance;
-
 class cShared
 {
     public:
+        static cShared* Instance()
+        {
+            static cShared instance;
+            return &instance;
+        }
         template <typename T> string ToStr(T i)
         {
             ostringstream buffer;
@@ -273,7 +256,7 @@ class cShared
         }
 };
 
-#define Shared CSingleton<cShared>::Instance()
+#define Shared cShared::Instance()
 
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 
