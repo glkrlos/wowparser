@@ -12,12 +12,12 @@ class CSV_Reader : public SaveFileInfo
         bool CheckCSV();
         bool CheckFieldsOfEachRecordAndSaveAllData();
     private:
-        bool ExtractFields(string, map<unsigned int, string> &);
-        bool SetFieldTypes(string);
+        static bool ExtractFields(string, map<unsigned int, string> &);
+        bool SetFieldTypes(const string&);
         enumFieldTypes GetFieldType(unsigned int);
-        const char* GetFieldTypeName(enumFieldTypes);
+        static const char* GetFieldTypeName(enumFieldTypes);
 
-        bool CheckFieldValue(unsigned int, enumFieldTypes, string, unsigned int);
+        static bool CheckFieldValue(unsigned int, enumFieldTypes, string, unsigned int);
     protected:
         map<unsigned int, string> _fileData;
         const char *_fileName;

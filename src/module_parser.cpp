@@ -76,7 +76,7 @@ bool Parser::CheckStructure()
         map<unsigned int, string> CSVDataMap;
 
         unsigned int rowcount = 0;
-        string currentLine = "";
+        string currentLine;
         for (unsigned long x = 0; x < _fileSize; x++)
         {
             char c = static_cast<char>(_wholeFileData[x]);
@@ -286,7 +286,7 @@ bool Parser::CheckStructure()
             case wdbpagetextcacheFile:
             case wdbquestcacheFile:
             {
-                if (!_XMLFileInfo.FormatedTotalFields || !_XMLFileInfo.FormatedFieldTypes.size() || !_XMLFileInfo.FormatedRecordSize)
+                if (!_XMLFileInfo.FormatedTotalFields || _XMLFileInfo.FormatedFieldTypes.empty() || !_XMLFileInfo.FormatedRecordSize)
                 {
                     Log->WriteLogNoTime("FAILED: Unable to parse without specified format.\n");
                     Log->WriteLog("\n");
@@ -325,7 +325,7 @@ bool Parser::CheckStructure()
                 /*unsigned int unk1 = */HeaderGetUInt();
                 /*unsigned int unk2 = */HeaderGetUInt();
 
-                long currentFileSize = _fileSize - 24;
+                long currentFileSize = (long)_fileSize - 24;
                 bool isFirstRecord = true;
 
                 vector<structRecord> Records;
@@ -338,7 +338,7 @@ bool Parser::CheckStructure()
                     if ((currentFileSize -= 8) >= 0)
                     {
                         entry = HeaderGetUInt();
-                        recordSize = HeaderGetUInt();
+                        recordSize = (int)HeaderGetUInt();
 
                         if (isFirstRecord && (!entry || !recordSize))
                         {
@@ -382,7 +382,7 @@ bool Parser::CheckStructure()
                             sRecordSyze.UIntValue = recordSize;
                             Fields.push_back(sRecordSyze);
 
-                            unsigned char *currentRecordData = new unsigned char[recordSize];
+                            auto *currentRecordData = new unsigned char[recordSize];
                             currentRecordData = _wholeFileData + _headerOffset;
                             _headerOffset += recordSize;
 
@@ -439,8 +439,8 @@ bool Parser::CheckStructure()
                                 else /// type_STRING
                                 {
                                     string StringValue = reinterpret_cast<char *>(currentRecordData + currentRecordOffSet);
-                                    currentRecordOffSet += StringValue.size() + 1;
-                                    recordSize -= StringValue.size() + 1;
+                                    currentRecordOffSet += (int)StringValue.size() + 1;
+                                    recordSize -= (int)StringValue.size() + 1;
                                     SetUniqueStringTexts(StringValue);
                                     sField.StringValue = GetUniqueTextPosition(StringValue);
                                 }
@@ -692,12 +692,12 @@ bool Parser::PredictFieldTypes()
         for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
         {
             float floatValue = GetRecord(currentRecord).GetFloat(currentField);
-            if (floatValue)
+            if (floatValue > 0)
             {
                 string floatStringValue = Shared->ToStr(floatValue);
-                int isFloat1 = floatStringValue.find("e");
-                int isFloat2 = floatStringValue.find("#");
-                int isFloat3 = floatStringValue.find("nan");
+                int isFloat1 = (int)floatStringValue.find('e');
+                int isFloat2 = (int)floatStringValue.find('#');
+                int isFloat3 =(int) floatStringValue.find("nan");
                 if (isFloat1 != -1 || isFloat2 != -1 || isFloat3 != -1)
                 {
                     _fieldTypes[currentField] = type_NONE;
@@ -739,7 +739,7 @@ bool Parser::PredictFieldTypes()
 
             for (unsigned int currentRecord = 0; currentRecord < _totalRecords; currentRecord++)
             {
-                int intValue = GetRecord(currentRecord).GetUInt(currentField);
+                int intValue = (int)GetRecord(currentRecord).GetUInt(currentField);
                 if (intValue < 0 || intValue >= int(_stringSize) || (intValue > 0 && _stringTable[intValue - 1]))
                 {
                     _fieldTypes[currentField] = type_INT;

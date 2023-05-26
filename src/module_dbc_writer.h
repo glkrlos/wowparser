@@ -19,11 +19,11 @@ class DBC_Writer
             _totalFields = totalFields;
             _recordSize = recordSize;
             _stringSize = stringSize;
-            _stringTexts = stringTexts;
-            _fileName = fileName;
-            _savedData = savedData;
+            _stringTexts = std::move(stringTexts);
+            _fileName = std::move(fileName);
+            _savedData = std::move(savedData);
         }
-        ~DBC_Writer() { }
+        ~DBC_Writer() = default;
         bool CreateDBCFile();
     protected:
         unsigned int _totalRecords;

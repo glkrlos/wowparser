@@ -10,8 +10,8 @@ class CSV_Writer
         CSV_Writer(string fileName,
                    vector<enumFieldTypes> fieldTypes,
                    map<string, structFileData> savedData,
-                   string stringTexts) : _fileName(fileName), _fieldTypes(fieldTypes), _savedData(savedData), _stringTexts(stringTexts) {}
-        ~CSV_Writer() {}
+                   string stringTexts) : _fileName(std::move(fileName)), _fieldTypes(std::move(fieldTypes)), _savedData(std::move(savedData)), _stringTexts(std::move(stringTexts)) {}
+        ~CSV_Writer() = default;
         bool CreateCSVFile();
     protected:
         string _fileName;

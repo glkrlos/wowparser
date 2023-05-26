@@ -3,12 +3,12 @@
 CSV_Reader::CSV_Reader(const char *FileName, map<unsigned int, string> FileData)
 {
     _fileName = FileName;
-    _fileData = FileData;
+    _fileData = std::move(FileData);
 }
 
 CSV_Reader::~CSV_Reader()
 {
-    _fileName = NULL;
+    _fileName = nullptr;
     _fileData.clear();
 }
 
@@ -50,7 +50,7 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
         return true;
     }
 
-    string _fieldData = "";
+    string _fieldData;
     for (unsigned int x = 0; x < originalText.size(); x++)
     {
         bool isFirstChar = (x == 0);
@@ -180,7 +180,7 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
 
                 if (isLastStringChar)
                 {
-                    int _temp = originalText.size() - 30;
+                    int _temp = (int)originalText.size() - 30;
                     unsigned int min = _temp < 0 ? 0 : _temp;
                     unsigned int max = originalText.size() - _temp;
                     Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
@@ -205,7 +205,7 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
     return true;
 }
 
-bool CSV_Reader::SetFieldTypes(string FirstLine)
+bool CSV_Reader::SetFieldTypes(const string& FirstLine)
 {
     if (FirstLine.empty())
     {
@@ -218,51 +218,51 @@ bool CSV_Reader::SetFieldTypes(string FirstLine)
     if (!ExtractFields(FirstLine, fieldNames))
         return false;
 
-    for (auto it = fieldNames.begin(); it != fieldNames.end(); ++it)
+    for (auto & fieldName : fieldNames)
     {
-        if (Shared->CompareTexts(it->second, "string"))
+        if (Shared->CompareTexts(fieldName.second, "string"))
         {
             _fieldTypes.push_back(type_STRING);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(it->second, "float"))
+        else if (Shared->CompareTexts(fieldName.second, "float"))
         {
             _fieldTypes.push_back(type_FLOAT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(it->second, "byte"))
+        else if (Shared->CompareTexts(fieldName.second, "byte"))
         {
             _fieldTypes.push_back(type_BYTE);
             _recordSize += 1;
         }
-        else if (Shared->CompareTexts(it->second, "ubyte"))
+        else if (Shared->CompareTexts(fieldName.second, "ubyte"))
         {
             _fieldTypes.push_back(type_UBYTE);
             _recordSize += 1;
         }
-        else if (Shared->CompareTexts(it->second, "int"))
+        else if (Shared->CompareTexts(fieldName.second, "int"))
         {
             _fieldTypes.push_back(type_INT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(it->second, "uint"))
+        else if (Shared->CompareTexts(fieldName.second, "uint"))
         {
             _fieldTypes.push_back(type_UINT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(it->second, "bool"))
+        else if (Shared->CompareTexts(fieldName.second, "bool"))
         {
             _fieldTypes.push_back(type_BOOL);
             _recordSize += 4;
         }
-        else if (it->second.empty())
+        else if (fieldName.second.empty())
         {
-            Log->WriteLogNoTime("FAILED: Name of field '%u' can't be empty.\n", it->first + 1);
+            Log->WriteLogNoTime("FAILED: Name of field '%u' can't be empty.\n", fieldName.first + 1);
             return false;
         }
         else
         {
-            Log->WriteLogNoTime("FAILED: In Field '%u' Unknown type '%s'.\n", it->first + 1, it->second.c_str());
+            Log->WriteLogNoTime("FAILED: In Field '%u' Unknown type '%s'.\n", fieldName.first + 1, fieldName.second.c_str());
             return false;
         }
     }
@@ -311,9 +311,9 @@ const char* CSV_Reader::GetFieldTypeName(enumFieldTypes fieldType)
 
 bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType, string fieldValue, unsigned int recordID)
 {
-    bool isFloat = fieldType == type_FLOAT ? true : false;
-    bool isBool = fieldType == type_BOOL ? true : false;
-    bool isUnsigned = (fieldType == type_UINT || fieldType == type_UBYTE) ? true : false;
+    bool isFloat = fieldType == type_FLOAT;
+    bool isBool = fieldType == type_BOOL;
+    bool isUnsigned = (fieldType == type_UINT || fieldType == type_UBYTE);
 
     if (fieldValue.empty())
     {
@@ -321,8 +321,8 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
         return false;
     }
 
-    int DotFirst = fieldValue.find('.');
-    int DotSecond = fieldValue.rfind('.');
+    int DotFirst = (int)fieldValue.find('.');
+    int DotSecond = (int)fieldValue.rfind('.');
 
     if (!isFloat && DotFirst != -1)
     {
@@ -350,15 +350,15 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
             return false;
         }
 
-        if (DotFirst == (fieldValue.size() - 1))
+        if (DotFirst == ((int)fieldValue.size() - 1))
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Dot symbol '.' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
             return false;
         }
     }
 
-    int NegativeFirst = fieldValue.find('-');
-    int NegativeSecond = fieldValue.rfind('-');
+    int NegativeFirst = (int)fieldValue.find('-');
+    int NegativeSecond = (int)fieldValue.rfind('-');
 
     if ((isBool || isUnsigned) && NegativeFirst != -1)
     {
@@ -385,22 +385,22 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
             return false;
         }
 
-        if (NegativeFirst == (fieldValue.size() - 1))
+        if (NegativeFirst == ((int)fieldValue.size() - 1))
         {
             Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Negative symbol '-' can't be the last character in field value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
             return false;
         }
     }
 
-    for (unsigned int currentChar = 0; currentChar < fieldValue.size(); currentChar++)
+    for (char currentChar : fieldValue)
     {
-        if (isFloat && fieldValue[currentChar] == '.')
+        if (isFloat && currentChar == '.')
             continue;
 
-        if ((fieldValue[currentChar] == '-') || (fieldValue[currentChar] == '3') || (fieldValue[currentChar] == '7') ||
-            (fieldValue[currentChar] == '0') || (fieldValue[currentChar] == '4') || (fieldValue[currentChar] == '8') ||
-            (fieldValue[currentChar] == '1') || (fieldValue[currentChar] == '5') || (fieldValue[currentChar] == '9') ||
-            (fieldValue[currentChar] == '2') || (fieldValue[currentChar] == '6'))
+        if ((currentChar == '-') || (currentChar == '3') || (currentChar == '7') ||
+            (currentChar == '0') || (currentChar == '4') || (currentChar == '8') ||
+            (currentChar == '1') || (currentChar == '5') || (currentChar == '9') ||
+            (currentChar == '2') || (currentChar == '6'))
             continue;
 
         Log->WriteLogNoTime("FAILED: Field '%u' Type '%s' Line '%u' Contains a non numeric value.\n", fieldID + 1, GetFieldTypeName(fieldType), recordID + 1);
@@ -448,14 +448,14 @@ bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
             return false;
         }
 
-        for (auto itFields = fieldsOfCurrentRecord.begin(); itFields != fieldsOfCurrentRecord.end(); itFields++)
+        for (auto & itFields : fieldsOfCurrentRecord)
         {
             // solamente para el caso que sea un string entonces simplemente lo ignoramos
-            if (GetFieldType(itFields->first) == type_STRING)
+            if (GetFieldType(itFields.first) == type_STRING)
                 continue;
 
             // comprobamos si el tipo de dato es correcto para todos fields que deban contener numeros
-            if (!CheckFieldValue(itFields->first, GetFieldType(itFields->first), itFields->second, itRecords->first))
+            if (!CheckFieldValue(itFields.first, GetFieldType(itFields.first), itFields.second, itRecords->first))
                 return false;
         }
 

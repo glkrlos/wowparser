@@ -28,44 +28,44 @@ bool DBC_Writer::CreateDBCFile()
 
     auto currentFile = _savedData.begin();
 
-    for (auto Records = currentFile->second.Record.begin(); Records != currentFile->second.Record.end(); Records++)
+    for (auto & Records : currentFile->second.Record)
     {
-        for (auto Fields = Records->Field.begin(); Fields != Records->Field.end(); Fields++)
+        for (auto & Fields : Records.Field)
         {
-            if (Fields->Type == type_FLOAT)
+            if (Fields.Type == type_FLOAT)
             {
-                float value = Fields->FloatValue;
+                float value = Fields.FloatValue;
                 fwrite(&value, 4, 1, output);
             }
-            else if (Fields->Type == type_BOOL)
+            else if (Fields.Type == type_BOOL)
             {
-                int value = Fields->BoolValue;
+                int value = (int)Fields.BoolValue;
                 fwrite(&value, 4, 1, output);
             }
-            else if (Fields->Type == type_BYTE)
+            else if (Fields.Type == type_BYTE)
             {
-                char value = Fields->ByteValue;
+                char value = Fields.ByteValue;
                 fwrite(&value, 1, 1, output);
             }
-            else if (Fields->Type == type_UBYTE)
+            else if (Fields.Type == type_UBYTE)
             {
-                unsigned char value = Fields->UByteValue;
+                unsigned char value = Fields.UByteValue;
                 fwrite(&value, 1, 1, output);
             }
-            else if (Fields->Type == type_INT)
+            else if (Fields.Type == type_INT)
             {
-                int value = Fields->IntValue;
+                int value = Fields.IntValue;
                 fwrite(&value, 4, 1, output);
             }
-            else if (Fields->Type == type_UINT)
+            else if (Fields.Type == type_UINT)
             {
-                unsigned int value = Fields->UIntValue;
+                unsigned int value = Fields.UIntValue;
                 fwrite(&value, 4, 1, output);
             }
             else
                 /// String
             {
-                unsigned int value = Fields->StringValue;
+                unsigned int value = Fields.StringValue;
                 fwrite(&value, 4, 1, output);
             }
         }

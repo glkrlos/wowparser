@@ -224,7 +224,7 @@ bool cFindFiles::ListEmpty()
 
 bool cFindFiles::HaveExtension(const string& fileName)
 {
-    return fileName.rfind('.') != -1;
+    return fileName.rfind('.') != string::npos;
 }
 
 string cFindFiles::GetFileExtension(const string& fileName)

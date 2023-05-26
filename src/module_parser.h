@@ -12,7 +12,7 @@
 class PrintFileInfo
 {
     public:
-        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, unsigned int totalRecords, bool predicted, string hash) : FieldTypes(eFT), TotalFields(totalFields), TotalRecords(totalRecords), Predicted(predicted), Hash(hash)
+        PrintFileInfo(vector<enumFieldTypes> eFT, unsigned int totalFields, unsigned int totalRecords, bool predicted, string hash) : FieldTypes(std::move(eFT)), TotalFields(totalFields), TotalRecords(totalRecords), Predicted(predicted), Hash(hash)
         {
             _countFloatFields = 0;
             _countStringFields = 0;
@@ -24,9 +24,9 @@ class PrintFileInfo
         }
         bool PrintResults()
         {
-            for (auto it = FieldTypes.begin(); it != FieldTypes.end(); ++it)
+            for (auto & FieldType : FieldTypes)
             {
-                switch (*it)
+                switch (FieldType)
                 {
                     case type_FLOAT:    _countFloatFields++; break;
                     case type_STRING:   _countStringFields++; break;
@@ -95,31 +95,30 @@ class DataAccessor : public SaveFileInfo
     public:
         DataAccessor()
         {
-            _fieldsOffset = NULL;
-            _dataTable = NULL;
-            _stringTable = NULL;
+            _fieldsOffset = nullptr;
+            _dataTable = nullptr;
+            _stringTable = nullptr;
         }
         ~DataAccessor()
-        {
-        }
+        = default;
         class RecordAccessor
         {
             public:
-                float GetFloat(size_t FieldID) const { return *reinterpret_cast<float *>(_data + _info.GetOffset(FieldID)); }
-                int GetInt(size_t FieldID) const { return *reinterpret_cast<int *>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int *>(_data + _info.GetOffset(FieldID)); }
-                unsigned int GetBool(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
-                unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
-                const char *GetString(size_t FieldID) const { return reinterpret_cast<char *>(_info._stringTable + GetUInt(FieldID)); }
+                [[nodiscard]] float GetFloat(size_t FieldID) const { return *reinterpret_cast<float *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] int GetInt(size_t FieldID) const { return *reinterpret_cast<int *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] unsigned int GetUInt(size_t FieldID) const { return *reinterpret_cast<unsigned int *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] unsigned int GetBool(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] char GetByte(size_t FieldID) const { return *reinterpret_cast<char *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] unsigned char GetUByte(size_t FieldID) const { return *reinterpret_cast<unsigned char *>(_data + _info.GetOffset(FieldID)); }
+                [[nodiscard]] const char *GetString(size_t FieldID) const { return reinterpret_cast<char *>(_info._stringTable + GetUInt(FieldID)); }
             private:
                 RecordAccessor(DataAccessor &info, unsigned char *data) : _data(data), _info(info) { }
-                unsigned char *_data = NULL;
+                unsigned char *_data = nullptr;
                 DataAccessor &_info;
                 friend class DataAccessor;
         };
         RecordAccessor GetRecord(size_t  RecordID) { return RecordAccessor(*this, _dataTable + RecordID * _recordSize); }
-        unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != NULL && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
+        [[nodiscard]] unsigned int GetOffset(size_t FieldID) const { return (_fieldsOffset != nullptr && FieldID < _totalFields) ? _fieldsOffset[FieldID] : 0; }
     protected:
         unsigned int *_fieldsOffset;
         unsigned char *_dataTable;
@@ -129,10 +128,10 @@ class DataAccessor : public SaveFileInfo
 class Parser : public DataAccessor
 {
     public:
-        Parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(XMLFileInfo)
+        explicit Parser(structXMLFileInfo XMLFileInfo) : _XMLFileInfo(std::move(XMLFileInfo))
         {
-            _inputFile = NULL;
-            _wholeFileData = NULL;
+            _inputFile = nullptr;
+            _wholeFileData = nullptr;
 
             _fileSize = 0;
 
@@ -148,12 +147,12 @@ class Parser : public DataAccessor
         }
         ~Parser()
         {
-            _inputFile = NULL;
+            _inputFile = nullptr;
 
             if (_wholeFileData)
             {
                 delete _wholeFileData;
-                _wholeFileData = NULL;
+                _wholeFileData = nullptr;
             }
 
             _fileSize = 0;
@@ -175,9 +174,9 @@ class Parser : public DataAccessor
         bool ParseCSVFile();
         bool CheckStructure();
         bool PredictFieldTypes();
-        bool IsPreFormatted() { return !_XMLFileInfo.FormatedFieldTypes.empty(); }
-        const char *GetFileName() { return _XMLFileInfo.FileName.c_str(); }
-        enumFileType GetFileType() { return _XMLFileInfo.Type; }
+        [[nodiscard]] bool IsPreFormatted() const { return !_XMLFileInfo.FormatedFieldTypes.empty(); }
+        [[nodiscard]] const char *GetFileName() const { return _XMLFileInfo.FileName.c_str(); }
+        [[nodiscard]] enumFileType GetFileType() const { return _XMLFileInfo.Type; }
         bool FileIsASCII()
         {
             if (_FirstTimeAksType)
@@ -277,7 +276,7 @@ class Parser : public DataAccessor
         }
         void SetStringTextsFromStringTable(unsigned int StringBytes)
         {
-            string Text = "";
+            string Text;
             for (unsigned long currentChar = 1; currentChar < StringBytes; currentChar++)
             {
                 char c = static_cast<char>(_stringTable[currentChar]);
