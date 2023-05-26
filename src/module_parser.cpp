@@ -181,13 +181,13 @@ bool Parser::CheckStructure()
                 _totalFields = HeaderGetUInt();
                 _recordSize = HeaderGetUInt();
                 unsigned int ReaderStringSize = HeaderGetUInt();
-                unsigned int TableHash = HeaderGetUInt();
-                unsigned int Build = HeaderGetUInt();
-                unsigned int unk1 = HeaderGetUInt();
-                unsigned int unk2 = HeaderGetUInt();
-                unsigned int unk3 = HeaderGetUInt();
-                unsigned int LocaleID = HeaderGetUInt();
-                unsigned int unk4 = HeaderGetUInt();
+                /*unsigned int TableHash = */HeaderGetUInt();
+                /*unsigned int Build = */HeaderGetUInt();
+                /*unsigned int unk1 = */HeaderGetUInt();
+                /*unsigned int unk2 = */HeaderGetUInt();
+                /*unsigned int unk3 = */HeaderGetUInt();
+                /*unsigned int LocaleID = */HeaderGetUInt();
+                /*unsigned int unk4 = */HeaderGetUInt();
 
                 unsigned int _dataBytes = _fileSize - HeaderSize - ReaderStringSize;
                 unsigned int _stringBytes = _fileSize - HeaderSize - _dataBytes;
@@ -230,9 +230,9 @@ bool Parser::CheckStructure()
                 _totalFields = HeaderGetUInt();
                 _recordSize = HeaderGetUInt();
                 unsigned int ReaderStringSize = HeaderGetUInt();
-                unsigned int tableHash = HeaderGetUInt();
+                /*unsigned int tableHash = */HeaderGetUInt();
                 unsigned int build = HeaderGetUInt();
-                unsigned int timestamp_last_written = HeaderGetUInt();
+                /*unsigned int timestamp_last_written = */HeaderGetUInt();
 
                 unsigned int diff = 0;
                 if (build > 12880)
@@ -240,8 +240,8 @@ bool Parser::CheckStructure()
                     HeaderSize += 16;
                     unsigned int min_id = HeaderGetUInt();
                     unsigned int max_id = HeaderGetUInt();
-                    unsigned int locales = HeaderGetUInt();
-                    unsigned int unk1 = HeaderGetUInt();
+                    /*unsigned int locales = */HeaderGetUInt();
+                    /*unsigned int unk1 = */HeaderGetUInt();
 
                     if (max_id)
                     {
@@ -317,13 +317,13 @@ bool Parser::CheckStructure()
                     return false;
                 }
 
-                char locale1 = HeaderGetChar();
-                char locale2 = HeaderGetChar();
-                char locale3 = HeaderGetChar();
-                char locale4 = HeaderGetChar();
-                unsigned int maxRecordSize = HeaderGetUInt();
-                unsigned int unk1 = HeaderGetUInt();
-                unsigned int unk2 = HeaderGetUInt();
+                /*char locale1 = */HeaderGetChar();
+                /*char locale2 = */HeaderGetChar();
+                /*char locale3 = */HeaderGetChar();
+                /*char locale4 = */HeaderGetChar();
+                /*unsigned int maxRecordSize = */HeaderGetUInt();
+                /*unsigned int unk1 = */HeaderGetUInt();
+                /*unsigned int unk2 = */HeaderGetUInt();
 
                 long currentFileSize = _fileSize - 24;
                 bool isFirstRecord = true;
