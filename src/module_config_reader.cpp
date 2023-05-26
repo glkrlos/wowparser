@@ -2,23 +2,23 @@
 
 Config_Reader::Config_Reader()
 {
-    string __fileName = "wowparser3.xml";
+    string _fileName = "wowparser3.xml";
 
     if (
-        (__fileName[12] != 'm') ||
-        (__fileName[4] != 'a') ||
-        (__fileName[7] != 'e') ||
-        (__fileName[8] != 'r') ||
-        (__fileName[13] != 'l') ||
-        (__fileName[2] != 'w') ||
-        (__fileName[9] != '3') ||
-        (__fileName[1] != 'o') ||
-        (__fileName[10] != '.') ||
-        (__fileName[0] != 'w') ||
-        (__fileName[5] != 'r') ||
-        (__fileName[3] != 'p') ||
-        (__fileName[6] != 's') ||
-        (__fileName[11] != 'x')
+        (_fileName[12] != 'm') ||
+        (_fileName[4] != 'a') ||
+        (_fileName[7] != 'e') ||
+        (_fileName[8] != 'r') ||
+        (_fileName[13] != 'l') ||
+        (_fileName[2] != 'w') ||
+        (_fileName[9] != '3') ||
+        (_fileName[1] != 'o') ||
+        (_fileName[10] != '.') ||
+        (_fileName[0] != 'w') ||
+        (_fileName[5] != 'r') ||
+        (_fileName[3] != 'p') ||
+        (_fileName[6] != 's') ||
+        (_fileName[11] != 'x')
         )
     {
         printf("Mmmmmmmm..... Why you try to change my config file name???\n");
@@ -26,7 +26,7 @@ Config_Reader::Config_Reader()
         exit(0);
     }
 
-    XMLdoc.LoadFile(__fileName.c_str());
+    XMLdoc.LoadFile(_fileName.c_str());
 }
 
 bool Config_Reader::LoadConfiguarionFile()
@@ -63,15 +63,15 @@ bool Config_Reader::LoadConfiguarionFile()
     Log->WriteLog("-----> Checking XML attributes of files to parse...\n");
 
     unsigned int fileID = 1;
-    for (fileElement; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
+    for (; fileElement; fileElement = fileElement->NextSiblingElement("file"), fileID++)
     {
         const char *_fileExtension = fileElement->Attribute("extension");
         string FileExtension = _fileExtension ? _fileExtension : "";
-        bool FileExtensionIsSet = FileExtension.empty() ? false : true;
+        bool FileExtensionIsSet = !FileExtension.empty();
 
         const char *_fileName = fileElement->Attribute("name");
         string FileName = _fileName ? _fileName : "";
-        bool Name = FileName.empty() ? false : true;
+        bool Name = !FileName.empty();
 
         // Si no hay nombre continuamos
         if (!Name && !FileExtensionIsSet)
@@ -82,7 +82,7 @@ bool Config_Reader::LoadConfiguarionFile()
 
         bool isRecursive = false;
         // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-        bool RecursiveAttributeIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) ? false : true;
+        bool RecursiveAttributeIsSet = fileElement->QueryBoolAttribute("recursive", &isRecursive) == 0;
 
         const char *_directoryName = fileElement->Attribute("directory");
         string DirectoryName = _directoryName ? _directoryName : "";
@@ -106,9 +106,9 @@ bool Config_Reader::LoadConfiguarionFile()
             tempDirectory += "/";
 
         outputFormat outFormats;
-        outFormats.isSetToCSV = fileElement->QueryBoolAttribute("ToCSV", &outFormats.ToCSV) ? false : true;
-        outFormats.isSetToDBC = fileElement->QueryBoolAttribute("ToDBC", &outFormats.ToDBC) ? false : true;
-        outFormats.isSetToSQL = fileElement->QueryBoolAttribute("ToSQL", &outFormats.ToSQL) ? false : true;
+        outFormats.isSetToCSV = fileElement->QueryBoolAttribute("ToCSV", &outFormats.ToCSV) == 0;
+        outFormats.isSetToDBC = fileElement->QueryBoolAttribute("ToDBC", &outFormats.ToDBC) == 0;
+        outFormats.isSetToSQL = fileElement->QueryBoolAttribute("ToSQL", &outFormats.ToSQL) == 0;
 
         FindFiles->FileToFind(DirectoryName, FileName, FileFormat, isRecursive, FileExtensionIsSet ? FileExtension : "", outFormats, fileID);
     }

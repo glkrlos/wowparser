@@ -20,11 +20,11 @@ class Config_Reader
         Config_Reader();
         bool LoadConfiguarionFile();
     private:
-        bool IsValidFormat(string structure)
+        static bool IsValidFormat(const string& structure)
         {
-            for (unsigned int x = 0; x < structure.size(); x++)
+            for (char x : structure)
             {
-                switch (structure[x])
+                switch (x)
                 {
                     case 'X':   // unk byte
                     case 'b':   // byte

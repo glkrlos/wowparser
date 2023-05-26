@@ -23,7 +23,7 @@
         #define _ARQUITECTURA "i386"
     #endif
 #elif defined _WIN32 || defined _WIN64
-    #pragma warning(disable: 4996 4267)
+    //#pragma warning(disable: 4996 4267)
     #include <conio.h>
     #define _OS "Windows"
 
