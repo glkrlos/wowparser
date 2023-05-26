@@ -1,8 +1,7 @@
 #include "findfiles.h"
 
 cFindFiles::cFindFiles()
-{
-}
+= default;
 
 cFindFiles* cFindFiles::Instance()
 {
@@ -10,9 +9,9 @@ cFindFiles* cFindFiles::Instance()
     return &instance;
 }
 
-enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
+enumFileType cFindFiles::GetFileTypeByExtension(const string& FileName)
 {
-    string _tempExt = FileName.substr(FileName.rfind(".") + 1, FileName.size());
+    string _tempExt = FileName.substr(FileName.rfind('.') + 1, FileName.size());
 
     if (Shared->CompareTexts(_tempExt, "dbc"))
         return dbcFile;
@@ -28,7 +27,7 @@ enumFileType cFindFiles::GetFileTypeByExtension(string FileName)
         return unkFile;
 }
 
-void cFindFiles::FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID)
+void cFindFiles::FileToFind(const string& directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID)
 {
     DIR *dir = opendir(directory.c_str());
     struct dirent *ent;
@@ -36,7 +35,7 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
     if (!dir)
         return;
 
-    while ((ent = readdir(dir)) != NULL)
+    while ((ent = readdir(dir)) != nullptr)
     {
         if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
             continue;
@@ -77,8 +76,8 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                                 XMLFileInfo.outputFormats.ToCSV = false;
                         }
 
-                        XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
-                        XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? true : XMLFileInfo.outputFormats.ToSQL;
+                        XMLFileInfo.outputFormats.ToDBC = XMLFileInfo.outputFormats.isSetToDBC && XMLFileInfo.outputFormats.ToDBC;
+                        XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL || XMLFileInfo.outputFormats.ToSQL;
                         AddFileToListIfNotExist(dirName, XMLFileInfo);
                     }
                 }
@@ -105,8 +104,8 @@ void cFindFiles::FileToFind(string directory, string filename, string structure,
                         XMLFileInfo.outputFormats.ToCSV = false;
                 }
 
-                XMLFileInfo.outputFormats.ToDBC = !XMLFileInfo.outputFormats.isSetToDBC ? false : XMLFileInfo.outputFormats.ToDBC;
-                XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL ? true : XMLFileInfo.outputFormats.ToSQL;
+                XMLFileInfo.outputFormats.ToDBC = XMLFileInfo.outputFormats.isSetToDBC && XMLFileInfo.outputFormats.ToDBC;
+                XMLFileInfo.outputFormats.ToSQL = !XMLFileInfo.outputFormats.isSetToSQL || XMLFileInfo.outputFormats.ToSQL;
                 AddFileToListIfNotExist(dirName, XMLFileInfo);
             }
         }
@@ -124,9 +123,9 @@ void cFindFiles::PrintAllFileNamesByFileType()
 
     unsigned int maxFileIDInXML = 0;
 
-    for (auto current = fileNames.begin(); current != fileNames.end(); current++)
-        if (current->second.XMLFileID > maxFileIDInXML)
-            maxFileIDInXML = current->second.XMLFileID;
+    for (auto & fileName : fileNames)
+        if (fileName.second.XMLFileID > maxFileIDInXML)
+            maxFileIDInXML = fileName.second.XMLFileID;
 
     for (unsigned int currentFileID = 0; currentFileID <= maxFileIDInXML; currentFileID++)
     {
@@ -134,9 +133,9 @@ void cFindFiles::PrintAllFileNamesByFileType()
         {
             unsigned int countCurrentFiles = 0;
 
-            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+            for (auto & fileName : fileNames)
             {
-                if (current->second.Type != x || current->second.XMLFileID != currentFileID)
+                if (fileName.second.Type != x || fileName.second.XMLFileID != currentFileID)
                     continue;
                 
                 countCurrentFiles++;
@@ -144,41 +143,41 @@ void cFindFiles::PrintAllFileNamesByFileType()
 
             bool First = true;
 
-            for (auto current = fileNames.begin(); current != fileNames.end(); current++)
+            for (auto & fileName : fileNames)
             {
-                if (current->second.Type != x || current->second.XMLFileID != currentFileID)
+                if (fileName.second.Type != x || fileName.second.XMLFileID != currentFileID)
                     continue;
 
                 if (First)
                 {
-                    Log->WriteLog("->%s '%u' %s file%s added", current->second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, Shared->GetFileExtensionByFileType(current->second.Type), countCurrentFiles > 1 ? "s" : "");
+                    Log->WriteLog("->%s '%u' %s file%s added", fileName.second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, Shared->GetFileExtensionByFileType(fileName.second.Type), countCurrentFiles > 1 ? "s" : "");
 
-                    if (current->second.isSearchedByExtension)
-                        Log->WriteLogNoTime(" with extension *.%s%s", current->second.Type == unkFile ? GetFileExtension(current->first).c_str() : Shared->GetFileExtensionByFileType(current->second.Type), current->second.isRecursivelySearched ? " in recursive mode" : "");
+                    if (fileName.second.isSearchedByExtension)
+                        Log->WriteLogNoTime(" with extension *.%s%s", fileName.second.Type == unkFile ? GetFileExtension(fileName.first).c_str() : Shared->GetFileExtensionByFileType(fileName.second.Type), fileName.second.isRecursivelySearched ? " in recursive mode" : "");
 
-                    if (current->second.XMLFileID)
-                        Log->WriteLogNoTime(" by <file> element '%u'", current->second.XMLFileID);
+                    if (fileName.second.XMLFileID)
+                        Log->WriteLogNoTime(" by <file> element '%u'", fileName.second.XMLFileID);
 
-                    if (current->second.isSearchedByExtension)
+                    if (fileName.second.isSearchedByExtension)
                         Log->WriteLogNoTime(", and they will pass to predicted mode");
 
-                    if (current->second.outputFormats.ToCSV || current->second.outputFormats.ToDBC || current->second.outputFormats.ToSQL)
+                    if (fileName.second.outputFormats.ToCSV || fileName.second.outputFormats.ToDBC || fileName.second.outputFormats.ToSQL)
                     {
                         Log->WriteLogNoTime(" with output to");
 
                         unsigned int contamostotalsalidas = 0;
 
-                        if (current->second.outputFormats.ToCSV)
+                        if (fileName.second.outputFormats.ToCSV)
                         {
                             Log->WriteLogNoTime(" CSV");
                             contamostotalsalidas++;
                         }
 
-                        if (current->second.outputFormats.ToDBC)
+                        if (fileName.second.outputFormats.ToDBC)
                         {
-                            if (current->second.outputFormats.ToCSV && current->second.outputFormats.ToSQL)
+                            if (fileName.second.outputFormats.ToCSV && fileName.second.outputFormats.ToSQL)
                                 Log->WriteLogNoTime(",");
-                            else if (current->second.outputFormats.ToCSV && !current->second.outputFormats.ToSQL)
+                            else if (fileName.second.outputFormats.ToCSV && !fileName.second.outputFormats.ToSQL)
                                 Log->WriteLogNoTime(" and");
 
                             Log->WriteLogNoTime(" DBC");
@@ -186,9 +185,9 @@ void cFindFiles::PrintAllFileNamesByFileType()
                             contamostotalsalidas++;
                         }
 
-                        if (current->second.outputFormats.ToSQL)
+                        if (fileName.second.outputFormats.ToSQL)
                         {
-                            if (current->second.outputFormats.ToCSV || current->second.outputFormats.ToDBC)
+                            if (fileName.second.outputFormats.ToCSV || fileName.second.outputFormats.ToDBC)
                                 Log->WriteLogNoTime(" and");
 
                             Log->WriteLogNoTime(" SQL");
@@ -205,10 +204,10 @@ void cFindFiles::PrintAllFileNamesByFileType()
                     First = false;
                 }
 
-                Log->WriteLog("File: '%s'", current->second.FileName.c_str());
+                Log->WriteLog("File: '%s'", fileName.second.FileName.c_str());
 
-                if (!current->second.Structure.empty())
-                    Log->WriteLogNoTime(", Structure: '%s'", current->second.Structure.c_str());
+                if (!fileName.second.Structure.empty())
+                    Log->WriteLogNoTime(", Structure: '%s'", fileName.second.Structure.c_str());
 
                 Log->WriteLogNoTime("\n");
             }
@@ -223,17 +222,17 @@ bool cFindFiles::ListEmpty()
     return fileNames.empty();
 }
 
-bool cFindFiles::HaveExtension(string fileName)
+bool cFindFiles::HaveExtension(const string& fileName)
 {
-    return fileName.rfind(".") != -1;
+    return fileName.rfind('.') != -1;
 }
 
-string cFindFiles::GetFileExtension(string fileName)
+string cFindFiles::GetFileExtension(const string& fileName)
 {
-    return fileName.substr(fileName.rfind(".") + 1, fileName.size());
+    return fileName.substr(fileName.rfind('.') + 1, fileName.size());
 }
 
-void cFindFiles::AddFileToListIfNotExist(string fileName, structXMLFileInfo File)
+void cFindFiles::AddFileToListIfNotExist(const string& fileName, const structXMLFileInfo& File)
 {
     auto Found = fileNames.find(fileName);
 
@@ -246,6 +245,4 @@ void cFindFiles::AddFileToListIfNotExist(string fileName, structXMLFileInfo File
     }
 
     fileNames.insert(pair<string, structXMLFileInfo>(fileName, File));
-
-    return;
 }

@@ -17,25 +17,25 @@ class cFindFiles
         static cFindFiles* Instance();
         map<string, structXMLFileInfo> XMLFileInfo() { return fileNames; }
         cFindFiles();
-        void FileToFind(string directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID = 0);
+        void FileToFind(const string& directory, string filename, string structure, bool recursive, string fileExt, outputFormat outFormats, unsigned int xmlFileID = 0);
         void PrintAllFileNamesByFileType();
         bool ListEmpty();
     private:
-        enumFileType GetFileTypeByExtension(string FileName);
-        bool HaveExtension(string fileName);
-        string GetFileExtension(string fileName);
-        void AddFileToListIfNotExist(string fileName, structXMLFileInfo File);
-        unsigned int GetFormatedTotalFields(string structure)
+        static enumFileType GetFileTypeByExtension(const string& FileName);
+        static bool HaveExtension(const string& fileName);
+        static string GetFileExtension(const string& fileName);
+        void AddFileToListIfNotExist(const string& fileName, const structXMLFileInfo& File);
+        static unsigned int GetFormatedTotalFields(const string& structure)
         {
             return structure.empty() ? 0 : structure.size();
         }
-        unsigned int GetFormatedRecordSize(string structure)
+        static unsigned int GetFormatedRecordSize(const string& structure)
         {
             unsigned int RecordSize = 0;
 
-            for (unsigned int x = 0; x < structure.size(); x++)
+            for (char x : structure)
             {
-                switch (structure[x])
+                switch (x)
                 {
                     case 'X':   // unk byte
                     case 'b':   // byte
@@ -49,12 +49,12 @@ class cFindFiles
 
             return RecordSize;
         }
-        vector<enumFieldTypes> GetFormatedFieldTypes(string structure)
+        static vector<enumFieldTypes> GetFormatedFieldTypes(const string& structure)
         {
             vector<enumFieldTypes> fieldTypes;
-            for (unsigned int x = 0; x < structure.size(); x++)
+            for (char x : structure)
             {
-                switch (structure[x])
+                switch (x)
                 {
                     case 'X':   // unk byte
                     case 'b':   // byte
