@@ -148,15 +148,15 @@ class SaveFileInfo
             _stringTexts.clear();
             _uniqueStringTexts.clear();
         }
-        unsigned int GetTotalFields() { return _totalFields; }
-        unsigned int GetTotalRecords() { return _totalRecords; }
-        unsigned int GetRecordSize() { return _recordSize; }
-        unsigned int GetStringSize() { return _stringSize; }
+        [[nodiscard]] unsigned int GetTotalFields() const { return _totalFields; }
+        [[nodiscard]] unsigned int GetTotalRecords() const { return _totalRecords; }
+        [[nodiscard]] unsigned int GetRecordSize() const { return _recordSize; }
+        [[nodiscard]] unsigned int GetStringSize() const { return _stringSize; }
         vector<enumFieldTypes> GetFieldTypes() { return _fieldTypes; }
         string GetStringTexts() { return _stringTexts; }
         map<string, vector<unsigned int>> GetUniqueStringTexts() { return _uniqueStringTexts; }
         map<string, structFileData> GetExtractedData() { return _savedData; }
-        void SetUniqueStringTexts(string Text)
+        void SetUniqueStringTexts(const string& Text)
         {
             if (!Text.empty() && !GetUniqueTextPosition(Text))
             {
@@ -169,7 +169,7 @@ class SaveFileInfo
                 _uniqueStringTexts.insert(pair<string, vector<unsigned int>>(Text, VectorForTextPosition));
             }
         }
-        unsigned int GetUniqueTextPosition(string Text)
+        unsigned int GetUniqueTextPosition(const string& Text)
         {
             if (!Text.empty())
             {
@@ -204,7 +204,6 @@ class SaveFileInfo
             VectorForTextPosition.push_back(TextPosition);
             _uniqueStringTexts.insert(pair<string, vector<unsigned int>>(Text, VectorForTextPosition));
             Text.clear();
-            return;
         }
     protected:
         unsigned int _recordSize;
@@ -234,15 +233,15 @@ class cShared
 
             return buffer.str();
         }
-        void ToLowerCase(string &text)
+        static void ToLowerCase(string &text)
         {
             transform(text.begin(), text.end(), text.begin(), ::tolower);
         }
-        bool CompareTexts(string txt1, string txt2)
+        static bool CompareTexts(const string& txt1, const string& txt2)
         {
-            return !txt1.compare(txt2);
+            return txt1 == txt2;
         }
-        const char *GetFileExtensionByFileType(enumFileType eFT)
+        static const char *GetFileExtensionByFileType(enumFileType eFT)
         {
             switch (eFT)
             {
@@ -257,22 +256,5 @@ class cShared
 };
 
 #define Shared cShared::Instance()
-
 // __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
-
-/*
-class classSingleton
-{
-    public:
-        static classSingleton& Instance()
-        {
-            static classSingleton instance;
-            return instance;
-        }
-    private:
-    protected:
-};
-
-#define TestClassOfSingleton classSingleton::Instance()
-*/
 #endif

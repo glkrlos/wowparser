@@ -32,16 +32,16 @@ ProgressBar::ProgressBar( int row_count )
     printf("\r Loading list of files to parse, Please Wait....");
     fflush(stdout);
 }
-void ProgressBar::SetFileName(string filename)
+void ProgressBar::SetFileName(const string& filename)
 {
-    string _filename = "";
+    string newFilename;
     if (filename.size() > 34)
     {
-        _filename.append("...");
-        _filename.append(filename.substr(filename.size() - 31));
+        newFilename.append("...");
+        newFilename.append(filename.substr(filename.size() - 31));
     }
     else
-        _filename = filename;
+        newFilename = filename;
 
     printf("\r");
 
@@ -54,7 +54,7 @@ void ProgressBar::SetFileName(string filename)
 
     for (; i < indic_len; i++) printf(empty);
 
-    printf("] %i%%  \r Loading file: %s", (int)percent, _filename.c_str());
+    printf("] %i%%  \r Loading file: %s", (int)percent, newFilename.c_str());
 
     fflush(stdout);
 }

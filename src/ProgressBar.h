@@ -17,9 +17,9 @@ class ProgressBar
     int i, n;
 
     public:
-        void SetFileName(string filename);
+        void SetFileName(const string& filename);
         void step( );
-        ProgressBar( int );
+        explicit ProgressBar( int );
         ~ProgressBar();
 };
 #endif
