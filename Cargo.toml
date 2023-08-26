@@ -1,0 +1,22 @@
+[package]
+name = "WoWParser"
+version = "4.0.0"
+edition = "2021"
+
+[[bin]]
+name = "wowparser4_x64"
+path = "src/main.rs"
+
+[[bin]]
+name = "wowparser4_amd64"
+path = "src/main.rs"
+
+[dependencies]
+
+[build-dependencies]
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# Dependencias específicas para Windows
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# Dependencias específicas para Linux
