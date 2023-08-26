@@ -2,6 +2,9 @@
 
 Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
+## WoWParser 4.0 (Huamantla) in Pre-Alpha Development State:
+    * Project fully rebuild in Rust languaje
+
 ## WoWParser 3.1 (Zitacuaro):
     * New Version 3.1.
     * New: For each new version of parser now will have a codename.
@@ -82,15 +85,18 @@ Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
     * Implemented Read CSV files.
 
 ## How To Compile:
-    * Compile under Linux Debian 11
-    * 1. Install these packages with apt-get: build-essential autoconf libtool gcc g++ make cmake git wget p7zip-full libncurses5-dev zlib1g-dev libbz2-dev openssl libssl-dev mariadb-server mariadb-client libmariadb-dev-compat libmariadb-dev libmysql++-dev libreadline-dev libboost-dev libboost-thread-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-iostreams-dev screen mingw-w64 mingw-w64-common mingw-w64-i686-dev mingw-w64-tools mingw-w64-x86-64-dev g++-multilib libc6-dev-i386
-    * 2. make
-    * 3. Its all, you have all executables for 32 and 64 bits (Linux and Windows under bin directory).
+    * Compiled under Linux Debian 12
+    * 1. apt-get update
+    * 2. apt-get upgrade
+    * 3. apt-get install curl build-essential
+    * NOTE: The installation of Rust is on current user in their home directory
+    * 4. curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    * 5. source $HOME/.cargo/env
+    * 6. Test rust: rustc --version
 
 ## License
 
 [MIT License](LICENSE)
-
 
 ## Reporting issues
 
