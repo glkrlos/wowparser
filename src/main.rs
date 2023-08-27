@@ -1,5 +1,6 @@
 mod staticdata;
 mod shared;
+mod log;
 
 fn print_header() {
     println!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
@@ -24,8 +25,9 @@ fn print_end() {
 }
 
 fn main() {
-    let shared_instance = shared::Sshared::instance();
-    shared_instance.show();
+    shared::instance().show();
+    log::instance().write_log_and_print("Test aqui");
+    log::instance().write_log_no_time("Test aqui");
 
     print_header();
 
