@@ -1,7 +1,7 @@
 mod staticdata;
+mod shared;
 
-fn print_header()
-{
+fn print_header() {
     println!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
     println!("Hash: {}\tDate: {}", staticdata::hash(), staticdata::date());
     println!("");
@@ -10,25 +10,23 @@ fn print_header()
     println!("");
 }
 
-fn pass1_loadconfig()
-{
+fn pass1_loadconfig() {
 }
 
-fn pass2_printfilestolog()
-{
+fn pass2_printfilestolog() {
 }
 
-fn pass3_checkheadersanddataconsistency()
-{
+fn pass3_checkheadersanddataconsistency() {
 }
 
-fn print_end()
-{
+fn print_end() {
     println!("-----> Finished");
 }
 
-fn main()
-{
+fn main() {
+    let shared_instance = shared::Sshared::instance();
+    shared_instance.show();
+
     print_header();
 
     pass1_loadconfig();
