@@ -1,6 +1,6 @@
 use std::fs::OpenOptions;
 use std::io::Write;
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use chrono::{Local, Datelike, Timelike};
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
@@ -24,9 +24,15 @@ impl CLog {
 
     pub fn write_log(&mut self, args: &str) {
         if let Some(file) = &mut self.log_file {
-            let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-            let formatted_time = format_time(current_time);
-            let formatted_log = format!("{} {}\n", formatted_time, args);
+            let current_time = Local::now();
+            let year = current_time.year();
+            let month = current_time.month();
+            let day = current_time.day();
+            let hour = current_time.hour();
+            let minute = current_time.minute();
+            let second = current_time.second();
+            let nanosecond = current_time.nanosecond() / 1_000;
+            let formatted_log = format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}\n", year, month, day, hour, minute, second, nanosecond, args);
             file.write_all(formatted_log.as_bytes()).unwrap();
         }
     }
@@ -47,22 +53,6 @@ impl CLog {
         println!("{}", args);
         self.write_log(args);
     }
-}
-
-fn format_time(duration: Duration) -> String {
-    let seconds = duration.as_secs();
-    let nanos = duration.subsec_nanos();
-    let formatted_time = format!(
-        "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}",
-        1970 + seconds / (365 * 24 * 3600),
-        (seconds / (30 * 24 * 3600)) % 12 + 1,
-        (seconds / (24 * 3600)) % 30 + 1,
-        (seconds / 3600) % 24,
-        (seconds / 60) % 60,
-        seconds % 60,
-        nanos
-    );
-    formatted_time
 }
 
 lazy_static! {
