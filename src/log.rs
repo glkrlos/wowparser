@@ -6,6 +6,40 @@ use std::sync::Mutex;
 
 static WOW_PARSER_LOG_OUTPUT: &str = "wowparser4.log";
 
+#[macro_export]
+macro_rules! write_log_and_print {
+    ($($arg:tt)*) => {
+        let formated = format!($($arg)*);
+        log::instance().write_log(formated.as_str());
+        println!("{}", formated);
+    };
+}
+
+#[macro_export]
+macro_rules! write_log_no_time_and_print {
+    ($($arg:tt)*) => {
+        let formated = format!($($arg)*);
+        log::instance().write_log_no_time(formated.as_str());
+        println!("{}", formated);
+    };
+}
+
+#[macro_export]
+macro_rules! write_log {
+    ($($arg:tt)*) => {
+        let formated = format!($($arg)*);
+        log::instance().write_log(formated.as_str());
+    };
+}
+
+#[macro_export]
+macro_rules! write_log_no_time {
+    ($($arg:tt)*) => {
+        let formated = format!($($arg)*);
+        log::instance().write_log_no_time(formated.as_str());
+    };
+}
+
 pub struct CLog {
     log_file: Option<std::fs::File>,
 }
@@ -43,16 +77,6 @@ impl CLog {
             file.write_all(formatted_log.as_bytes()).unwrap();
         }
     }
-
-    pub fn write_log_no_time_and_print(&mut self, args: &str) {
-        println!("{}", args);
-        self.write_log_no_time(args);
-    }
-
-    pub fn write_log_and_print(&mut self, args: &str) {
-        println!("{}", args);
-        self.write_log(args);
-    }
 }
 
 lazy_static! {
@@ -62,3 +86,4 @@ lazy_static! {
 pub fn instance() -> std::sync::MutexGuard<'static, CLog> {
     INSTANCE.lock().unwrap()
 }
+
