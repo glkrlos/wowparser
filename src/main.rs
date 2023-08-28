@@ -2,6 +2,8 @@ mod staticdata;
 mod shared;
 mod log;
 
+use std::io::{self, Read};
+
 fn print_header() {
     write_log_and_print!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
     write_log_and_print!("Hash: {}\tDate: {}", staticdata::hash(), staticdata::date());
@@ -36,4 +38,6 @@ fn main() {
     pass3_checkheadersanddataconsistency();
 
     print_end();
+
+    getch!();
 }
