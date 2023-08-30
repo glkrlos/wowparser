@@ -6,7 +6,6 @@ mod log;
 use shared::EnumFieldTypes;
 #[allow(unused_imports)]
 use shared::EnumFileType;
-
 use std::io::{self, Read};
 
 fn print_header() {
