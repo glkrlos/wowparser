@@ -30,10 +30,6 @@ fn print_end() {
 }
 
 fn main() {
-    println!("{}",shared::instance().get_file_extension_by_file_type(EnumFileType::AdbFile));
-    let test = shared::instance().to_lower_case("HOLA");
-    println!("{}", test);
-
     print_header();
 
     pass1_loadconfig();
