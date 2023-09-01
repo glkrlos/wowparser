@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use std::sync::{Mutex, Arc};
+use std::sync::Mutex;
 use std::collections::HashMap;
 
 #[macro_export]
@@ -275,7 +275,7 @@ impl CShared {
 }
 
 lazy_static! {
-    static ref INSTANCE: Arc<Mutex<CShared>> = Arc::new(Mutex::new(CShared));
+    static ref INSTANCE: Mutex<CShared> = Mutex::new(CShared);
 }
 
 pub fn instance() -> std::sync::MutexGuard<'static, CShared> {
