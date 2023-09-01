@@ -53,7 +53,7 @@ impl CLog {
             .open(WOW_PARSER_LOG_OUTPUT)
             .ok();
 
-        CLog { log_file }
+        Self { log_file }
     }
 
     pub fn write_log(&mut self, args: &str, time: bool) {
