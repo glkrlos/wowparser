@@ -62,7 +62,7 @@ fn pass2_printfilestolog() {
 
     println!("-----> Printing all files found in the log... ");
     FindFiles().print_all_file_names_by_file_type();
-    println!("DONE.\n");
+    println!("DONE.");
 }
 
 fn pass3_checkheadersanddataconsistency() {
