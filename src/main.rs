@@ -4,6 +4,9 @@ mod log;
 mod module_config_reader;
 mod findfiles;
 
+use indicatif::{ProgressBar, ProgressStyle};
+use std::thread;
+use std::time::Duration;
 use shared::get_file_extension_by_file_type as GetFileExtensionByFileType;
 use findfiles::instance as FindFiles;
 
@@ -62,9 +65,6 @@ fn pass2_printfilestolog() {
     println!("DONE.\n");
 }
 
-use indicatif::{ProgressBar, ProgressStyle};
-use std::thread;
-use std::time::Duration;
 fn pass3_checkheadersanddataconsistency() {
 
     if FindFiles().list_empty() {
