@@ -12,7 +12,15 @@ macro_rules! getch {
     };
 }
 
+/*#[macro_export]
+macro_rules! Shared {
+    () => {
+            &shared::instance()
+    };
+}*/
+
 #[allow(dead_code)]
+#[derive(Clone)]
 pub enum EnumFieldTypes {
     TypeNone    = 0,
     TypeString  = 1,
@@ -25,6 +33,7 @@ pub enum EnumFieldTypes {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub enum EnumFileType {
     UnkFile                 = 0,
     DbcFile                 = 1,
@@ -86,7 +95,8 @@ pub struct StructFileData {
 }
 
 #[allow(dead_code)]
-struct OutputFormat {
+#[derive(Clone)]
+pub struct OutputFormat {
     to_csv:         bool,
     to_dbc:         bool,
     to_sql:         bool,
@@ -97,7 +107,7 @@ struct OutputFormat {
 
 #[allow(dead_code)]
 impl OutputFormat {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             to_csv:         false,
             to_dbc:         false,
@@ -110,17 +120,18 @@ impl OutputFormat {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct StructXMLFileInfo {
-    file_name:                  String,
-    file_type:                  EnumFileType,
-    structure:                  String,
-    is_recursively_searched:    bool,
-    is_searched_by_extension:   bool,
-    xml_file_id:                u32,
-    formatted_field_types:      Vec<EnumFieldTypes>,
-    formatted_total_fields:     u32,
-    formatted_record_size:      u32,
-    output_formats:             OutputFormat,
+    pub file_name:                  String,
+    pub file_type:                  EnumFileType,
+    pub structure:                  String,
+    pub is_recursively_searched:    bool,
+    pub is_searched_by_extension:   bool,
+    pub xml_file_id:                u32,
+    pub formatted_field_types:      Vec<EnumFieldTypes>,
+    pub formatted_total_fields:     u32,
+    pub formatted_record_size:      u32,
+    pub output_formats:             OutputFormat,
 }
 
 #[allow(dead_code)]
@@ -263,16 +274,16 @@ impl CShared {
     pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
         txt1 == txt2
     }
+}
 
-    pub fn get_file_extension_by_file_type(&self, eft: EnumFileType) -> &'static str {
-        match eft {
-            EnumFileType::DbcFile   => "dbc",
-            EnumFileType::Db2File   => "db2",
-            EnumFileType::AdbFile   => "adb",
-            EnumFileType::WdbFile   => "wdb",
-            EnumFileType::CsvFile   => "csv",
-            _                       => "Unknown",
-        }
+pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
+    match eft {
+        EnumFileType::DbcFile   => "dbc",
+        EnumFileType::Db2File   => "db2",
+        EnumFileType::AdbFile   => "adb",
+        EnumFileType::WdbFile   => "wdb",
+        EnumFileType::CsvFile   => "csv",
+        _                       => "Unknown",
     }
 }
 
