@@ -12,14 +12,14 @@ use shared::get_file_extension_by_file_type as GetFileExtensionByFileType;
 use findfiles::instance as FindFiles;
 
 fn print_header() {
-    write_log_and_print!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
-    write_log_and_print!("Hash: {}\tDate: {}", staticdata::hash(), staticdata::date());
-    write_log_and_print!("");
-    write_log_and_print!("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).");
-    write_log_and_print!("Copyright(c) 2023 Carlos Ramzuel - Huamantla, Tlaxcala, Mexico.");
-    write_log_and_print!("");
+    write_log_and_print!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})\n", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
+    write_log_and_print!("Hash: {}\tDate: {}\n", staticdata::hash(), staticdata::date());
+    write_log_and_print!("\n");
+    write_log_and_print!("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
+    write_log_and_print!("Copyright(c) 2023 Carlos Ramzuel - Huamantla, Tlaxcala, Mexico.\n");
+    write_log_and_print!("\n");
 
-    write_log!("====================================LOG FILE START====================================");
+    write_log!("====================================LOG FILE START====================================\n");
 }
 
 fn pass1_loadconfig() {
@@ -28,19 +28,19 @@ fn pass1_loadconfig() {
 
     if !config.load_configuration_file() {
         write_log!(
-            "Trying to find files in recursive mode with the following extensions: {} {} {}",
+            "Trying to find files in recursive mode with the following extensions: {} {} {}\n",
             GetFileExtensionByFileType(shared::EnumFileType::DbcFile),
             GetFileExtensionByFileType(shared::EnumFileType::Db2File),
             GetFileExtensionByFileType(shared::EnumFileType::AdbFile)
         );
 
-        FindFiles().file_to_find(".", "", "", true, "dbc", shared::OutputFormat::new());
-        FindFiles().file_to_find(".", "", "", true, "db2", shared::OutputFormat::new());
-        FindFiles().file_to_find(".", "", "", true, "adb", shared::OutputFormat::new());
+        FindFiles().file_to_find(".", "", "", true, "dbc", shared::OutputFormat::new(), 0);
+        FindFiles().file_to_find(".", "", "", true, "db2", shared::OutputFormat::new(), 0);
+        FindFiles().file_to_find(".", "", "", true, "adb", shared::OutputFormat::new(), 0);
 
         if FindFiles().list_empty() {
             write_log_and_print!(
-                "No {}, {}, or {} files found using recursive mode.",
+                "No {}, {}, or {} files found using recursive mode.\n",
                 GetFileExtensionByFileType(shared::EnumFileType::DbcFile),
                 GetFileExtensionByFileType(shared::EnumFileType::Db2File),
                 GetFileExtensionByFileType(shared::EnumFileType::AdbFile)
@@ -51,7 +51,7 @@ fn pass1_loadconfig() {
     }
 
     if FindFiles().list_empty() {
-        write_log_and_print!("Configuration file loaded, but no files found.");
+        write_log_and_print!("Configuration file loaded, but no files found.\n");
     }
 }
 
@@ -63,7 +63,7 @@ fn pass2_printfilestolog() {
 
     print!("-----> Printing all files found in the log... ");
     FindFiles().print_all_file_names_by_file_type();
-    println!("DONE.");
+    print!("DONE.\n");
 }
 
 fn pass3_checkheadersanddataconsistency() {
@@ -72,8 +72,8 @@ fn pass3_checkheadersanddataconsistency() {
         return;
     }
 
-    write_log!("");
-    write_log_and_print!("-----> Checking header and data consistency of each file added to parse it...");
+    write_log!("\n");
+    write_log_and_print!("-----> Checking header and data consistency of each file added to parse it...\n");
 
     let xml_file_info = FindFiles().xml_file_info();
     let bar = ProgressBar::new(xml_file_info.len() as u64);
@@ -106,8 +106,8 @@ fn pass3_checkheadersanddataconsistency() {
     term.clear_line().unwrap();
 }
 fn print_end() {
-    write_log_and_print!("-----> Finished");
-    write_log!("=====================================LOG FILE END=====================================");
+    write_log_and_print!("-----> Finished\n");
+    write_log!("=====================================LOG FILE END=====================================\n");
     getch!();
 }
 

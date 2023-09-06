@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use std::io::{stdout, stdin, Write};
+use std::str::FromStr;
 
 #[macro_export]
 macro_rules! getch {
@@ -88,21 +89,15 @@ pub struct StructFileData {
 #[allow(dead_code)]
 #[derive(Clone)]
 pub struct OutputFormat {
-    to_csv:         bool,
-    to_dbc:         bool,
-    to_sql:         bool,
-    is_set_to_csv:  bool,
-    is_set_to_dbc:  bool,
-    is_set_to_sql:  bool,
+    pub(crate) is_set_to_csv:  bool,
+    pub(crate) is_set_to_dbc:  bool,
+    pub(crate) is_set_to_sql:  bool,
 }
 
 #[allow(dead_code)]
 impl OutputFormat {
     pub fn new() -> Self {
         Self {
-            to_csv:         false,
-            to_dbc:         false,
-            to_sql:         false,
             is_set_to_csv:  false,
             is_set_to_dbc:  false,
             is_set_to_sql:  false,
@@ -274,4 +269,31 @@ pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
         EnumFileType::CsvFile   => "csv",
         _                       => "Unknown",
     }
+}
+
+pub fn str_to_type<T>(s: &str) -> T
+    where
+        T: FromStr + Default,
+{
+    s.parse().unwrap_or_default()
+}
+
+pub fn is_valid_format(structure: &str) -> bool {
+    for x in structure.chars() {
+        match x {
+            'X' |   // unk byte
+            'b' |   // byte
+            's' |   // string
+            'f' |   // float
+            'd' |   // int
+            'n' |   // int
+            'x' |   // unk int
+            'i' |   // int
+            'u' =>  // unsigned int
+                continue,
+            _ =>
+                return false,
+        }
+    }
+    true
 }
