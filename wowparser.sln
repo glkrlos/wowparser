@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7F9528CA-309
 		src\main.rs = src\main.rs
 		src\shared.rs = src\shared.rs
 		src\staticdata.rs = src\staticdata.rs
-		src\module_config_reader.rs = src\module_config_reader.rs
+		src\config_reader.rs = src\config_reader.rs
 		src\findfiles.rs = src\findfiles.rs
 	EndProjectSection
 EndProject

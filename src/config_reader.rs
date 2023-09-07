@@ -107,13 +107,13 @@ impl ConfigReader {
             file_id += 1;
 
             let extension_attribute = child.attribute("extension").unwrap_or("");
-            let file_extension_is_set = !extension_attribute.is_empty();
+            let extension_attribute_is_set = !extension_attribute.is_empty();
 
-            let name_attribute = child.attribute("name").unwrap_or("");
-            let name = !name_attribute.is_empty();
+            let filename_attribute = child.attribute("name").unwrap_or("");
+            let filename_is_set = !filename_attribute.is_empty();
 
             // Si no hay nombre continuamos
-            if !name && !file_extension_is_set {
+            if !filename_is_set && !extension_attribute_is_set {
                 write_log!("\t WARNING: name attribute can't be empty in configuration file. Ignoring element number '{file_id}'\n");
                 continue
             }
@@ -123,42 +123,42 @@ impl ConfigReader {
             let recursive_attribute = str_to_type::<bool>(child.attribute("recursive").unwrap_or("false"));
 
             let directory_attribute = child.attribute("directory").unwrap_or("");
-            let directory = if directory_attribute.is_empty() { "." } else { directory_attribute };
+            let directory_value = if directory_attribute.is_empty() { "." } else { directory_attribute };
 
             // Si se establecio una extension de archivo y el atributo recursive no esta establecido entonces forzamos dicho modo
-            if !recursive_attribute && file_extension_is_set {
+            if !recursive_attribute && extension_attribute_is_set {
                 is_recursive = true;
             }
 
             let format_attribute = child.attribute("format").unwrap_or("");
 
-            if !file_extension_is_set && !is_valid_format(format_attribute) {
-                write_log!("\t WARNING: For file name '{name_attribute}' contains an invalid character in format attribute. Ignoring element '{file_id}'\n");
+            if !extension_attribute_is_set && !is_valid_format(format_attribute) {
+                write_log!("\t WARNING: For file name '{filename_attribute}' contains an invalid character in format attribute. Ignoring element '{file_id}'\n");
                 continue
             }
 
-            let mut temp_directory = String::from(directory);
-            if temp_directory == "." {
-                temp_directory += "/";
+            let mut final_directory_value = String::from(directory_value);
+            if final_directory_value == "." {
+                final_directory_value += "/";
             }
 
             let to_csv = str_to_type::<bool>(child.attribute("ToCSV").unwrap_or("true"));
             let to_dbc = str_to_type::<bool>(child.attribute("ToDBC").unwrap_or("false"));
             let to_sql = str_to_type::<bool>(child.attribute("ToSQL").unwrap_or("false"));
 
-            let out_formats = OutputFormat {
+            let output_formats = OutputFormat {
                 is_set_to_csv: to_csv,
                 is_set_to_dbc: to_dbc,
                 is_set_to_sql: to_sql,
             };
 
             FindFiles().file_to_find(
-                &*temp_directory,
-                name_attribute,
+                &*final_directory_value,
+                filename_attribute,
                 format_attribute,
                 is_recursive,
-                if file_extension_is_set { extension_attribute } else { "" },
-                out_formats,
+                if extension_attribute_is_set { extension_attribute } else { "" },
+                output_formats,
                 file_id
             )
         }

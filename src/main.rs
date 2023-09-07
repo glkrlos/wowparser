@@ -1,7 +1,7 @@
 mod staticdata;
 mod shared;
 mod log;
-mod module_config_reader;
+mod config_reader;
 mod findfiles;
 
 use indicatif::{ProgressBar, ProgressStyle};
@@ -24,7 +24,7 @@ fn print_header() {
 
 fn pass1_loadconfig() {
 
-    let config = module_config_reader::ConfigReader::new();
+    let config = config_reader::ConfigReader::new();
 
     if !config.load_configuration_file() {
         write_log!(
