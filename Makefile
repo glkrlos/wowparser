@@ -1,4 +1,4 @@
-all: linux_build #windows_build
+all: linux_build windows_build
 
 pre-build:
 	@bash staticdata.sh
