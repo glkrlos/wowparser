@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 use std::collections::HashMap;
-use crate::shared::*;
+use crate::shared::{EnumFileType, OutputFormat, StructXMLFileInfo};
 
 /*
 TODO
@@ -37,7 +37,6 @@ impl cFindFiles {
     }
     
     pub fn print_all_file_names_by_file_type(&self) {
-        
     }
 
     pub fn xml_file_info(&mut self) -> HashMap<String, StructXMLFileInfo> {
