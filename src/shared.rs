@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 use crossterm::{event, terminal};
+use serde::Serialize;
 
 #[macro_export]
 macro_rules! getch {
@@ -10,7 +11,7 @@ macro_rules! getch {
 }
 
 #[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug, Serialize)]
 pub enum EnumFieldTypes {
     TypeNone    = 0,
     TypeString  = 1,
@@ -23,7 +24,7 @@ pub enum EnumFieldTypes {
 }
 
 #[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug, Serialize)]
 pub enum EnumFileType {
     UnkFile                 = 0,
     DbcFile                 = 1,
@@ -85,11 +86,11 @@ pub struct StructFileData {
 }
 
 #[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct OutputFormat {
-    pub(crate) is_set_to_csv:  bool,
-    pub(crate) is_set_to_dbc:  bool,
-    pub(crate) is_set_to_sql:  bool,
+    pub is_set_to_csv:  bool,
+    pub is_set_to_dbc:  bool,
+    pub is_set_to_sql:  bool,
 }
 
 #[allow(dead_code)]
@@ -104,14 +105,13 @@ impl OutputFormat {
 }
 
 #[allow(dead_code)]
-#[derive(Clone)]
+#[derive(Clone, Debug, Serialize)]
 pub struct StructXMLFileInfo {
     pub file_name:                  String,
     pub file_type:                  EnumFileType,
     pub structure:                  String,
     pub is_recursively_searched:    bool,
     pub is_searched_by_extension:   bool,
-    pub xml_file_id:                u32,
     pub formatted_field_types:      Vec<EnumFieldTypes>,
     pub formatted_total_fields:     u32,
     pub formatted_record_size:      u32,
@@ -127,7 +127,6 @@ impl StructXMLFileInfo {
             structure:                  String::new(),
             is_recursively_searched:    false,
             is_searched_by_extension:   false,
-            xml_file_id:                0,
             formatted_field_types:      Vec::new(),
             formatted_total_fields:     0,
             formatted_record_size:      0,
@@ -276,18 +275,19 @@ pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
     txt1 == txt2
 }
 
-pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
+pub fn get_file_extension_by_file_type(eft: &str) -> EnumFileType {
     match eft {
-        EnumFileType::DbcFile   => "dbc",
-        EnumFileType::Db2File   => "db2",
-        EnumFileType::AdbFile   => "adb",
-        EnumFileType::WdbFile   => "wdb",
-        EnumFileType::CsvFile   => "csv",
-        _                       => "Unknown",
+        "dbc" => EnumFileType::DbcFile,
+        "db2" => EnumFileType::Db2File,
+        "adb" => EnumFileType::AdbFile,
+        "wdb" => EnumFileType::WdbFile,
+        "csv" => EnumFileType::CsvFile,
+        _     => EnumFileType::UnkFile,
     }
 }
 
-pub fn str_to_type<T>(s: &str) -> T
+#[allow(dead_code)]
+pub fn str_to<T>(s: &str) -> T
     where
         T: FromStr + Default,
 {
