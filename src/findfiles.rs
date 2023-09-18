@@ -167,9 +167,11 @@ impl FindFiles {
     }
 
     pub fn print_all_file_names_by_file_type(&self) {
+        let json_string = serde_json::to_string_pretty(&self.file_name).unwrap();
+        println!("{}", json_string);
     }
 
-    pub fn xml_file_info(&mut self) -> HashMap<String, StructXMLFileInfo> {
+    pub fn xml_file_info(&self) -> HashMap<String, StructXMLFileInfo> {
         self.file_name.clone()
     }
 }
