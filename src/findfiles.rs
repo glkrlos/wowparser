@@ -74,7 +74,6 @@ impl FindFiles {
                 info.file_type = GetFileExtensionByFileType(file_ext.to_lowercase().as_str());
                 info.is_searched_by_extension = true;
                 self.add_file_to_list_if_not_exist(&current_entry.display().to_string(), info.clone());
-                println!("Con extension: '{}' {} {} {}", file_ext, current_entry.display().to_string(), filename, structure);
             }
             else {
                 // If unable to get file name part, continues
@@ -101,11 +100,7 @@ impl FindFiles {
                 info.formatted_record_size = self.get_formated_record_size(structure);
 
                 self.add_file_to_list_if_not_exist(&current_entry.display().to_string(), info.clone());
-                println!("Sin extension: '{}' {} {} {}", file_ext, current_entry_file_name, filename, structure);
             }
-
-            // let json_string = serde_json::to_string_pretty(&info).unwrap();
-            // println!("{} {}", json_string, structure);
         }
     }
 

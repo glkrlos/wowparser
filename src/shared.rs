@@ -260,21 +260,6 @@ pub fn getch() {
     let _ = terminal::disable_raw_mode().unwrap();
 }
 
-#[allow(dead_code)]
-pub fn to_str<T: ToString>(i: T) -> String {
-    i.to_string()
-}
-
-#[allow(dead_code)]
-pub fn to_lower_case(text: &str) -> String {
-    text.to_lowercase()
-}
-
-#[allow(dead_code)]
-pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
-    txt1 == txt2
-}
-
 pub fn get_file_extension_by_file_type(eft: &str) -> EnumFileType {
     match eft {
         "dbc" => EnumFileType::DbcFile,
@@ -286,8 +271,7 @@ pub fn get_file_extension_by_file_type(eft: &str) -> EnumFileType {
     }
 }
 
-#[allow(dead_code)]
-pub fn str_to<T>(s: &str) -> T
+pub fn str_to<T>(s: String) -> T
     where
         T: FromStr + Default,
 {
