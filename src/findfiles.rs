@@ -3,8 +3,8 @@ use std::sync::Mutex;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use crate::shared;
 use crate::shared::{EnumFieldTypes, EnumFileType, OutputFormat, StructXMLFileInfo};
-use crate::shared::get_file_extension_by_file_type as GetFileExtensionByFileType;
 
 pub struct FindFiles {
     file_name: HashMap<String, StructXMLFileInfo>
@@ -71,7 +71,7 @@ impl FindFiles {
                     continue
                 }
 
-                info.file_type = GetFileExtensionByFileType(file_ext.to_lowercase().as_str());
+                info.file_type = self.get_file_type_by_extension(file_ext.to_lowercase().as_str());
                 info.is_searched_by_extension = true;
                 self.add_file_to_list_if_not_exist(&current_entry.display().to_string(), info.clone());
             }
@@ -92,7 +92,7 @@ impl FindFiles {
                     continue
                 }
 
-                info.file_type = GetFileExtensionByFileType(current_extension.to_lowercase().as_str());
+                info.file_type = self.get_file_type_by_extension(current_extension.to_lowercase().as_str());
                 info.structure = structure.to_string();
                 info.is_searched_by_extension = false;
                 info.formatted_field_types = self.get_formated_field_types(structure);
@@ -104,6 +104,16 @@ impl FindFiles {
         }
     }
 
+    pub fn get_file_type_by_extension(&self, eft: &str) -> EnumFileType {
+        match eft {
+            "dbc" => EnumFileType::DbcFile,
+            "db2" => EnumFileType::Db2File,
+            "adb" => EnumFileType::AdbFile,
+            "wdb" => EnumFileType::WdbFile,
+            "csv" => EnumFileType::CsvFile,
+            _     => EnumFileType::UnkFile,
+        }
+    }
     fn get_formated_record_size(&self, frs: &str) -> u32 {
         let mut record_size = 0;
 
@@ -150,8 +160,7 @@ impl FindFiles {
         self.file_name.is_empty()
     }
 
-    fn add_file_to_list_if_not_exist(&mut self, file_name: &str, file_info: StructXMLFileInfo)
-    {
+    fn add_file_to_list_if_not_exist(&mut self, file_name: &str, file_info: StructXMLFileInfo) {
         if self.file_name.contains_key(file_name) {
             self.file_name.insert(file_name.to_string(), file_info);
 
@@ -162,8 +171,18 @@ impl FindFiles {
     }
 
     pub fn print_all_file_names_by_file_type(&self) {
-        let json_string = serde_json::to_string_pretty(&self.file_name).unwrap();
-        println!("{}", json_string);
+        if self.list_empty() {
+            return
+        }
+
+        let mut count_current_files: u32 = 0;
+        // let json_string = serde_json::to_string_pretty(&self.file_name).unwrap();
+        // println!("{}", json_string);
+        for file in &self.file_name {
+            count_current_files += 1;
+
+            print!("\n->{} '{}' {} file{} added", if file.1.file_type == EnumFileType::UnkFile { "(WARNING)" } else { "" }, count_current_files, shared::get_file_extension_by_file_type(&file.1.file_type), if count_current_files > 1 { "s" } else { "" });
+        }
     }
 
     pub fn xml_file_info(&self) -> HashMap<String, StructXMLFileInfo> {
