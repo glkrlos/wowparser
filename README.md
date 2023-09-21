@@ -2,7 +2,7 @@
 
 Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
-## WoWParser 4.0 (Huamantla) in Pre-Alpha Development State:
+## WoWParser 4.0 (Huamantla) in Development State:
     * Project fully rebuild in Rust languaje
 
 ## WoWParser 3.1 (Zitacuaro):
