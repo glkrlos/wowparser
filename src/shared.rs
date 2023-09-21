@@ -116,25 +116,6 @@ pub struct StructXMLFileInfo {
     pub output_formats:             OutputFormat,
 }
 
-#[allow(dead_code)]
-impl StructXMLFileInfo {
-    fn new() -> Self {
-        Self {
-            file_name:                  String::new(),
-            file_type:                  EnumFileType::UnkFile,
-            file_extension:             String::new(),
-            file_id:                    0,
-            structure:                  String::new(),
-            is_recursively_searched:    false,
-            is_searched_by_extension:   false,
-            formatted_field_types:      Vec::new(),
-            formatted_total_fields:     0,
-            formatted_record_size:      0,
-            output_formats:             OutputFormat::new(),
-        }
-    }
-}
-
 pub struct SaveFileInfo {
     record_size:            u32,
     total_fields:           u32,
