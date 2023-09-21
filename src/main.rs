@@ -10,6 +10,7 @@ use std::thread;
 use std::time::Duration;
 use console::Term;
 use findfiles::instance as FindFiles;
+use parser::Parser as Parser;
 
 fn print_header() {
     write_log_and_print!("WoWParser Version {} ({}) in Development State for {} {} (Revision: {})\n", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
@@ -80,10 +81,10 @@ fn pass3_checkheadersanddataconsistency() {
         bar.set_message(new_filename);
         thread::sleep(Duration::from_secs(1));
 
-        let parser_pointer = parser::Parser::new(current_file_info);
+        let parser = Parser::new(current_file_info);
 
-        if parser_pointer.load() {
-            parser_pointer.parse_file();
+        if parser.load() {
+            parser.parse_file();
         }
 
         bar.inc(1);
