@@ -3,19 +3,20 @@ use std::sync::Mutex;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use crate::{log, write_log, write_log_no_time};
 use crate::shared;
 use crate::shared::{EnumFieldTypes, EnumFileType, OutputFormat, StructXMLFileInfo};
 
 pub struct FindFiles {
-    file_name: HashMap<String, StructXMLFileInfo>
+    file_names: HashMap<String, StructXMLFileInfo>
 }
 
 impl FindFiles {
     pub fn new() -> Self {
-        Self { file_name: HashMap::new() }
+        Self { file_names: HashMap::new() }
     }
 
-    pub fn file_to_find(&mut self, directory: &str, filename: &str, structure: &str, recursive: bool, file_ext: &str, out_formats: OutputFormat) {
+    pub fn file_to_find(&mut self, directory: &str, filename: &str, structure: &str, recursive: bool, file_ext: &str, out_formats: OutputFormat, file_id: u32) {
 
         // If unable to read directory, returns
         let current_directory = match fs::read_dir(Path::new(directory)) {
@@ -34,7 +35,7 @@ impl FindFiles {
             if current_entry.is_dir() {
 
                 if recursive {
-                    self.file_to_find(&current_entry.to_string_lossy(), &filename, &structure, recursive, &file_ext, out_formats);
+                    self.file_to_find(&current_entry.to_string_lossy(), &filename, &structure, recursive, &file_ext, out_formats, file_id);
                 }
 
                 continue;
@@ -55,6 +56,8 @@ impl FindFiles {
             let mut info = StructXMLFileInfo {
                 file_name: current_entry.display().to_string(),
                 file_type: EnumFileType::UnkFile,
+                file_extension: current_extension.to_ascii_lowercase(),
+                file_id,
                 structure: "".to_string(),
                 is_recursively_searched: recursive,
                 is_searched_by_extension: false,
@@ -157,17 +160,17 @@ impl FindFiles {
     }
 
     pub fn list_empty(&self) -> bool {
-        self.file_name.is_empty()
+        self.file_names.is_empty()
     }
 
     fn add_file_to_list_if_not_exist(&mut self, file_name: &str, file_info: StructXMLFileInfo) {
-        if self.file_name.contains_key(file_name) {
-            self.file_name.insert(file_name.to_string(), file_info);
+        if let Some(found) = self.file_names.get_mut(file_name) {
+            *found = file_info;
 
             return;
         }
 
-        self.file_name.insert(file_name.to_string(), file_info);
+        self.file_names.insert(file_name.to_string(), file_info);
     }
 
     pub fn print_all_file_names_by_file_type(&self) {
@@ -175,18 +178,111 @@ impl FindFiles {
             return
         }
 
-        let mut count_current_files: u32 = 0;
-        // let json_string = serde_json::to_string_pretty(&self.file_name).unwrap();
-        // println!("{}", json_string);
-        for file in &self.file_name {
-            count_current_files += 1;
+        let mut max_file_id_in_xml = 0;
 
-            print!("\n->{} '{}' {} file{} added", if file.1.file_type == EnumFileType::UnkFile { "(WARNING)" } else { "" }, count_current_files, shared::get_file_extension_by_file_type(&file.1.file_type), if count_current_files > 1 { "s" } else { "" });
+        for file in &self.file_names {
+            if file.1.file_id > max_file_id_in_xml {
+                max_file_id_in_xml = file.1.file_id;
+            }
+        }
+
+        for current_file_id in 0..=max_file_id_in_xml {
+            for x in 0..(EnumFileType::TotalFileTypes as u32) {
+                let mut count_current_files = 0;
+
+                for file in &self.file_names {
+                    if (file.1.file_type.clone() as u32) != x || file.1.file_id != current_file_id {
+                        continue;
+                    }
+
+                    count_current_files += 1;
+                }
+
+                let mut first = true;
+
+                for file in &self.file_names {
+                    if (file.1.file_type.clone() as u32) != x || file.1.file_id != current_file_id {
+                         continue
+                    }
+
+                    if first {
+                        write_log!("->{} '{}' {} file{} added",
+                               if file.1.file_type == EnumFileType::UnkFile { "(WARNING)" } else { "" },
+                               count_current_files,
+                               shared::get_file_extension_by_file_type(&file.1.file_type),
+                               if count_current_files > 1 { "s" } else { "" });
+
+                        if file.1.is_searched_by_extension {
+                            write_log_no_time!(" with extension *.{}{}",
+                                if file.1.file_type == EnumFileType::UnkFile { &file.1.file_extension } else { shared::get_file_extension_by_file_type(&file.1.file_type) },
+                                if file.1.is_recursively_searched { " in recursive mode" } else { "" } );
+                        }
+
+                        if file.1.file_id > 0 {
+                            write_log_no_time!(" by <file> element '{}'", file.1.file_id);
+                        }
+
+                        if file.1.is_searched_by_extension {
+                            write_log_no_time!(", and they will pass to predicted mode");
+                        }
+
+                        if file.1.output_formats.is_set_to_csv || file.1.output_formats.is_set_to_dbc || file.1.output_formats.is_set_to_sql {
+                            write_log_no_time!(" with output to");
+
+                            let mut count_outputs: u32 = 0;
+
+                            if file.1.output_formats.is_set_to_csv {
+                                write_log_no_time!(" CSV");
+                                count_outputs += 1;
+                            }
+
+                            if file.1.output_formats.is_set_to_dbc {
+                                if file.1.output_formats.is_set_to_csv && file.1.output_formats.is_set_to_sql {
+                                    write_log_no_time!(",");
+                                }
+                                else if file.1.output_formats.is_set_to_csv && !file.1.output_formats.is_set_to_sql {
+                                    write_log_no_time!(" and");
+                                }
+
+                                write_log_no_time!(" DBC");
+                                count_outputs += 1;
+                            }
+
+                            if file.1.output_formats.is_set_to_sql {
+                                if file.1.output_formats.is_set_to_csv || file.1.output_formats.is_set_to_dbc {
+                                    write_log_no_time!(" and");
+                                }
+
+                                write_log_no_time!(" SQL");
+                                count_outputs += 1;
+                            }
+
+                            write_log_no_time!(" file format{}",
+                                if count_outputs > 1 { "s" } else { "" });
+                        }
+                        else {
+                            write_log_no_time!(" with file information only");
+                        }
+
+                        write_log_no_time!(".\n");
+                        first = false;
+                    }
+
+                    write_log!("File: '{}'", file.1.file_name);
+
+                    if !file.1.structure.is_empty() {
+                        write_log_no_time!(", Structure: '{}'", file.1.structure);
+                    }
+
+                    write_log_no_time!("\n");
+                }
+
+            }
         }
     }
 
     pub fn xml_file_info(&self) -> HashMap<String, StructXMLFileInfo> {
-        self.file_name.clone()
+        self.file_names.clone()
     }
 }
 

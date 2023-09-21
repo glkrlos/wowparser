@@ -105,6 +105,8 @@ impl OutputFormat {
 pub struct StructXMLFileInfo {
     pub file_name:                  String,
     pub file_type:                  EnumFileType,
+    pub file_extension:             String,
+    pub file_id:                    u32,
     pub structure:                  String,
     pub is_recursively_searched:    bool,
     pub is_searched_by_extension:   bool,
@@ -120,6 +122,8 @@ impl StructXMLFileInfo {
         Self {
             file_name:                  String::new(),
             file_type:                  EnumFileType::UnkFile,
+            file_extension:             String::new(),
+            file_id:                    0,
             structure:                  String::new(),
             is_recursively_searched:    false,
             is_searched_by_extension:   false,

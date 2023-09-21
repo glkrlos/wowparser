@@ -183,6 +183,7 @@ impl ConfigReader {
                 recursive_attribute,
                 if extension_attribute_is_set { extension_attribute.as_str() } else { "" },
                 output_formats,
+                file_id
             )
         }
 

@@ -28,9 +28,9 @@ fn pass1_loadconfig() {
     if !config.load_configuration_file() {
         write_log!("Trying to find files in recursive mode with the following extensions: dbc db2 adb\n");
 
-        FindFiles().file_to_find(".", "", "", true, "dbc", shared::OutputFormat::new());
-        FindFiles().file_to_find(".", "", "", true, "db2", shared::OutputFormat::new());
-        FindFiles().file_to_find(".", "", "", true, "adb", shared::OutputFormat::new());
+        FindFiles().file_to_find(".", "", "", true, "dbc", shared::OutputFormat::new(), 0);
+        FindFiles().file_to_find(".", "", "", true, "db2", shared::OutputFormat::new(), 0);
+        FindFiles().file_to_find(".", "", "", true, "adb", shared::OutputFormat::new(), 0);
 
         if FindFiles().list_empty() {
             write_log_and_print!("No dbc, db2, or adb files found using recursive mode.\n");
