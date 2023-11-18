@@ -4,4 +4,6 @@ bin/
 x64/
 Win32/
 *.user
-revision.h
+revision.rs
+target/
+Cargo.lock
