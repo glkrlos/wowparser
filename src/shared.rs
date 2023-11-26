@@ -1,12 +1,17 @@
-struct cShared;
+use lazy_static::lazy_static;
 
-impl cShared {
-    fn instance() -> &'static cShared {
-        static INSTANCE: cShared = cShared;
+pub struct Sshared;
+
+impl Sshared {
+    pub fn instance() -> &'static Sshared {
+        static INSTANCE: Sshared = Sshared;
         &INSTANCE
+    }
+    pub fn show(&self) {
+        println!("Shared");
     }
 }
 
 lazy_static! {
-    static ref SHARED: &'static cShared = cShared::instance();
+    static ref SHARED: &'static Sshared = Sshared::instance();
 }
