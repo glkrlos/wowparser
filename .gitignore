@@ -7,3 +7,4 @@ Win32/
 staticdata.rs
 target/
 Cargo.lock
+*.log
