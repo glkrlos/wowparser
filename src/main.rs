@@ -5,10 +5,10 @@ mod log;
 fn print_header() {
     println!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
     println!("Hash: {}\tDate: {}", staticdata::hash(), staticdata::date());
-    println!("");
-    println!("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).");
-    println!("Copyright(c) 2023 Carlos Ramzuel - Huamantla, Tlaxcala, Mexico.");
-    println!("");
+    log::instance().write_log_and_print("");
+    log::instance().write_log_and_print("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).");
+    log::instance().write_log_and_print("Copyright(c) 2023 Carlos Ramzuel - Huamantla, Tlaxcala, Mexico.");
+    log::instance().write_log_and_print("");
 }
 
 fn pass1_loadconfig() {
@@ -21,13 +21,11 @@ fn pass3_checkheadersanddataconsistency() {
 }
 
 fn print_end() {
-    println!("-----> Finished");
+    log::instance().write_log_and_print("-----> Finished");
 }
 
 fn main() {
     shared::instance().show();
-    log::instance().write_log_and_print("Test aqui");
-    log::instance().write_log_no_time("Test aqui");
 
     print_header();
 
