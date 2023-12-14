@@ -86,4 +86,3 @@ lazy_static! {
 pub fn instance() -> std::sync::MutexGuard<'static, CLog> {
     INSTANCE.lock().unwrap()
 }
-
