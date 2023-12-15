@@ -10,7 +10,7 @@ static WOW_PARSER_LOG_OUTPUT: &str = "wowparser4.log";
 macro_rules! write_log_and_print {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
-        log::instance().write_log(formated.as_str());
+        log::instance().write_log(&formated, true);
         println!("{}", formated);
     };
 }
@@ -19,7 +19,7 @@ macro_rules! write_log_and_print {
 macro_rules! write_log_no_time_and_print {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
-        log::instance().write_log_no_time(formated.as_str());
+        log::instance().write_log(&formated, false);
         println!("{}", formated);
     };
 }
@@ -28,7 +28,7 @@ macro_rules! write_log_no_time_and_print {
 macro_rules! write_log {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
-        log::instance().write_log(formated.as_str());
+        log::instance().write_log(&formated, true);
     };
 }
 
@@ -36,7 +36,7 @@ macro_rules! write_log {
 macro_rules! write_log_no_time {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
-        log::instance().write_log_no_time(formated.as_str());
+        log::instance().write_log(&formated, false);
     };
 }
 
@@ -56,24 +56,23 @@ impl CLog {
         CLog { log_file }
     }
 
-    pub fn write_log(&mut self, args: &str) {
+    pub fn write_log(&mut self, args: &str, time: bool) {
         if let Some(file) = &mut self.log_file {
-            let current_time = Local::now();
-            let year = current_time.year();
-            let month = current_time.month();
-            let day = current_time.day();
-            let hour = current_time.hour();
-            let minute = current_time.minute();
-            let second = current_time.second();
-            let nanosecond = current_time.nanosecond() / 1_000;
-            let formatted_log = format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}\n", year, month, day, hour, minute, second, nanosecond, args);
-            file.write_all(formatted_log.as_bytes()).unwrap();
-        }
-    }
+            let formatted_log;
+            if time {
+                let current_time = Local::now();
+                let year = current_time.year();
+                let month = current_time.month();
+                let day = current_time.day();
+                let hour = current_time.hour();
+                let minute = current_time.minute();
+                let second = current_time.second();
+                let nanosecond = current_time.nanosecond() / 1_000;
+                formatted_log = format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}\n", year, month, day, hour, minute, second, nanosecond, args);
+            } else {
+                formatted_log = format!("{}\n", args);
+            }
 
-    pub fn write_log_no_time(&mut self, args: &str) {
-        if let Some(file) = &mut self.log_file {
-            let formatted_log = format!("{}\n", args);
             file.write_all(formatted_log.as_bytes()).unwrap();
         }
     }
