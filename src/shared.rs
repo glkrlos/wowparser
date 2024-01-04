@@ -254,15 +254,15 @@ impl CShared {
         i.to_string()
     }
 
-    pub fn to_lower_case(&self, text: &mut String) {
-        text.make_ascii_lowercase();
+    pub fn to_lower_case(&self, text: &str) -> String {
+        text.to_lowercase()
     }
 
     pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
         txt1 == txt2
     }
 
-    pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
+    pub fn get_file_extension_by_file_type(&self, eft: EnumFileType) -> &'static str {
         match eft {
             EnumFileType::DbcFile   => "dbc",
             EnumFileType::Db2File   => "db2",
