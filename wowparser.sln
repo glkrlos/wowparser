@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v4", "v4", "{E5A60F28-7436-4FB8-AF40-81583EB6A573}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Cargo.lock = Cargo.lock
+		Cargo.toml = Cargo.toml
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE = LICENSE
+		Makefile = Makefile
+		README.md = README.md
+		staticdata.sh = staticdata.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7F9528CA-309C-43A0-994F-2926205FEA05}"
+	ProjectSection(SolutionItems) = preProject
+		src\findfiles.cpp = src\findfiles.cpp
+		src\findfiles.h = src\findfiles.h
+		src\log.rs = src\log.rs
+		src\main.cpp = src\main.cpp
+		src\main.rs = src\main.rs
+		src\md5.cpp = src\md5.cpp
+		src\md5.h = src\md5.h
+		src\module_config_reader.cpp = src\module_config_reader.cpp
+		src\module_config_reader.h = src\module_config_reader.h
+		src\module_csv_reader.cpp = src\module_csv_reader.cpp
+		src\module_csv_reader.h = src\module_csv_reader.h
+		src\module_csv_writer.cpp = src\module_csv_writer.cpp
+		src\module_csv_writer.h = src\module_csv_writer.h
+		src\module_dbc_writer.cpp = src\module_dbc_writer.cpp
+		src\module_dbc_writer.h = src\module_dbc_writer.h
+		src\module_parser.cpp = src\module_parser.cpp
+		src\module_parser.h = src\module_parser.h
+		src\module_sql_writer.cpp = src\module_sql_writer.cpp
+		src\module_sql_writer.h = src\module_sql_writer.h
+		src\pch.cpp = src\pch.cpp
+		src\pch.h = src\pch.h
+		src\ProgressBar.cpp = src\ProgressBar.cpp
+		src\ProgressBar.h = src\ProgressBar.h
+		src\shared.rs = src\shared.rs
+		src\staticdata.rs = src\staticdata.rs
+		src\tinyxml2.cpp = src\tinyxml2.cpp
+		src\tinyxml2.h = src\tinyxml2.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "win32", "win32", "{08431B7E-D407-4A84-A797-3EB07CE7534E}"
+	ProjectSection(SolutionItems) = preProject
+		src\win32\dirent.h = src\win32\dirent.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linux", "linux", "{868D5970-1D7E-4DEE-8668-E0F40B7E10DC}"
+	ProjectSection(SolutionItems) = preProject
+		src\linux\getch.h = src\linux\getch.h
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F9528CA-309C-43A0-994F-2926205FEA05} = {E5A60F28-7436-4FB8-AF40-81583EB6A573}
+		{08431B7E-D407-4A84-A797-3EB07CE7534E} = {7F9528CA-309C-43A0-994F-2926205FEA05}
+		{868D5970-1D7E-4DEE-8668-E0F40B7E10DC} = {7F9528CA-309C-43A0-994F-2926205FEA05}
+	EndGlobalSection
+EndGlobal
