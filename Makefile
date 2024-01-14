@@ -7,6 +7,7 @@ linux_build: pre-build
 	@echo "Compiling for Linux"
 	@cargo build --target=x86_64-unknown-linux-gnu
 	@cp target/x86_64-unknown-linux-gnu/debug/wowparser4 bin/wowparser4_amd64
+	@./bin/wowparser4_amd64
 
 windows_build: pre-build
 	@echo "Compiling for Windows"
