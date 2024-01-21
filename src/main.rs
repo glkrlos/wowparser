@@ -6,7 +6,6 @@ mod log;
 use shared::EnumFieldTypes;
 #[allow(unused_imports)]
 use shared::EnumFileType;
-use std::io::{self, Read};
 
 fn print_header() {
     write_log_and_print!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
@@ -31,7 +30,6 @@ fn print_end() {
 }
 
 fn main() {
-    shared::instance().show();
     println!("{}",shared::instance().get_file_extension_by_file_type(EnumFileType::AdbFile));
     let test = shared::instance().to_lower_case("HOLA");
     println!("{}", test);
