@@ -1,7 +1,11 @@
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 use std::collections::HashMap;
-use std::io::{self, Read};
+
+extern crate termion;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+use std::io::{stdout, stdin, Write};
 
 #[macro_export]
 macro_rules! getch {
@@ -244,11 +248,10 @@ pub struct CShared;
 #[allow(dead_code)]
 impl CShared {
     pub fn getch(&self) {
-        println!("Press enter to continue...");
-        let mut buffer = [0u8; 1];
-        let stdin = io::stdin();
-
-        stdin.lock().read(&mut buffer).unwrap();
+        println!("Press any key to continue...");
+        let mut stdout = stdout().into_raw_mode().unwrap();
+        stdout.flush().unwrap();
+        stdin().events().next();
     }
 
     pub fn to_str<T: ToString>(&self, i: T) -> String {
