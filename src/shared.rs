@@ -1,8 +1,6 @@
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 use std::collections::HashMap;
-
-extern crate termion;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use std::io::{stdout, stdin, Write};
