@@ -26,7 +26,7 @@ class Log
 
        fwrite($this->logFile, $text);
     }
-    protected static function log(string $str, bool $time, bool $print): void
+    protected static function add(string $str, bool $time, bool $print): void
     {
         if (!(Log::$logClass instanceof Log))
             Log::$logClass = new Log();
@@ -45,18 +45,18 @@ class Log
     }
     public static function WriteLogAndPrint(...$fmt_args): void
     {
-        Log::log(sprintf(...$fmt_args), true, true);
+        Log::add(sprintf(...$fmt_args), true, true);
     }
     public static function WriteLogNoTimeAndPrint(...$fmt_args): void
     {
-        Log::log(sprintf(...$fmt_args), false, true);
+        Log::add(sprintf(...$fmt_args), false, true);
     }
     public static function WriteLog(...$fmt_args): void
     {
-        Log::log(sprintf(...$fmt_args), true, false);
+        Log::add(sprintf(...$fmt_args), true, false);
     }
     public static function WriteLogNoTime(...$fmt_args): void
     {
-        Log::log(sprintf(...$fmt_args), false, false);
+        Log::add(sprintf(...$fmt_args), false, false);
     }
 }
