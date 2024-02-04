@@ -15,13 +15,15 @@ spl_autoload_register(function ($class) {
         include_once __DIR__ . "/" . $class;
 });
 
-function getch() {
+function getch(): false|string
+{
     system('stty -icanon');
     $char = fread(STDIN, 1);
     system('stty icanon');
     return $char;
 }
-function printHeader() {
+function printHeader(): void
+{
     Log::WriteLogAndPrint("parser Version %s (%s) for %s %s (Revision: %s)\n", "_VERSION", "_CODENAME", "_OS", "_ARQUITECTURA", "_REVISION");
     Log::WriteLogAndPrint("Hash: %s\tDate: %s\n", "_HASH", "_DATE");
     Log::WriteLogAndPrint("\n");
@@ -41,7 +43,8 @@ function pass2PrintFilesToLog() {
 function pass3CheckHeadersAndDataConsistency() {
 }
 
-function printEnd() {
+function printEnd(): void
+{
     Log::WriteLogAndPrint("-----> Finished\n");
     Log::WriteLog("=====================================LOG FILE END=====================================\n");
     printf("--Press any key to exit--\n");
