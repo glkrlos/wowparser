@@ -26,8 +26,8 @@ include_once "parser/Version.php";
 
 function printHeader(): void
 {
-    Log::WriteLogAndPrint("WoWParser Version %s (%s) in Development State for %s %s (Revision: %s)\n", _VERSION, _CODENAME, _OS, _ARQUITECTURA, "_REVISION");
-    Log::WriteLogAndPrint("Hash: %s\tDate: %s\n", "_HASH", _DATE);
+    Log::WriteLogAndPrint("WoWParser Version %s (%s) in Development State for %s %s (Revision: %s)\n", _VERSION, _CODENAME, _OS, _ARQUITECTURA, _REVISION);
+    Log::WriteLogAndPrint("Hash: %s\tDate: %s\n", _HASH, _DATE);
     Log::WriteLogAndPrint("\n");
     Log::WriteLogAndPrint("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
     Log::WriteLogAndPrint("Copyright(c) 2024 Carlos Ramzuel - Tlaxcala, Mexico.\n");
