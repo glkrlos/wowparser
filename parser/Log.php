@@ -31,12 +31,12 @@ class Log
         if (!(Log::$logClass instanceof Log))
             Log::$logClass = new Log();
 
+        $formatted_log = $str;
+
         if ($time) {
             $currentTime = date("Y-m-d H:i:s");
-            $formatted_log = $currentTime . " " . $str;
+            $formatted_log = $currentTime . " " . $formatted_log;
         }
-        else
-            $formatted_log = $str;
 
         if ($print)
             echo $formatted_log;
