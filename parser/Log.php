@@ -26,7 +26,7 @@ class Log
 
        fwrite($this->logFile, $text);
     }
-    protected static function log(String $str, bool $time, bool $print): void
+    protected static function log(string $str, bool $time, bool $print): void
     {
         if (!(Log::$logClass instanceof Log))
             Log::$logClass = new Log();
