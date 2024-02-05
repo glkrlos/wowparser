@@ -2,8 +2,6 @@
 
 namespace Parser;
 
-const WOW_PARSER_LOG_OUTPUT = "wowparser4.log";
-
 class Log
 {
     private static ?Log $logClass = null;
@@ -11,7 +9,7 @@ class Log
     private bool $logFileIsOpen;
     public function __construct()
     {
-        $this->logFile = fopen(WOW_PARSER_LOG_OUTPUT, "w+");
+        $this->logFile = fopen(_LOG_FILENAME, "w+");
         $this->logFileIsOpen = $this->logFile !== false;
     }
     public function __destruct()

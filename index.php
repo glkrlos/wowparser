@@ -1,5 +1,6 @@
 <?php
 
+use Parser\Config;
 use Parser\Log;
 
 header("Content-Type: text/plain");
@@ -37,6 +38,7 @@ function printHeader(): void
 }
 
 function pass1LoadConfig() {
+    $test = new Config();
 }
 
 function pass2PrintFilesToLog() {

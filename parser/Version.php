@@ -4,6 +4,8 @@ const _VERSION = "4.0";
 const _CODENAME = "Huamantla";
 const _OS = "PHP";
 const _ARQUITECTURA = "8.2";
+const _CONFIG_FILENAME = "wowparser4.xml";
+const _LOG_FILENAME = "wowparser4.log";
 
 $gitdata = explode("-", exec("git describe --match init --dirty=+ --abbrev=12"));
 define("_REVISION", $gitdata[1]);
