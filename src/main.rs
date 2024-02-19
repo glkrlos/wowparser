@@ -60,7 +60,7 @@ fn pass2_printfilestolog() {
         return;
     }
 
-    println!("-----> Printing all files found in the log... ");
+    print!("-----> Printing all files found in the log... ");
     FindFiles().print_all_file_names_by_file_type();
     println!("DONE.");
 }
@@ -77,7 +77,7 @@ fn pass3_checkheadersanddataconsistency() {
     let xml_file_info = FindFiles().xml_file_info();
     let bar = ProgressBar::new(xml_file_info.len() as u64);
     let style = ProgressStyle::default_bar()
-        .template("[{elapsed_precise}] [{bar:40.cyan/blue}] ({pos}/{len} {percent}%) {msg}").expect("Failed")
+        .template("-----> [{elapsed_precise}] [{bar:40.cyan/blue}] ({pos}/{len} {percent}%) {msg}").expect("Failed")
         .progress_chars("* ");
 
     bar.set_style(style);
