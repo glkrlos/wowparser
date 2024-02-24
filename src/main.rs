@@ -7,6 +7,7 @@ mod findfiles;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::thread;
 use std::time::Duration;
+use console::Term;
 use shared::get_file_extension_by_file_type as GetFileExtensionByFileType;
 use findfiles::instance as FindFiles;
 
@@ -77,7 +78,7 @@ fn pass3_checkheadersanddataconsistency() {
     let xml_file_info = FindFiles().xml_file_info();
     let bar = ProgressBar::new(xml_file_info.len() as u64);
     let style = ProgressStyle::default_bar()
-        .template("-----> [{elapsed_precise}] [{bar:40.cyan/blue}] ({pos}/{len} {percent}%) {msg}").expect("Failed")
+        .template("  Loading file: {msg:34} [{elapsed_precise}] [{bar:40.cyan/blue}] ({pos}/{len} {percent}%)").expect("Failed")
         .progress_chars("* ");
 
     bar.set_style(style);
@@ -100,6 +101,9 @@ fn pass3_checkheadersanddataconsistency() {
 
     bar.set_message("");
     bar.finish();
+
+    let term = Term::stdout();
+    term.clear_line().unwrap();
 }
 fn print_end() {
     write_log_and_print!("-----> Finished");
