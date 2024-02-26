@@ -1,5 +1,3 @@
-use lazy_static::lazy_static;
-use std::sync::Mutex;
 use std::collections::HashMap;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
@@ -8,16 +6,9 @@ use std::io::{stdout, stdin, Write};
 #[macro_export]
 macro_rules! getch {
     () => {
-            shared::instance().getch();
+            shared::getch();
     };
 }
-
-/*#[macro_export]
-macro_rules! Shared {
-    () => {
-            &shared::instance()
-    };
-}*/
 
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -252,28 +243,26 @@ impl SaveFileInfo {
     }
 }
 
-pub struct CShared;
+pub fn getch() {
+    println!("Press any key to continue...");
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    stdout.flush().unwrap();
+    stdin().events().next();
+}
 
 #[allow(dead_code)]
-impl CShared {
-    pub fn getch(&self) {
-        println!("Press any key to continue...");
-        let mut stdout = stdout().into_raw_mode().unwrap();
-        stdout.flush().unwrap();
-        stdin().events().next();
-    }
+pub fn to_str<T: ToString>(i: T) -> String {
+    i.to_string()
+}
 
-    pub fn to_str<T: ToString>(&self, i: T) -> String {
-        i.to_string()
-    }
+#[allow(dead_code)]
+pub fn to_lower_case(text: &str) -> String {
+    text.to_lowercase()
+}
 
-    pub fn to_lower_case(&self, text: &str) -> String {
-        text.to_lowercase()
-    }
-
-    pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
-        txt1 == txt2
-    }
+#[allow(dead_code)]
+pub fn compare_texts(txt1: &str, txt2: &str) -> bool {
+    txt1 == txt2
 }
 
 pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
@@ -285,12 +274,4 @@ pub fn get_file_extension_by_file_type(eft: EnumFileType) -> &'static str {
         EnumFileType::CsvFile   => "csv",
         _                       => "Unknown",
     }
-}
-
-lazy_static! {
-    static ref INSTANCE: Mutex<CShared> = Mutex::new(CShared);
-}
-
-pub fn instance() -> std::sync::MutexGuard<'static, CShared> {
-    INSTANCE.lock().unwrap()
 }
