@@ -1,10 +1,16 @@
 ## WoWParser is a Tool to Parse World of Warcraft files (DBC ADB DB2 WDB) to a various file formats.
 
-Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
+Copyright(c) 2024 - Carlos Ramzuel - Tlaxcala, Mexico
 
 ## WoWParser 4.0 (Huamantla) in Development State:
- - Project fully rebuild in Rust languaje [master branch](https://github.com/glkrlos/wowparser)
- - Project fully rebuild in PHP languaje [php branch](https://github.com/glkrlos/wowparser/tree/php)
+The project will be completely rebuilt in:
+ - Rust language at [master branch](https://github.com/glkrlos/wowparser)
+ - PHP language at [php branch](https://github.com/glkrlos/wowparser/tree/php)
+
+New version for language C++ still pending for development.
+
+## Versions up to 3.1 are in the C++ language
+ - These versions are in branch [stable_cplus](https://github.com/glkrlos/wowparser/tree/stable_cplus)
 
 ## WoWParser 3.1 (Zitacuaro):
     * New Version 3.1.
