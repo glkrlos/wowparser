@@ -11,7 +11,7 @@ macro_rules! write_log_and_print {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
         log::instance().write_log(&formated, true);
-        println!("{}", formated);
+        print!("{}", formated);
     };
 }
 
@@ -20,7 +20,7 @@ macro_rules! write_log_no_time_and_print {
     ($($arg:tt)*) => {
         let formated = format!($($arg)*);
         log::instance().write_log(&formated, false);
-        println!("{}", formated);
+        print!("{}", formated);
     };
 }
 
@@ -68,9 +68,9 @@ impl CLog {
                 let minute = current_time.minute();
                 let second = current_time.second();
                 let nanosecond = current_time.nanosecond() / 1_000;
-                formatted_log = format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}\n", year, month, day, hour, minute, second, nanosecond, args);
+                formatted_log = format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}", year, month, day, hour, minute, second, nanosecond, args);
             } else {
-                formatted_log = format!("{}\n", args);
+                formatted_log = format!("{}", args);
             }
 
             file.write_all(formatted_log.as_bytes()).unwrap();

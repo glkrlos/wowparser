@@ -17,7 +17,19 @@ impl cFindFiles {
         Self { fileName: HashMap::new() }
     }
 
-    pub fn file_to_find(&self, _directory: &str, _filename: &str, _structure: &str, _recursive: bool, _file_ext: &str, _out_formats: OutputFormat/*, xml_file_id: u64*/) {
+    pub fn file_to_find(&self, _directory: &str, _filename: &str, _structure: &str, _recursive: bool, _file_ext: &str, _out_formats: OutputFormat, _xml_file_id: u32) {
+        // println!(
+        //     "\tDirectory: {}, Name: {}, Format: {}, Recursive: {}, Extension: {}, ToCSV: {}, ToDBC: {}, ToSQL: {}, File ID: {}",
+        //     _directory,
+        //     _filename,
+        //     _structure,
+        //     _recursive,
+        //     _file_ext,
+        //     _out_formats.is_set_to_csv,
+        //     _out_formats.is_set_to_dbc,
+        //     _out_formats.is_set_to_sql,
+        //     _xml_file_id
+        // );
     }
 
     pub fn list_empty(&self) -> bool {

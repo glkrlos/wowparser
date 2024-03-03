@@ -9,6 +9,7 @@ chrono = "0.4"
 termion = "2.0.1"
 indicatif = "0.17.6"
 console = "0.15.7"
+roxmltree = "0.18.0"
 
 [build-dependencies]
 
