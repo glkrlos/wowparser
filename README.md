@@ -101,8 +101,9 @@ Known Bugs in version 2.0:
  1. apt-get update
  2. apt-get upgrade
  3. apt-get install curl build-essential
- 
- NOTE: The installation of Rust is on current user in their home directory
+
+NOTE: The installation of Rust is on current user in their home directory
+
  4. curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
  5. source $HOME/.cargo/env
  6. Test rust: rustc --version
