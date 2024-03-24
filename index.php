@@ -38,13 +38,22 @@ function printHeader(): void
 }
 
 function pass1LoadConfig() {
-    $test = new Config();
+    if (!(new Config())->Load())
+    {
+        // TODO
+
+        return;
+    }
+
+    // TODO
 }
 
 function pass2PrintFilesToLog() {
+    // TODO
 }
 
 function pass3CheckHeadersAndDataConsistency() {
+    // TODO
 }
 
 function printEnd(): void
