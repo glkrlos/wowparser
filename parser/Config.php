@@ -79,6 +79,15 @@ class Config
             return false;
         }
 
+        Log::WriteLogNoTimeAndPrint("OK\n");
+
+        Log::WriteLog("\n");
+        Log::WriteLog("-----> Checking XML attributes of files to parse...\n");
+
+        // TODO: Implementar la lectura de cada elemento <file>
+
+        Log::WriteLog("-----> All OK after checking XML attributes of files to parse.\n");
+
         return true;
     }
 }
