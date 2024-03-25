@@ -16,8 +16,14 @@ spl_autoload_register(function ($class) {
         include_once __DIR__ . "/" . $class;
 });
 
-function getch(): void
+function getch(?string $text = null): void
 {
+    if (PHP_SAPI != "cli")
+        return;
+
+    if (!is_null($text))
+        printf($text);
+
     system('stty -icanon');
     fread(STDIN, 1);
     system('stty icanon');
@@ -60,8 +66,8 @@ function printEnd(): void
 {
     Log::WriteLogAndPrint("-----> Finished\n");
     Log::WriteLog("=====================================LOG FILE END=====================================\n");
-    printf("--Press any key to exit--\n");
-    getch();
+
+    getch("--Press any key to exit--\n");
 }
 
 printHeader();
