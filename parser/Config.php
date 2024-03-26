@@ -62,9 +62,13 @@ class Config
             return false;
         }
 
-        $dom->loadXML($xmlfile);
+        if ($dom->loadXML($xmlfile) === false)
+        {
+            Log::WriteLogNoTimeAndPrint("Failed: Unexpected error.\n");
+            return false;
+        }
 
-        if ($dom->documentElement->nodeName !== 'WoWParser4')
+        if ($dom->documentElement->nodeName !== _XML_ROOT_NAME)
         {
             Log::WriteLogNoTimeAndPrint("Failed: Invalid XML file.\n");
             return false;
