@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use termion::input::TermRead;
-use termion::raw::IntoRawMode;
-use std::io::{stdout, stdin, Write};
 use std::str::FromStr;
+use crossterm::{event, terminal};
 
 #[macro_export]
 macro_rules! getch {
@@ -240,9 +238,27 @@ impl SaveFileInfo {
 
 pub fn getch() {
     println!("Press any key to continue...");
-    let mut stdout = stdout().into_raw_mode().unwrap();
-    stdout.flush().unwrap();
-    stdin().events().next();
+    let _ = terminal::enable_raw_mode().unwrap();
+
+    //io::stdout().execute(terminal::Clear(ClearType::All)).unwrap();
+
+    loop {
+        if event::poll(std::time::Duration::from_millis(100)).unwrap() {
+            if let event::Event::Key(event::KeyEvent {
+                code: _,
+                kind: _,
+                state: _,
+                modifiers: _,
+            }) = event::read().unwrap()
+            {
+                /*if kind == KeyEventKind::Press && state == KeyEventState::NONE*/ {
+                    break;
+                }
+            }
+        }
+    }
+
+    let _ = terminal::disable_raw_mode().unwrap();
 }
 
 #[allow(dead_code)]
