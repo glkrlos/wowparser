@@ -40,11 +40,11 @@ macro_rules! write_log_no_time {
     };
 }
 
-pub struct CLog {
+pub struct Log {
     log_file: Option<std::fs::File>,
 }
 
-impl CLog {
+impl Log {
     fn new() -> Self {
         let log_file = OpenOptions::new()
             .write(true)
@@ -79,9 +79,9 @@ impl CLog {
 }
 
 lazy_static! {
-    pub static ref INSTANCE: Mutex<CLog> = Mutex::new(CLog::new());
+    pub static ref INSTANCE: Mutex<Log> = Mutex::new(Log::new());
 }
 
-pub fn instance() -> std::sync::MutexGuard<'static, CLog> {
+pub fn instance() -> std::sync::MutexGuard<'static, Log> {
     INSTANCE.lock().unwrap()
 }

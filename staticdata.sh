@@ -6,12 +6,12 @@ REVISION=${Array[1]}
 HASH=${Array[2]:1}
 DATE=`git show -s --format=%ci`
 
-echo "#[allow(dead_code)]pub fn version() -> String { \"4.0\".to_string() }" > src/staticdata.rs
-echo "#[allow(dead_code)]pub fn codename() -> String { \"Huamantla\".to_string() }" >> src/staticdata.rs
-echo "#[allow(dead_code)]pub fn revision() -> String { \"$REVISION\".to_string() }" >> src/staticdata.rs
-echo "#[allow(dead_code)]pub fn hash() -> String { \"$HASH\".to_string() }" >> src/staticdata.rs
-echo "#[allow(dead_code)]pub fn date() -> String { \"$DATE\".to_string() }" >> src/staticdata.rs
-echo "#[allow(dead_code)]pub fn os() -> String {
+echo "pub fn version() -> String { \"4.0\".to_string() }" > src/staticdata.rs
+echo "pub fn codename() -> String { \"Huamantla\".to_string() }" >> src/staticdata.rs
+echo "pub fn revision() -> String { \"$REVISION\".to_string() }" >> src/staticdata.rs
+echo "pub fn hash() -> String { \"$HASH\".to_string() }" >> src/staticdata.rs
+echo "pub fn date() -> String { \"$DATE\".to_string() }" >> src/staticdata.rs
+echo "pub fn os() -> String {
 let os_text =
 if cfg!(target_os = \"linux\")
 { \"Linux\" }
@@ -22,7 +22,7 @@ else
 
 os_text.to_string()
 }" >> src/staticdata.rs
-echo "#[allow(dead_code)]pub fn arch() -> String {
+echo "pub fn arch() -> String {
 let arch_text =
 if cfg!(target_arch = \"x86\")
 {
