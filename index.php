@@ -1,6 +1,7 @@
 <?php
 
 use Parser\Config;
+use Parser\FindFiles;
 use Parser\Log;
 
 header("Content-Type: text/plain");
@@ -55,6 +56,9 @@ function pass1LoadConfig() {
 }
 
 function pass2PrintFilesToLog() {
+    // Just for testing
+    FindFiles::PrintAllFileNamesByFileType();
+
     // TODO
 }
 
