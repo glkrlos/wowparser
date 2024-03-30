@@ -2,13 +2,41 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 use roxmltree::Document;
+use serde::Deserialize;
+use serde_xml_rs::from_str;
 
 use crate::{write_log, write_log_and_print, write_log_no_time_and_print};
 use crate::log;
-use crate::shared::{is_valid_format, OutputFormat, str_to_type};
+use crate::shared::{is_valid_format, OutputFormat};
 use crate::findfiles::instance as FindFiles;
 
 static WOW_PARSER_XML: &str = "wowparser4.xml";
+
+#[derive(Debug, Deserialize)]
+struct Files {
+    #[serde(rename = "name")]
+    name: Option<String>,
+    #[serde(rename = "extension")]
+    extension: Option<String>,
+    #[serde(rename = "recursive")]
+    recursive: Option<bool>,
+    #[serde(rename = "directory")]
+    directory: Option<String>,
+    #[serde(rename = "format")]
+    format: Option<String>,
+    #[serde(rename = "ToCSV")]
+    to_csv: Option<bool>,
+    #[serde(rename = "ToDBC")]
+    to_dbc: Option<bool>,
+    #[serde(rename = "ToSQL")]
+    to_sql: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
+struct WoWParser {
+    #[serde(rename = "file")]
+    files: Option<Vec<Files>>,
+}
 
 pub struct ConfigReader {
 }
@@ -42,7 +70,7 @@ impl ConfigReader {
 
         let current_dir = match env::current_exe() {
             Ok(dir) => dir,
-            Err(_e) => {
+            Err(_) => {
                 write_log_no_time_and_print!("Unable to locate configuration file.\n");
                 return false
             }
@@ -58,7 +86,7 @@ impl ConfigReader {
 
         let mut file = match File::open(full_path) {
             Ok(file) => file,
-            Err(_e) => {
+            Err(_) => {
                 write_log_no_time_and_print!("Unable to open configuration file.\n");
                 return false
             }
@@ -76,7 +104,7 @@ impl ConfigReader {
             Err(_) => {
                 write_log_no_time_and_print!("Failed: Syntax errors.\n");
                 return false
-            } 
+            }
         };
 
         if !document.root_element().has_tag_name("WoWParser4") {
@@ -84,83 +112,84 @@ impl ConfigReader {
             return false
         }
 
-        let root = document.root_element();
-        let file_count = root.children().filter(|n| n.has_tag_name("file")).count();
-
-        if file_count == 0 {
-            write_log_no_time_and_print!("Failed: No files to parse.\n");
-            return false
-        }
-
-        write_log_no_time_and_print!("OK\n");
-
-        write_log!("\n");
-        write_log!("-----> Checking XML attributes of files to parse...\n");
-
-        let mut file_id: u32 = 0;
-
-        for child in root.children() {
-            if !child.has_tag_name("file") {
-                continue
+        let result: Result<WoWParser, serde_xml_rs::Error> = from_str(&xml_content);
+        match result {
+            Err(_) => {
+                write_log_no_time_and_print!("Failed: Unserialize error.\n");
+                return false
             }
 
-            file_id += 1;
+            Ok(data) => {
+                let file_elements = match data.files {
+                    None => {
+                        write_log_no_time_and_print!("Failed: No files to parse.\n");
+                        return false
+                    }
+                    Some(data) => { data }
+                };
 
-            let extension_attribute = child.attribute("extension").unwrap_or("");
-            let extension_attribute_is_set = !extension_attribute.is_empty();
+                write_log_no_time_and_print!("OK\n");
 
-            let filename_attribute = child.attribute("name").unwrap_or("");
-            let filename_is_set = !filename_attribute.is_empty();
+                write_log!("\n");
+                write_log!("-----> Checking XML attributes of files to parse...\n");
 
-            // Si no hay nombre continuamos
-            if !filename_is_set && !extension_attribute_is_set {
-                write_log!("\t WARNING: name attribute can't be empty in configuration file. Ignoring element number '{file_id}'\n");
-                continue
+                let mut file_id: u32 = 0;
+
+                for file in file_elements {
+                    file_id += 1;
+
+                    let extension_attribute = file.extension.unwrap_or("".to_string());
+                    let extension_attribute_is_set = !extension_attribute.is_empty();
+
+                    let filename_attribute = file.name.unwrap_or("".to_string());
+                    let filename_is_set = !filename_attribute.is_empty();
+
+                    // Si no hay nombre continuamos
+                    if !filename_is_set && !extension_attribute_is_set {
+                        write_log!("\t WARNING: name attribute can't be empty in configuration file. Ignoring element number '{file_id}'\n");
+                        continue
+                    }
+
+                    let mut is_recursive = false;
+                    // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
+                    let recursive_attribute = file.recursive.unwrap_or(false);
+
+                    let directory_attribute = file.directory.unwrap_or("".to_string());
+                    let directory_value = if directory_attribute.is_empty() { "." } else { &directory_attribute };
+
+                    // Si se establecio una extension de archivo y el atributo recursive no esta establecido entonces forzamos dicho modo
+                    if !recursive_attribute && extension_attribute_is_set {
+                        is_recursive = true;
+                    }
+
+                    let format_attribute = file.format.unwrap_or("".to_string());
+                    //println!("{} {} {}", filename_attribute, format_attribute, extension_attribute);
+                    if !extension_attribute_is_set && !is_valid_format(&format_attribute) {
+                        write_log!("\t WARNING: For file name '{filename_attribute}' contains an invalid character in format attribute. Ignoring element '{file_id}'\n");
+                        continue
+                    }
+
+                    let mut final_directory_value = String::from(directory_value);
+                    if final_directory_value == "." {
+                        final_directory_value += "/";
+                    }
+
+                    let output_formats = OutputFormat {
+                        is_set_to_csv: file.to_csv.unwrap_or(true),
+                        is_set_to_dbc: file.to_dbc.unwrap_or(false),
+                        is_set_to_sql: file.to_sql.unwrap_or(false),
+                    };
+
+                    FindFiles().file_to_find(
+                        final_directory_value.as_str(),
+                        filename_attribute.as_str(),
+                        format_attribute.as_str(),
+                        is_recursive,
+                        if extension_attribute_is_set { extension_attribute.as_str() } else { "" },
+                        output_formats
+                    )
+                }
             }
-
-            let mut is_recursive = false;
-            // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-            let recursive_attribute = str_to_type::<bool>(child.attribute("recursive").unwrap_or("false"));
-
-            let directory_attribute = child.attribute("directory").unwrap_or("");
-            let directory_value = if directory_attribute.is_empty() { "." } else { directory_attribute };
-
-            // Si se establecio una extension de archivo y el atributo recursive no esta establecido entonces forzamos dicho modo
-            if !recursive_attribute && extension_attribute_is_set {
-                is_recursive = true;
-            }
-
-            let format_attribute = child.attribute("format").unwrap_or("");
-
-            if !extension_attribute_is_set && !is_valid_format(format_attribute) {
-                write_log!("\t WARNING: For file name '{filename_attribute}' contains an invalid character in format attribute. Ignoring element '{file_id}'\n");
-                continue
-            }
-
-            let mut final_directory_value = String::from(directory_value);
-            if final_directory_value == "." {
-                final_directory_value += "/";
-            }
-
-            let to_csv = str_to_type::<bool>(child.attribute("ToCSV").unwrap_or("true"));
-            let to_dbc = str_to_type::<bool>(child.attribute("ToDBC").unwrap_or("false"));
-            let to_sql = str_to_type::<bool>(child.attribute("ToSQL").unwrap_or("false"));
-
-            let output_formats = OutputFormat {
-                is_set_to_csv: to_csv,
-                is_set_to_dbc: to_dbc,
-                is_set_to_sql: to_sql,
-            };
-
-            FindFiles().file_to_find(
-                &*final_directory_value,
-                filename_attribute,
-                format_attribute,
-                is_recursive,
-                if extension_attribute_is_set { extension_attribute } else { "" },
-                output_formats,
-                file_id
-            )
         }
 
         write_log!("-----> All OK after checking XML attributes of files to parse.\n");
