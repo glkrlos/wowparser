@@ -4,7 +4,7 @@
     <file extension="db2" />
     <file extension="adb" />
     <file extension="csv" />
-    <file name="example1.csv.dbc" format="usibif" ToCSV=""/>
+    <file name="example1.csv.dbc" format="usibif" />
 </WoWParser4>
 
 <!--
