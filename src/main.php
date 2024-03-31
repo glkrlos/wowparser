@@ -12,7 +12,7 @@ ini_set('memory_limit', '2048M');
 set_time_limit(0);
 
 spl_autoload_register(function ($class) {
-    $class = lcfirst(str_replace('\\', '/', $class)) . '.php';
+    $class = str_replace('\\', '/', $class) . '.php';
     if (file_exists(__DIR__ . "/" . $class))
         include_once __DIR__ . "/" . $class;
 });
@@ -30,7 +30,7 @@ function getch(?string $text = null): void
     system('stty icanon');
 }
 
-include_once "parser/Version.php";
+include_once "Parser/Version.php";
 
 function printHeader(): void
 {
