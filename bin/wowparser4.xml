@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<WoWParser4>
+    <file extension="dbc" />
+    <file extension="db2" />
+    <file extension="adb" />
+    <file extension="csv" />
+    <file name="example1.csv.dbc" format="usibif" />
+</WoWParser4>
+
+<!--
+WoWParser 4 - XML Configuration File
+
+<file name="" extension="" recursive="" directory="" format="" ToCSV="" ToDBC="" ToSQL=""/>
+
+name=
+File name to be parsed
+    * Example: name="Achievement.dbc"
+
+extension=
+Find files by extension
+    * If this option is set, name and format will be ignored.
+    * Example: extension="dbc"
+
+recursive=
+Find files in recursive mode
+    * Default value is "false" except when extension is set.
+    * Example: recursive="true"
+
+directory=
+Find files inside specified directory
+    * If recursive is "true", will find in recursive mode all files starting in current directory
+    * If recursive is "false", will not use recursive mode and find all files inside specified directory
+      and subsecuent subdirectories if any.
+    * Default value is "."
+    * Example: directory="./dbc"
+        - ./ means directory of program
+        - If you dont put the first dot will find in root of your current drive
+        - Must never end with /
+
+format=
+Set exact format for speficied file
+    * If format is set, and other file with same name and in same location without format unset,
+      then the file with format will prevail and the other file will be ignored.
+    * Example: "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii"
+    * Only the next characters can be used in format:
+        b X     -> byte
+        d n x i -> int
+        u       -> unsigned int
+        s       -> string
+        f       -> float
+
+ToCSV=
+Will parse the file(s) to CSV file format.
+    * Default value is "false"
+
+ToDBC=
+Will parse the file(s) to DBC file format.
+    * Default value is "false"
+
+ToSQL=
+Will parse the file(s) to SQL file format.
+    * Default value is "true"
+
+************************************************************************************************************************************************
+Examples:
+
+Find specific file with recursive mode:
+<file name="Achievement.dbc" recursive="true" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find specific file with recursive mode in specified directory
+<file name="Achievement.dbc" recursive="true" directory="./dbc" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find specific files without recursive mode for example:
+<file name="Achievement.dbc" format="niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii" />
+
+Find files by extension with recursive mode starting in default directory:
+<file extension="dbc" />
+
+Find files by extension with recursive mode starting in specified directory:
+<file extension="dbc" directory="./dbc" />
+
+Find files by extension without recursive mode in specified directory:
+<file extension="dbc" recursive="false" directory="./dbc/esMX" />
+
+WDB Files can be parsed only with specific structrue.
+Just the parse of itemcache.wdb is disabled for now.
+These Samples are for Version 3.3.5a (12340)
+<file name="creaturecache.wdb" format="uussssssiiiiiiiiiiffbiiiiiii" />
+<file name="gameobjectcache.wdb" format="uuiisssssssiiiiiiiiiiiiiiiiiiiiiiiifiiiiii" />
+<file name="itemcache.wdb" format="uuiiissssiiiiiiiiiiiiiiiiiiiiixnnnnnnnnnnnnnnnnnnnniiffiffiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiisiiiiiiiiiiiiiiiiiiiiiiiiifiii" />
+<file name="itemnamecache.wdb" format="uusi" />
+<file name="itemtextcache.wdb" format="uus" />
+<file name="npccache.wdb" format="uufssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiiifssiiiiiii" />
+<file name="pagetextcache.wdb" format="uusi" />
+<file name="questcache.wdb" format="uuiiiiiiiiiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiffisssssiiiiiiiiiiiiiiiiiiiiiiiiiiiissss" />
+
+NOTES: * The program can't read byte fields without the specific format for that file.
+       * The output of parsed files for now are always to CSV and SQL formats
+-->
