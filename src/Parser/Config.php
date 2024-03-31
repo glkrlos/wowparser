@@ -188,6 +188,10 @@ class Config
         Log::WriteLog("-----> All OK after checking XML attributes of files to parse.\n");
         return true;
     }
+    private function IsUsed($value): bool
+    {
+        return $value !== 'unused';
+    }
     private function ValidateBool($var): bool
     {
         return !is_null($var) && (preg_match('/^(true)$/i', $var));
