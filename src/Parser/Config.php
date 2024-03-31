@@ -130,25 +130,30 @@ class Config
         $fileID = 0;
         foreach ($file_elements as $currentElementFile)
         {
-            $attrib = array_fill_keys(['extension', 'name', 'recursive', 'directory', 'format', 'ToCSV', 'ToDBC', 'ToSQL'], null);
+            $attributesList = array_fill_keys(
+                ['extension', 'name', 'recursive', 'directory', 'format', 'ToCSV', 'ToDBC', 'ToSQL'],
+                ['IsSet' => false, 'Value' => '', 'IsEmpty' => true]
+            );
 
-            $attributes = $currentElementFile->attributes;
-            foreach ($attributes as $attribute)
+            foreach ($currentElementFile->attributes as $attribute)
             {
-                if (!array_key_exists($attribute->nodeName, $attrib))
+                $nodeName = $attribute->nodeName;
+                if (!array_key_exists($nodeName, $attributesList))
                     continue;
 
-                $attrib[$attribute->nodeName] = $attribute->nodeValue;
+                $attributesList[$nodeName]['IsSet'] = true;
+                $attributesList[$nodeName]['Value'] = empty($attribute->nodeValue) ? "" : $attribute->nodeValue;
+                $attributesList[$nodeName]['IsEmpty'] = empty($attribute->nodeValue) ?? true;
             }
 
             // Sumamos uno al contador de <file> por que desde aqui empezamos a hacer las comprobaciones
             $fileID++;
 
-            $FileExtension = !is_null($attrib['extension']) ? $attrib['extension'] : "";
-            $FileExtensionIsSet = !empty($FileExtension);
+            $FileExtension = $attributesList['extension']['Value'];
+            $FileExtensionIsSet = $attributesList['extension']['IsSet'];
 
-            $FileName = !is_null($attrib['name']) ? $attrib['name'] : "";
-            $Name = !empty($FileName);
+            $FileName = $attributesList['name']['Value'];
+            $Name = $attributesList['name']['IsEmpty'];
 
             // Si no hay nombre continuamos
             if (!$Name && !$FileExtensionIsSet)
@@ -159,15 +164,15 @@ class Config
 
             $isRecursive = false;
             // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-            $RecursiveAttributeIsSet = is_bool($attrib['recursive']) && $attrib['recursive'];
+            $RecursiveAttributeIsSet = is_bool($attributesList['recursive']['Value']) && $attributesList['recursive']['Value'];
 
-            $_directoryName = !is_null($attrib['directory']) ? $attrib['directory'] : "";
-            $DirectoryName = empty($_directoryName) ? "." : $_directoryName;
+            $_directoryName = $attributesList['directory']['Value'];
+            $DirectoryName = $attributesList['directory']['IsEmpty'] ? "." : $_directoryName;
 
             if (!$RecursiveAttributeIsSet && $FileExtensionIsSet)
                 $isRecursive = true;
 
-            $FileFormat = !is_null($attrib['format']) ? $attrib['format'] : "";
+            $FileFormat = $attributesList['format']['Value'];
 
             if (!$FileExtensionIsSet && !$this->IsValidFormat($FileFormat))
             {
@@ -177,9 +182,9 @@ class Config
 
             // Quizas mejor usar filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) ???
             $outFormats = [
-                'ToCSV' => $this->ValidateBool($attrib['ToCSV']),
-                'ToDBC' => $this->ValidateBool($attrib['ToDBC']),
-                'ToSQL' => $this->ValidateBool($attrib['ToSQL'])
+                'ToCSV' => $this->ValidateBool($attributesList['ToCSV']['Value']),
+                'ToDBC' => $this->ValidateBool($attributesList['ToDBC']['Value']),
+                'ToSQL' => $this->ValidateBool($attributesList['ToSQL']['Value'])
             ];
 
             FindFiles::FileToFind($DirectoryName, $FileName, $FileFormat, $isRecursive, $FileExtensionIsSet ? $FileExtension : "", $outFormats, $fileID);
@@ -188,12 +193,8 @@ class Config
         Log::WriteLog("-----> All OK after checking XML attributes of files to parse.\n");
         return true;
     }
-    private function IsUsed($value): bool
-    {
-        return $value !== 'unused';
-    }
     private function ValidateBool($var): bool
     {
-        return !is_null($var) && (preg_match('/^(true)$/i', $var));
+        return preg_match('/^(true)$/i', $var);
     }
 }
