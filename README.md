@@ -13,10 +13,10 @@ New version for language C++ still pending for development.
  - These versions are in branch [master](https://github.com/glkrlos/wowparser)
 
 ## How To Use:
-1. Tests made under Linux Debian 12
-2. Have installed PHP 8.2
-3. Enter to public folder
-4. Run: **php index.php**
+Tests made under Linux Debian 12
+1. Have installed PHP 8.2
+2. Enter to public folder
+3. Run: **php index.php**
 
 If you want to run under web browser, you need this:
 1. Install Apache or Nginx
