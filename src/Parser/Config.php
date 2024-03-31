@@ -130,16 +130,7 @@ class Config
         $fileID = 0;
         foreach ($file_elements as $currentElementFile)
         {
-            $attrib = [
-                'extension' => null,
-                'name' => null,
-                'recursive' => null,
-                'directory' => null,
-                'format' => null,
-                'ToCSV' => null,
-                'ToDBC' => null,
-                'ToSQL' => null
-            ];
+            $attrib = array_fill_keys(['extension', 'name', 'recursive', 'directory', 'format', 'ToCSV', 'ToDBC', 'ToSQL'], null);
 
             $attributes = $currentElementFile->attributes;
             foreach ($attributes as $attribute)
