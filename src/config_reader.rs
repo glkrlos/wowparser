@@ -150,20 +150,18 @@ impl ConfigReader {
                         continue
                     }
 
-                    let mut is_recursive = false;
                     // si el valor de recursive no esta establecido o es un valor incorrecto entonces ponemos que recursive is not set
-                    let recursive_attribute = file.recursive.unwrap_or(false);
+                    let mut recursive_attribute = file.recursive.unwrap_or(false);
 
                     let directory_attribute = file.directory.unwrap_or("".to_string());
                     let directory_value = if directory_attribute.is_empty() { "." } else { &directory_attribute };
 
                     // Si se establecio una extension de archivo y el atributo recursive no esta establecido entonces forzamos dicho modo
                     if !recursive_attribute && extension_attribute_is_set {
-                        is_recursive = true;
+                        recursive_attribute = true;
                     }
 
                     let format_attribute = file.format.unwrap_or("".to_string());
-                    //println!("{} {} {}", filename_attribute, format_attribute, extension_attribute);
                     if !extension_attribute_is_set && !is_valid_format(&format_attribute) {
                         write_log!("\t WARNING: For file name '{filename_attribute}' contains an invalid character in format attribute. Ignoring element '{file_id}'\n");
                         continue
@@ -184,7 +182,7 @@ impl ConfigReader {
                         final_directory_value.as_str(),
                         filename_attribute.as_str(),
                         format_attribute.as_str(),
-                        is_recursive,
+                        recursive_attribute,
                         if extension_attribute_is_set { extension_attribute.as_str() } else { "" },
                         output_formats
                     )
