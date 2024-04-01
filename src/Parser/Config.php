@@ -90,8 +90,8 @@ class Config
                 if (is_null($errorLevel))
                     continue;
 
-                Log::WriteLog($errorLevel . " error -> ");
-                Log::WriteLogNoTime("Code: %d, Line: %d, Column: %d [%s]\n",
+                Log::WriteLog("%s -> Code: %d, Line: %d, Column: %d [%s]\n",
+                    $errorLevel,
                     $error->code,
                     $error->line,
                     $error->column,
@@ -153,7 +153,7 @@ class Config
             $FileExtensionIsSet = $attributesList['extension']['IsSet'];
 
             $FileName = $attributesList['name']['Value'];
-            $Name = $attributesList['name']['IsEmpty'];
+            $Name = !$attributesList['name']['IsEmpty'];
 
             // Si no hay nombre continuamos
             if (!$Name && !$FileExtensionIsSet)
