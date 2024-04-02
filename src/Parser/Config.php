@@ -3,49 +3,10 @@
 namespace Parser;
 
 use DOMDocument;
+use Helpers\Config\Utility;
 
 class Config
 {
-    private function IsValidFormat(string $structure): bool
-    {
-        /*
-         * X -> unk byte
-         * b -> byte
-         * s -> string
-         * f -> float
-         * d -> int
-         * n -> int
-         * x -> unk int
-         * i -> int
-         * u -> unsigned int
-         */
-        return preg_match('/^[Xbsfdnxiu]+$/i', $structure);
-    }
-    private function CheckXMLSyntax($xmlData): bool
-    {
-        if ( empty($xmlData) )
-            return false;
-
-        $xmlcontent = $xmlData;
-        if( substr($xmlcontent, 0,3) == pack("CCC",0xef,0xbb,0xbf) )
-            $xmlcontent = substr($xmlcontent, 3);
-
-        if (!mb_check_encoding($xmlcontent,"utf-8"))
-            $xmlcontent = mb_convert_encoding($xmlcontent, 'UTF-8', 'ISO-8859-1');
-
-        $newxmlcontent = mb_convert_encoding($xmlcontent, 'UTF-8', 'ISO-8859-1');
-
-        if (mb_check_encoding($newxmlcontent,"utf-8") && $newxmlcontent != $xmlcontent)
-            $xmlcontent = $newxmlcontent;
-
-        if (stripos($xmlcontent, '<!DOCTYPE html') !== false || stripos($xmlcontent, '<html') !== false)
-            return false;
-
-        if(simplexml_load_string($xmlcontent) === FALSE)
-            return false;
-
-        return true;
-    }
     public function Load(): bool
     {
         Log::WriteLogAndPrint("-----> Loading Configuration file... ");
@@ -74,7 +35,7 @@ class Config
             return false;
         }
 
-        if (!$this->CheckXMLSyntax($xmlfile))
+        if (!Utility::CheckXMLSyntax($xmlfile))
         {
             Log::WriteLogNoTimeAndPrint("Failed: Syntax errors. Details in log.\n");
 
@@ -174,7 +135,7 @@ class Config
 
             $FileFormat = $attributesList['format']['Value'];
 
-            if (!$FileExtensionIsSet && !$this->IsValidFormat($FileFormat))
+            if (!$FileExtensionIsSet && !Utility::IsValidFormat($FileFormat))
             {
                 Log::WriteLogAndPrint("\t WARNING: For file name '%s' contains an invalid character in format attribute. Ignoring element '%u'\n", $FileName, $fileID);
                 continue;
@@ -182,9 +143,9 @@ class Config
 
             // Quizas mejor usar filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) ???
             $outFormats = [
-                'ToCSV' => $this->ValidateBool($attributesList['ToCSV']['Value']),
-                'ToDBC' => $this->ValidateBool($attributesList['ToDBC']['Value']),
-                'ToSQL' => $this->ValidateBool($attributesList['ToSQL']['Value'])
+                'ToCSV' => Utility::ValidateBool($attributesList['ToCSV']['Value']),
+                'ToDBC' => Utility::ValidateBool($attributesList['ToDBC']['Value']),
+                'ToSQL' => Utility::ValidateBool($attributesList['ToSQL']['Value'])
             ];
 
             FindFiles::FileToFind($DirectoryName, $FileName, $FileFormat, $isRecursive, $FileExtensionIsSet ? $FileExtension : "", $outFormats, $fileID);
@@ -192,9 +153,5 @@ class Config
 
         Log::WriteLog("-----> All OK after checking XML attributes of files to parse.\n");
         return true;
-    }
-    private function ValidateBool($var): bool
-    {
-        return preg_match('/^(true)$/i', $var);
     }
 }
