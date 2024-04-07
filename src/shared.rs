@@ -85,7 +85,6 @@ pub struct StructFileData {
     records: Vec<StructRecord>,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct OutputFormat {
     pub is_set_to_csv:  bool,
@@ -93,7 +92,6 @@ pub struct OutputFormat {
     pub is_set_to_sql:  bool,
 }
 
-#[allow(dead_code)]
 impl OutputFormat {
     pub fn new() -> Self {
         Self {
@@ -104,7 +102,6 @@ impl OutputFormat {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Debug, Serialize)]
 pub struct StructXMLFileInfo {
     pub file_name:                  String,
@@ -135,7 +132,6 @@ impl StructXMLFileInfo {
     }
 }
 
-#[allow(dead_code)]
 pub struct SaveFileInfo {
     record_size:            u32,
     total_fields:           u32,
