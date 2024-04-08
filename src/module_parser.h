@@ -1,5 +1,5 @@
-#ifndef _MODULE_PARSER_H_
-#define _MODULE_PARSER_H_
+#ifndef MODULE_PARSER_H
+#define MODULE_PARSER_H
 
 #include "pch.h"
 #include "shared.h"

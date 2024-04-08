@@ -1,9 +1,9 @@
-#ifndef _PCH_H_
-#define _PCH_H_
+#ifndef PCH_H
+#define PCH_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <map>
 #include <fstream>
 #include <vector>
@@ -11,27 +11,27 @@
 #include <memory>
 #include <utility>
 
-#define _CODENAME "Zitacuaro"
-#define _VERSION "3.1"
+#define CODENAME "Zitacuaro"
+#define VERSION "3.1"
 
 #ifdef __linux__
     #include "linux/getch.h"
-    #define _OS "Linux"
+    #define OS "Linux"
 
     #ifdef __x86_64__
-        #define _ARQUITECTURA "AMD64"
+        #define ARQUITECTURA "AMD64"
     #else
-        #define _ARQUITECTURA "i386"
+        #define ARQUITECTURA "i386"
     #endif
 #elif defined _WIN32 || defined _WIN64
     //#pragma warning(disable: 4996 4267)
     #include <conio.h>
-    #define _OS "Windows"
+    #define OS "Windows"
 
     #ifdef _WIN64
-        #define _ARQUITECTURA "x64"
+        #define ARQUITECTURA "x64"
     #else
-        #define _ARQUITECTURA "x86"
+        #define ARQUITECTURA "x86"
     #endif
 #endif
 

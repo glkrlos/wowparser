@@ -1,5 +1,5 @@
-#ifndef _FINDFILES_H_
-#define _FINDFILES_H_
+#ifndef FINDFILES_H
+#define FINDFILES_H
 
 #include "pch.h"
 #include "shared.h"

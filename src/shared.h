@@ -1,5 +1,5 @@
-#ifndef _SHARED_H_
-#define _SHARED_H_
+#ifndef SHARED_H
+#define SHARED_H
 
 #include "pch.h"
 #include <algorithm>

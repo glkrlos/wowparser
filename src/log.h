@@ -1,5 +1,5 @@
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef LOG_H
+#define LOG_H
 
 #include "pch.h"
 #include "shared.h"

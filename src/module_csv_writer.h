@@ -1,5 +1,5 @@
-#ifndef _MODULE_CSV_WRITER_H_
-#define _MODULE_CSV_WRITER_H_
+#ifndef MODULE_CSV_WRITER_H
+#define MODULE_CSV_WRITER_H
 
 #include "pch.h"
 #include "shared.h"

@@ -1,5 +1,5 @@
-#ifndef _MODULE_CONFIG_READER_H_
-#define _MODULE_CONFIG_READER_H_
+#ifndef MODULE_CONFIG_READER_H
+#define MODULE_CONFIG_READER_H
 
 #include "pch.h"
 #include "shared.h"

@@ -1,5 +1,5 @@
-#ifndef _PROGRESSBAR_H
-#define _PROGRESSBAR_H
+#ifndef PROGRESSBAR_H
+#define PROGRESSBAR_H
 
 #include "pch.h"
 

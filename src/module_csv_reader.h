@@ -1,5 +1,5 @@
-#ifndef _MODULE_CSV_READER_H_
-#define _MODULE_CSV_READER_H_
+#ifndef MODULE_CSV_READER_H
+#define MODULE_CSV_READER_H
 
 #include "pch.h"
 #include "shared.h"
