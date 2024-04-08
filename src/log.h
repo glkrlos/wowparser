@@ -4,9 +4,9 @@
 #include "pch.h"
 #include "shared.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 #ifdef _WIN32
-    #include <time.h>
+    #include <ctime>
 #endif
 
 #define WoWParserLogOutPut "wowparser3.log"
@@ -16,10 +16,10 @@ class cLog
     public:
         cLog();
         static cLog* Instance();
-        void WriteLog(const char* args, ...);
-        void WriteLogNoTime(const char* args, ...);
-        void WriteLogNoTimeAndPrint(const char* args, ...);
-        void WriteLogAndPrint(const char* args, ...);
+        static void WriteLog(const char* args, ...);
+        static void WriteLogNoTime(const char* args, ...);
+        static void WriteLogNoTimeAndPrint(const char* args, ...);
+        static void WriteLogAndPrint(const char* args, ...);
 };
 
 #define Log cLog::Instance()
