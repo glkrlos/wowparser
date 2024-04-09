@@ -11,8 +11,8 @@
 #include <memory>
 #include <utility>
 
-#define CODENAME "Zitacuaro"
-#define VERSION "3.1"
+#define CODENAME "Huamantla"
+#define VERSION "4.0"
 
 #ifdef __linux__
     #include "linux/getch.h"
