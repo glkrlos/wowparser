@@ -100,9 +100,11 @@ Known Bugs in version 2.0:
  Compiled under Linux Debian 12
  1. apt-get update
  2. apt-get upgrade
- 3. apt-get install make mingw-w64 mingw-w64-common mingw-w64-i686-dev mingw-w64-tools mingw-w64-x86-64-dev g++-multilib libc6-dev-i386
- 4. make
- 5. It's all, you have all executables for 32 and 64 bits (Linux and Windows under bin directory).
+ 3. apt-get install cmake make mingw-w64 mingw-w64-common mingw-w64-i686-dev mingw-w64-tools mingw-w64-x86-64-dev g++-multilib libc6-dev-i386
+ 4. mkdir build
+ 5. cd build/
+ 6. make 
+ 7. It's all, you have all executables for 32 and 64 bits for Linux and Windows under bin directory.
 
 ## License
 
