@@ -103,8 +103,9 @@ Known Bugs in version 2.0:
  3. apt-get install cmake make mingw-w64 mingw-w64-common mingw-w64-i686-dev mingw-w64-tools mingw-w64-x86-64-dev g++-multilib libc6-dev-i386
  4. mkdir build
  5. cd build/
- 6. make 
- 7. It's all, you have all executables for 32 and 64 bits for Linux and Windows under bin directory.
+ 6. cmake ../
+ 7. make
+ 8. It's all, you have all executables for 32 and 64 bits for Linux and Windows under bin directory.
 
 ## License
 
