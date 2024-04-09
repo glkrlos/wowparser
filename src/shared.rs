@@ -43,33 +43,32 @@ pub enum EnumFileType {
     WdbQuestCacheFile       = 14,
 }
 
-#[allow(non_snake_case)]
 #[allow(dead_code)]
 struct StructField {
-    ID:             u32,
-    Type:           EnumFieldTypes,
-    StringValue:    u32,
-    UIntValue:      u32,
-    IntValue:       i32,
-    BoolValue:      u32,
-    ByteValue:      i8,
-    UByteValue:     u8,
-    FloatValue:     f32,
+    id:             u32,
+    field_type:     EnumFieldTypes,
+    string_value:   u32,
+    uint_value:     u32,
+    int_value:      i32,
+    bool_value:     u32,
+    byte_value:     i8,
+    ubyte_value:    u8,
+    float_value:    f32,
 }
 
 #[allow(dead_code)]
 impl StructField {
     fn new() -> Self {
         Self {
-            ID:             0,
-            Type:           EnumFieldTypes::TypeNone,
-            StringValue:    0,
-            UIntValue:      0,
-            IntValue:       0,
-            BoolValue:      0,
-            ByteValue:      0,
-            UByteValue:     0,
-            FloatValue:     0.0,
+            id:             0,
+            field_type:     EnumFieldTypes::TypeNone,
+            string_value:   0,
+            uint_value:     0,
+            int_value:      0,
+            bool_value:     0,
+            byte_value:     0,
+            ubyte_value:    0,
+            float_value:    0.0,
         }
     }
 }
