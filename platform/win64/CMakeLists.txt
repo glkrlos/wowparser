@@ -1,0 +1,5 @@
+message(STATUS "Configuring for Windows 64-bits")
+set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+set(CMAKE_CXX_FLAGS "-Wno-unused-function ${CMAKE_CXX_FLAGS}")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+add_executable(wowparser3_x64 ${SOURCES})

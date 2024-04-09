@@ -1,0 +1,5 @@
+message(STATUS "Configuring for Linux 64-bits")
+set(CMAKE_CXX_COMPILER g++)
+set(CMAKE_CXX_FLAGS "-m64 ${CMAKE_CXX_FLAGS}")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+add_executable(wowparser3_amd64 ${SOURCES})

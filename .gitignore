@@ -6,3 +6,4 @@ Win32/
 *.user
 *.gch
 revision.h
+build/
