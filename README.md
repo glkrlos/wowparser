@@ -7,10 +7,7 @@ The project will be completely rebuilt in:
  - Rust language at [rust branch](https://github.com/glkrlos/wowparser/tree/rust)
  - PHP language at [php branch](https://github.com/glkrlos/wowparser/tree/php)
 
-New version for language C++ still pending for development.
-
-## Versions up to 3.1 are in the C++ language
- - These versions are in branch [master](https://github.com/glkrlos/wowparser)
+New version for C++ project is now under development on [master](https://github.com/glkrlos/wowparser) branch.
 
 ## WoWParser 3.1 (Zitacuaro):
  * New Version 3.1

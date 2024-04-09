@@ -9,7 +9,7 @@
     #include <ctime>
 #endif
 
-#define WoWParserLogOutPut "wowparser3.log"
+#define WoWParserLogOutPut "wowparser4.log"
 
 class cLog
 {

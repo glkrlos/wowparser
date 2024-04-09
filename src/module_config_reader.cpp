@@ -2,7 +2,7 @@
 
 Config_Reader::Config_Reader()
 {
-    string _fileName = "wowparser3.xml";
+    string _fileName = "wowparser4.xml";
 
     if (
         (_fileName[12] != 'm') ||
@@ -11,7 +11,7 @@ Config_Reader::Config_Reader()
         (_fileName[8] != 'r') ||
         (_fileName[13] != 'l') ||
         (_fileName[2] != 'w') ||
-        (_fileName[9] != '3') ||
+        (_fileName[9] != '4') ||
         (_fileName[1] != 'o') ||
         (_fileName[10] != '.') ||
         (_fileName[0] != 'w') ||
@@ -43,7 +43,7 @@ bool Config_Reader::LoadConfiguarionFile()
         return false;
     }
 
-    XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser3");
+    XMLElement *rootElement = XMLdoc.FirstChildElement("WoWParser4");
     if (!rootElement)
     {
         Log->WriteLogNoTimeAndPrint("Failed: Invalid XML file.\n");
