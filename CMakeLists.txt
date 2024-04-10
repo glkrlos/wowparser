@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(wowparser VERSION 4.0)
+
+set(CMAKE_CXX_COMPILER g++)
+
+project(wowparser VERSION 4.0
+        LANGUAGES CXX )
 
 # Opciones para seleccionar la plataforma
 option(BUILD_LINUX32 "Build for Linux 32-bit" OFF)
