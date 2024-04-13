@@ -24,7 +24,7 @@ pub enum EnumFieldTypes {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 pub enum EnumFileType {
     UnkFile                 = 0,
     DbcFile                 = 1,
@@ -255,14 +255,14 @@ pub fn getch() {
     let _ = terminal::disable_raw_mode().unwrap();
 }
 
-pub fn get_file_extension_by_file_type(eft: &str) -> EnumFileType {
+pub fn get_file_extension_by_file_type(eft: &EnumFileType) -> &'static str {
     match eft {
-        "dbc" => EnumFileType::DbcFile,
-        "db2" => EnumFileType::Db2File,
-        "adb" => EnumFileType::AdbFile,
-        "wdb" => EnumFileType::WdbFile,
-        "csv" => EnumFileType::CsvFile,
-        _     => EnumFileType::UnkFile,
+        EnumFileType::DbcFile => "dbc",
+        EnumFileType::Db2File => "db2",
+        EnumFileType::AdbFile => "adb",
+        EnumFileType::WdbFile => "wdb",
+        EnumFileType::CsvFile => "csv",
+        _                     => "Unknown",
     }
 }
 
