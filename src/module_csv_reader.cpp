@@ -41,6 +41,11 @@ bool CSV_Reader::CheckCSV()
     return true;
 }
 
+/*
+ * TODO
+ * -> Implement separator char as option
+ * -> Fix for \n \r \t on strings, correct behavior is read until next double quoted is ended even if is a new line in CSV file, then, count for correct columns
+ */
 bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &mapFields)
 {
     unsigned int fieldID = 0;

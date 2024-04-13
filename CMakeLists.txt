@@ -26,20 +26,12 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Os -s -Wall -msse2 -mfpmath=sse -std=c++20 -static -static-libgcc -static-libstdc++")
 
+file(GLOB source_parser ${PROJECT_SOURCE_DIR}/src/**.cpp ${PROJECT_SOURCE_DIR}/src/**.h)
+file(GLOB source_lib ${PROJECT_SOURCE_DIR}/lib/tinyxml2/**.cpp ${PROJECT_SOURCE_DIR}/lib/tinyxml2/**.h)
+
 set(SOURCES
-        ${PROJECT_SOURCE_DIR}/src/findfiles.cpp
-        ${PROJECT_SOURCE_DIR}/src/log.cpp
-        ${PROJECT_SOURCE_DIR}/src/main.cpp
-        ${PROJECT_SOURCE_DIR}/src/md5.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_config_reader.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_csv_reader.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_csv_writer.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_dbc_writer.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_parser.cpp
-        ${PROJECT_SOURCE_DIR}/src/module_sql_writer.cpp
-        ${PROJECT_SOURCE_DIR}/src/pch.cpp
-        ${PROJECT_SOURCE_DIR}/src/ProgressBar.cpp
-        ${PROJECT_SOURCE_DIR}/src/tinyxml2.cpp
+        ${source_parser}
+        ${source_lib}
 )
 
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/revision.sh)

@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
-#include "tinyxml2.h"
+#include "../lib/tinyxml2/tinyxml2.h"
 #include "findfiles.h"
 
 #ifdef _WIN32
