@@ -52,24 +52,6 @@ bool CSV_Writer::CreateCSVFile()
                         if (_stringTexts[x] == '"')
                             outText.append("\"");
 
-                        if (_stringTexts[x] == '\r')
-                        {
-                            outText.append("||||r||||");
-                            continue;
-                        }
-
-                        if (_stringTexts[x] == '\n')
-                        {
-                            outText.append("{{{{n}}}}");
-                            continue;
-                        }
-
-                        if (_stringTexts[x] == '\t')
-                        {
-                            outText.append("[[[[t]]]]");
-                            continue;
-                        }
-
                         outText.append(Shared->ToStr(_stringTexts[x]));
                     }
                     outText.append("\"");

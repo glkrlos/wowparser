@@ -133,48 +133,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
 
                     break;
                 }
-                else if (originalText[x] == '|' &&
-                     originalText[x + 1] == '|' &&
-                     originalText[x + 2] == '|' &&
-                     originalText[x + 3] == '|' &&
-                     originalText[x + 4] == 'r' &&
-                     originalText[x + 5] == '|' &&
-                     originalText[x + 6] == '|' &&
-                     originalText[x + 7] == '|' &&
-                     originalText[x + 8] == '|')
-                {
-                    x += 8;
-                    _fieldData += '\r';
-                    continue;
-                }
-                else if (originalText[x] == '{' &&
-                     originalText[x + 1] == '{' &&
-                     originalText[x + 2] == '{' &&
-                     originalText[x + 3] == '{' &&
-                     originalText[x + 4] == 'n' &&
-                     originalText[x + 5] == '}' &&
-                     originalText[x + 6] == '}' &&
-                     originalText[x + 7] == '}' &&
-                     originalText[x + 8] == '}')
-                {
-                    x += 8;
-                    _fieldData += '\n';
-                    continue;
-                }
-                else if (originalText[x] == '[' &&
-                     originalText[x + 1] == '[' &&
-                     originalText[x + 2] == '[' &&
-                     originalText[x + 3] == '[' &&
-                     originalText[x + 4] == 't' &&
-                     originalText[x + 5] == ']' &&
-                     originalText[x + 6] == ']' &&
-                     originalText[x + 7] == ']' &&
-                     originalText[x + 8] == ']')
-                {
-                    x += 8;
-                    _fieldData += '\t';
-                    continue;
-                }
                 else
                     _fieldData += originalText[x];
 
