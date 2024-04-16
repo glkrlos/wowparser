@@ -95,7 +95,7 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                             currentState = StateCSVFile::StringField;
                             continue;
                         case ' ':
-                            Log->WriteLogAndPrint("FAILED: Missing \" in the start of string at field '%u'. If you want to put an empty text just leave it empty or if is a number you must not use spaces at line '%u'.\n", mapFields.size() + 1, rowID);
+                            Log->WriteLogNoTime("FAILED: Unexpected empty spaces. There are blank spaces, but it is not a text. If you want to write a text, enclose it in double quotes. If it is an empty text, just leave it empty. If it is a number, it cannot have empty spaces, or simply leave the field empty instead. In field '%u' on line '%u'.\n", mapFields.size() + 1, rowID);
                             return false;
                         default:
                             currentValue += currentCharacter;
