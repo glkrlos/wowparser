@@ -7,7 +7,16 @@ The project will be completely rebuilt in:
  - Rust language at [rust branch](https://github.com/glkrlos/wowparser/tree/rust)
  - PHP language at [php branch](https://github.com/glkrlos/wowparser/tree/php)
 
-New version for C++ project is now under development on [master](https://github.com/glkrlos/wowparser) branch.
+New version for C++ project is now under development on [master](https://github.com/glkrlos/wowparser) branch, with the next changelog:
+
+New:
+* CSV Parser: Now works with multi-line strings as expected.
+
+Fixes:
+* CSV Parser: Removed hack for handle characters like \t \n and \r during parse and write. 
+
+Pending Improvements:
+* CSV Parser: Ability to select separator and quoted character manually in config. 
 
 ## WoWParser 3.1 (Zitacuaro):
  * New Version 3.1
