@@ -77,7 +77,8 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
         /// Para cada iteración incrementamos el ID del row
         rowID++;
 
-        for (auto pCurrentCharacter = value.begin(); pCurrentCharacter != value.end(); ++pCurrentCharacter)
+        unsigned int countCurrentCharacter = 0;
+        for (auto pCurrentCharacter = value.begin(); pCurrentCharacter != value.end(); ++pCurrentCharacter, countCurrentCharacter++)
         {
             char currentCharacter = *pCurrentCharacter;
 
@@ -89,13 +90,16 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                         case ',':
                             mapFields.insert(pair<unsigned int, string>(fieldID++, currentValue));
                             currentValue = "";
-                            break;
+                            continue;
                         case '"':
                             currentState = StateCSVFile::StringField;
-                            break;
+                            continue;
+                        case ' ':
+                            Log->WriteLogAndPrint("FAILED: Missing \" in the start of string at field '%u'. If you want to put an empty text just leave it empty or if is a number you must not use spaces at line '%u'.\n", mapFields.size() + 1, rowID);
+                            return false;
                         default:
                             currentValue += currentCharacter;
-                            break;
+                            continue;
                     }
                     break;
                 case StateCSVFile::StringField:
@@ -103,10 +107,10 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                     {
                         case '"':
                             currentState = StateCSVFile::QuotedOnStringField;
-                            break;
+                            continue;
                         default:
                             currentValue += currentCharacter;
-                            break;
+                            continue;
                     }
                     break;
                 case StateCSVFile::QuotedOnStringField:
@@ -116,14 +120,17 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                             mapFields.insert(pair<unsigned int, string>(fieldID++, currentValue));
                             currentValue = "";
                             currentState = StateCSVFile::NoQuotedField;
-                            break;
+                            continue;
                         case '"':
                             currentValue += currentCharacter;
                             currentState = StateCSVFile::StringField;
-                            break;
+                            continue;
                         default:
-                            currentState = StateCSVFile::NoQuotedField;
-                            break;
+                            int _temp = countCurrentCharacter - 30;
+                            unsigned int min = _temp < 0 ? 0 : _temp;
+                            unsigned int max = countCurrentCharacter - min;
+                            Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at line %u after '%s'\n", mapFields.size() + 1, rowID, value.substr(min, max).c_str());
+                            return false;
                     }
                     break;
             }

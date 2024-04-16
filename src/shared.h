@@ -4,13 +4,6 @@
 #include "pch.h"
 #include <algorithm>
 
-enum StateCSVFile
-{
-    NoQuotedField,
-    StringField,
-    QuotedOnStringField
-};
-
 enum enumFieldTypes
 {
     type_NONE   = 0,

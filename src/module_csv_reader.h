@@ -4,6 +4,13 @@
 #include "pch.h"
 #include "shared.h"
 
+enum StateCSVFile
+{
+    NoQuotedField,
+    StringField,
+    QuotedOnStringField
+};
+
 class CSV_Reader : public SaveFileInfo
 {
     public:
