@@ -69,50 +69,6 @@ bool SQL_Writer::CreateSQLFile()
                         if (_stringTexts[x] == '\\')
                             outText += '\\';
 
-                        if (_stringTexts[x] == '|' &&
-                            _stringTexts[x + 1] == '|' &&
-                            _stringTexts[x + 2] == '|' &&
-                            _stringTexts[x + 3] == '|' &&
-                            _stringTexts[x + 4] == 'r' &&
-                            _stringTexts[x + 5] == '|' &&
-                            _stringTexts[x + 6] == '|' &&
-                            _stringTexts[x + 7] == '|' &&
-                            _stringTexts[x + 8] == '|')
-                        {
-                            x += 8;
-                            outText += '\r';
-                            continue;
-                        }
-
-                        if (_stringTexts[x] == '{' &&
-                            _stringTexts[x + 1] == '{' &&
-                            _stringTexts[x + 2] == '{' &&
-                            _stringTexts[x + 3] == '{' &&
-                            _stringTexts[x + 4] == 'n' &&
-                            _stringTexts[x + 5] == '}' &&
-                            _stringTexts[x + 6] == '}' &&
-                            _stringTexts[x + 7] == '}' &&
-                            _stringTexts[x + 8] == '}')
-                        {
-                            x += 8;
-                            outText += '\n';
-                            continue;
-                        }
-
-                        if (_stringTexts[x] == '[' &&
-                            _stringTexts[x + 1] == '[' &&
-                            _stringTexts[x + 2] == '[' &&
-                            _stringTexts[x + 3] == '[' &&
-                            _stringTexts[x + 4] == 't' &&
-                            _stringTexts[x + 5] == ']' &&
-                            _stringTexts[x + 6] == ']' &&
-                            _stringTexts[x + 7] == ']' &&
-                            _stringTexts[x + 8] == ']')
-                        {
-                            x += 8;
-                            outText += '\t';
-                            continue;
-                        }
                         outText.append(Shared->ToStr(_stringTexts[x]));
                     }
                     outText.append("\"");

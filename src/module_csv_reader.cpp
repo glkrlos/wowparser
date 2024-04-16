@@ -42,10 +42,160 @@ bool CSV_Reader::CheckCSV()
 }
 
 /*
- * TODO
- * -> Implement separator char as option
- * -> Fix for \n \r \t on strings, correct behavior is read until next double quoted is ended even if is a new line in CSV file, then, count for correct columns
+ * TODO Implement separator char as option
  */
+bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
+{
+    map<unsigned int, string> mapFields;
+    unsigned int fieldID = 0;
+    unsigned int rowID = 1;
+    string currentValue = "";
+    bool stillOnString = false;
+    unsigned int InitialStringRowID = 0;
+
+    StateCSVFile currentState = StateCSVFile::NoQuotedField;
+
+    for (auto& [id, value] : _fileData)
+    {
+        /// Solo reiniciamos fieldID a 1 cuando el estado esta en NoQuotedField, debido a que como se guardan los datos en un mapa
+        /// estos datos se pueden reescribirce cuando es un string activo en el estado por que el key del mapa es único
+        if (currentState == StateCSVFile::NoQuotedField)
+        {
+            fieldID = 0;
+        }
+
+        /// Si seguimos en estado de StringField o QuotedOnStringField, entonces agregamos un salto de linea
+        if (stillOnString)
+        {
+            currentValue += "\n";
+
+            /// Guardamos el rowID del elemento anterior antes de sumar con rowID++, para saber desde que linea se inicio el string
+            if (InitialStringRowID == 0)
+                InitialStringRowID = rowID;
+        }
+
+        /// Para cada iteración incrementamos el ID del row
+        rowID++;
+
+        for (auto pCurrentCharacter = value.begin(); pCurrentCharacter != value.end(); ++pCurrentCharacter)
+        {
+            char currentCharacter = *pCurrentCharacter;
+
+            switch (currentState)
+            {
+                case StateCSVFile::NoQuotedField:
+                    switch (currentCharacter)
+                    {
+                        case ',':
+                            mapFields.insert(pair<unsigned int, string>(fieldID++, currentValue));
+                            currentValue = "";
+                            break;
+                        case '"':
+                            currentState = StateCSVFile::StringField;
+                            break;
+                        default:
+                            currentValue += currentCharacter;
+                            break;
+                    }
+                    break;
+                case StateCSVFile::StringField:
+                    switch (currentCharacter)
+                    {
+                        case '"':
+                            currentState = StateCSVFile::QuotedOnStringField;
+                            break;
+                        default:
+                            currentValue += currentCharacter;
+                            break;
+                    }
+                    break;
+                case StateCSVFile::QuotedOnStringField:
+                    switch (currentCharacter)
+                    {
+                        case ',':
+                            mapFields.insert(pair<unsigned int, string>(fieldID++, currentValue));
+                            currentValue = "";
+                            currentState = StateCSVFile::NoQuotedField;
+                            break;
+                        case '"':
+                            currentValue += currentCharacter;
+                            currentState = StateCSVFile::StringField;
+                            break;
+                        default:
+                            currentState = StateCSVFile::NoQuotedField;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        /// Si ya estamos en el estado de NoQuotedField, entonces no requerimos mas stillOnString si sigue establecido
+        /// esto para prevenir agregar un salto de linea en currentValue
+        if (stillOnString && currentState == StateCSVFile::NoQuotedField)
+        {
+            stillOnString = false;
+        }
+
+#ifdef DEBUG
+        printf("mapFields '%lu' -> _totalFields '%u' -> currentState '%i', StateCSVFile::NoQuotedField '%i'\n", mapFields.size(), _totalFields, currentState, StateCSVFile::NoQuotedField);
+#endif
+
+        /// Si currentState es diferente de NoQuotedField y ademas, mapFields size + 1 es menor al total de fields
+        /// significa que estamos ante un string aun y continuaremos a la siguiente linea
+        if (mapFields.size() + 1 < _totalFields && currentState != StateCSVFile::NoQuotedField)
+        {
+#ifdef DEBUG
+            printf("Pasa por aqui %i, '%s' '%lu'\n", currentState, currentValue.c_str(), mapFields.size());
+#endif
+
+            stillOnString = true;
+            continue;
+        }
+
+        /// Insertamos el ultimo field que quedo despues de la coma final o despues de la ultima comilla, salvo que el estado
+        /// sea diferente de NoQuotedField y que ademas aun sea menor a _totalFields
+        mapFields.insert(pair<unsigned int, string>(fieldID++, currentValue));
+        currentValue = "";
+
+        if ( (currentState != StateCSVFile::QuotedOnStringField || currentState != StateCSVFile::StringField) && mapFields.size() != _totalFields)
+        {
+            Log->WriteLogNoTime("FAILED: Expected '%u' fields not '%u' fields in line '%u'", _totalFields, mapFields.size(), rowID);
+
+            if (InitialStringRowID)
+                Log->WriteLogNoTime(" -> Error started from line '%u' and ended in line '%u'", InitialStringRowID, rowID);
+
+            Log->WriteLogNoTime("\n");
+
+            return false;
+        }
+
+#ifdef DEBUG
+        printf("%li %u\n", mapFields.size(), _totalFields);
+#endif
+
+        newData.push_back(mapFields);
+        mapFields.clear();
+
+#ifdef DEBUG
+        printf("Estado actual es: %i < debe ser 0\n", currentState);
+        printf("\nCURRENT VALUE: %s\n", currentValue.c_str());
+        printf("%s\n", value.c_str());
+#endif
+    }
+
+#ifdef TEST
+    for (auto& test: newData)
+    {
+        printf("Record:\n");
+        for (auto& [id, data]: test)
+        {
+            printf("%u -> %s\n", id, data.c_str());
+        }
+    }
+#endif
+    return true;
+}
+
 bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &mapFields)
 {
     unsigned int fieldID = 0;
@@ -60,8 +210,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
     {
         bool isFirstChar = (x == 0);
         bool isLastChar = (x + 1) >= originalText.size();
-        bool isOnlyOneChar = isFirstChar && isLastChar;
-        bool isOnlyLastChar = !isFirstChar && isLastChar;
 
         if (originalText[x] == ',')
         {
@@ -81,75 +229,6 @@ bool CSV_Reader::ExtractFields(string originalText, map<unsigned int, string> &m
             }
 
             continue;
-        }
-        else if (originalText[x] == '"')
-        {
-            if (!isFirstChar && originalText[x - 1] != ',')
-            {
-                unsigned int min = x;
-                unsigned int max = originalText.size() < 30 ? originalText.size() : 30;
-                Log->WriteLogNoTime("FAILED: Unexpected start of string in field '%u' Expected ',' at row %u before '%s'\n", mapFields.size() + 1, x + 1, originalText.substr(min, max).c_str());
-                return false;
-            }
-
-            if (isOnlyOneChar)
-            {
-                Log->WriteLogNoTime("FAILED: Missing \" of string at first field. If you want to put an empty text just leave it empty.\n");
-                return false;
-                // Si despues cambio la forma de mostrar los errores, entonces lo dejo como Warning
-                //mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                //continue;
-            }
-
-            if (isOnlyLastChar)
-            {
-                Log->WriteLogNoTime("FAILED: Missing \" of string at last field (%u). If you want to put an empty text just leave it empty.\n", mapFields.size() + 1);
-                return false;
-                // Si despues cambio la forma de mostrar los errores, entonces lo dejo como Warning
-                //mapFields.insert(pair<unsigned int, string>(fieldID++, ""));
-                //continue;
-            }
-
-            x++;
-            for (; x < originalText.size(); x++)
-            {
-                bool isNotLastStringChar = (x + 1) < originalText.size();
-                bool isLastStringChar = (x + 1) >= originalText.size();
-
-                /// Si hay una comilla pueden ocurrir dos cosas
-                if (originalText[x] == '"')
-                {
-                    /// Si el siguiente caracter es otra comilla, siginifica que siguiente solo es comilla doble
-                    if (originalText[x + 1] == '"')
-                    {
-                        _fieldData += '"';
-                        x++;
-                        continue;
-                    }
-                    /// Si el siguiente caracter no es coma y no es el ultimo record, entonces se vuelve invalida la terminacion del string
-                    else if (originalText[x + 1] != ',' && isNotLastStringChar)
-                    {
-                        int _temp = x - 30;
-                        unsigned int min = _temp < 0 ? 0 : _temp;
-                        unsigned int max = x - min + 1;
-                        Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at row %u after '%s'\n", mapFields.size() + 1, x + 2, originalText.substr(min, max).c_str());
-                        return false;
-                    }
-
-                    break;
-                }
-                else
-                    _fieldData += originalText[x];
-
-                if (isLastStringChar)
-                {
-                    int _temp = (int)originalText.size() - 30;
-                    unsigned int min = _temp < 0 ? 0 : _temp;
-                    unsigned int max = originalText.size() - _temp;
-                    Log->WriteLogNoTime("FAILED: Unexpected end of line of string in field '%u' Expected '\"' at row %u before '%s'\n", mapFields.size() + 1, originalText.size() + 1, originalText.substr(min, max).c_str());
-                    return false;
-                }
-            }
         }
         else
             _fieldData += originalText[x];
@@ -396,36 +475,31 @@ bool CSV_Reader::CheckFieldValue(unsigned int fieldID, enumFieldTypes fieldType,
 
 bool CSV_Reader::CheckFieldsOfEachRecordAndSaveAllData()
 {
+    vector<map<unsigned int, string>> LoadedData;
+
+    if (!ExtractDataFields(LoadedData))
+        return false;
+
     unsigned int currentRecord = 0;
     vector<structRecord> Records;
-    for (auto itRecords = _fileData.begin(); itRecords != _fileData.end(); itRecords++, currentRecord++)
+
+    for (auto itRecords = LoadedData.begin(); itRecords != LoadedData.end(); itRecords++, currentRecord++)
     {
-        map<unsigned int, string> fieldsOfCurrentRecord;
-
-        if (!ExtractFields(itRecords->second, fieldsOfCurrentRecord))
-            return false;
-
-        if (fieldsOfCurrentRecord.size() != _totalFields)
-        {
-            Log->WriteLogNoTime("FAILED: Expected '%u' fields not '%u' fields in line '%u'.\n", _totalFields, fieldsOfCurrentRecord.size(), itRecords->first + 1);
-            return false;
-        }
-
-        for (auto & itFields : fieldsOfCurrentRecord)
+        for (auto& [fieldID, recordValue] : *itRecords)
         {
             // solamente para el caso que sea un string entonces simplemente lo ignoramos
-            if (GetFieldType(itFields.first) == type_STRING)
+            if (GetFieldType(fieldID) == type_STRING)
                 continue;
 
             // comprobamos si el tipo de dato es correcto para todos fields que deban contener numeros
-            if (!CheckFieldValue(itFields.first, GetFieldType(itFields.first), itFields.second, itRecords->first))
+            if (!CheckFieldValue(fieldID, GetFieldType(fieldID), recordValue, currentRecord))
                 return false;
         }
 
         // Guardamos la informacion desde aqui
         vector<structField> Fields;
         unsigned int currentField = 0;
-        for (auto itFields = fieldsOfCurrentRecord.begin(); itFields != fieldsOfCurrentRecord.end(); itFields++, currentField++)
+        for (auto itFields = itRecords->begin(); itFields != itRecords->end(); itFields++, currentField++)
         {
             /// Guardamos primero los Fields osea las columnas del registro actual
             structField sField;

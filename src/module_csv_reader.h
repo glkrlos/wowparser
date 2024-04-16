@@ -12,6 +12,7 @@ class CSV_Reader : public SaveFileInfo
         bool CheckCSV();
         bool CheckFieldsOfEachRecordAndSaveAllData();
     private:
+        bool ExtractDataFields(vector<map<unsigned int, string>> &);
         static bool ExtractFields(string, map<unsigned int, string> &);
         bool SetFieldTypes(const string&);
         enumFieldTypes GetFieldType(unsigned int);
