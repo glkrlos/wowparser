@@ -9,14 +9,14 @@ The project will be completely rebuilt in:
 
 New version for C++ project is now under development on [master](https://github.com/glkrlos/wowparser) branch, with the next changelog:
 
-New:
+### New:
 * CSV Parser: Now works with multi-line strings as expected.
 
-Fixes:
-* CSV Parser: Removed hack for handle characters like \t \n and \r during parse and write. 
+### Fixes:
+* CSV Parser: Removed hack for handle characters like \t \n and \r during parse and write.
 
-Pending Improvements:
-* CSV Parser: Ability to select separator and quoted character manually in config. 
+### Pending Improvements:
+* CSV Parser: Ability to select separator and quoted character manually in config.
 
 ## WoWParser 3.1 (Zitacuaro):
  * New Version 3.1
