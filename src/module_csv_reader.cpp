@@ -55,8 +55,10 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
 
     StateCSVFile currentState = StateCSVFile::NoQuotedField;
 
+    unsigned int countFileData = 0;
     for (auto& [id, value] : _fileData)
     {
+        countFileData++;
         /// Solo reiniciamos fieldID a 1 cuando el estado esta en NoQuotedField, debido a que como se guardan los datos en un mapa
         /// estos datos se pueden reescribirce cuando es un string activo en el estado por que el key del mapa es único
         if (currentState == StateCSVFile::NoQuotedField)
@@ -78,9 +80,9 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
         rowID++;
 
         unsigned int countCurrentCharacter = 0;
-        for (auto pCurrentCharacter = value.begin(); pCurrentCharacter != value.end(); ++pCurrentCharacter, countCurrentCharacter++)
+        for (auto currentCharacter: value)
         {
-            char currentCharacter = *pCurrentCharacter;
+            countCurrentCharacter++;
 
             switch (currentState)
             {
@@ -128,7 +130,7 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                         default:
                             int _temp = countCurrentCharacter - 30;
                             unsigned int min = _temp < 0 ? 0 : _temp;
-                            unsigned int max = countCurrentCharacter - min;
+                            unsigned int max = countCurrentCharacter - min - 1;
                             Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at line %u after '%s'\n", mapFields.size() + 1, rowID, value.substr(min, max).c_str());
                             return false;
                     }
@@ -136,6 +138,22 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
             }
         }
 
+        if (countFileData >= _fileData.size() && currentState == StateCSVFile::StringField && mapFields.size() < _totalFields)
+        {
+#ifdef DEBUG
+            printf("->>>Ya termino %lu, %lu, totalfields: %lu, mapfields %lu, pero esta en StringFiled y es la ultima linea y field\n", countFileData, _fileData.size(), _totalFields, mapFields.size());
+#endif
+            Log->WriteLogNoTime("FAILED: Unexpected end of file -> Expected \" at the end of line '%u' -> Error started at field '%lu'", rowID, fieldID + 1);
+
+            if (InitialStringRowID)
+            {
+                Log->WriteLogNoTime(" in line '%u'", InitialStringRowID);
+            }
+
+            Log->WriteLogNoTime("\n");
+
+            return false;
+        }
         /// Si ya estamos en el estado de NoQuotedField, entonces no requerimos mas stillOnString si sigue establecido
         /// esto para prevenir agregar un salto de linea en currentValue
         if (stillOnString && currentState == StateCSVFile::NoQuotedField)

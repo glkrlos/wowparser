@@ -87,13 +87,6 @@ bool Parser::CheckStructure()
 
             if (c == '\n')
             {
-                if (currentLine.empty())
-                {
-                    Log->WriteLogNoTime("FAILED: Contains an empty line at Row '%u'.\n", rowcount + 1);
-                    Log->WriteLog("\n");
-                    return false;
-                }
-
                 /// Si el ultimo char es \n entonces decidimos si lo hacemos totalmente estricto
                 if (isLastChar)
                 {
