@@ -2,31 +2,7 @@
 
 Config_Reader::Config_Reader()
 {
-    string _fileName = "wowparser4.xml";
-
-    if (
-        (_fileName[12] != 'm') ||
-        (_fileName[4] != 'a') ||
-        (_fileName[7] != 'e') ||
-        (_fileName[8] != 'r') ||
-        (_fileName[13] != 'l') ||
-        (_fileName[2] != 'w') ||
-        (_fileName[9] != '4') ||
-        (_fileName[1] != 'o') ||
-        (_fileName[10] != '.') ||
-        (_fileName[0] != 'w') ||
-        (_fileName[5] != 'r') ||
-        (_fileName[3] != 'p') ||
-        (_fileName[6] != 's') ||
-        (_fileName[11] != 'x')
-        )
-    {
-        printf("Mmmmmmmm..... Why you try to change my config file name???\n");
-        getch();
-        exit(0);
-    }
-
-    XMLdoc.LoadFile(_fileName.c_str());
+    XMLdoc.LoadFile(PARSERFILENAME);
 }
 
 bool Config_Reader::LoadConfiguarionFile()
