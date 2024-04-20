@@ -97,7 +97,7 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                             currentState = StateCSVFile::StringField;
                             continue;
                         case ' ':
-                            Log->WriteLogNoTime("FAILED: Unexpected empty spaces. There are blank spaces, but it is not a text. If you want to write a text, enclose it in double quotes. If it is an empty text, just leave it empty. If it is a number, it cannot have empty spaces, or simply leave the field empty instead. In field '%u' on line '%u'.\n", mapFields.size() + 1, rowID);
+                            Log->WriteLogNoTime("FAILED: Unexpected empty space. There are blank space, but it is not a text. If you want to write a text, enclose it in double quotes. If it is an empty text, just leave it empty. If it is a number, it cannot have empty spaces, or simply leave the field empty instead. In field '%u' on line '%u'.\n", mapFields.size() + 1, rowID);
                             return false;
                         default:
                             currentValue += currentCharacter;
@@ -131,7 +131,7 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
                             int _temp = countCurrentCharacter - 30;
                             unsigned int min = _temp < 0 ? 0 : _temp;
                             unsigned int max = countCurrentCharacter - min - 1;
-                            Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at line %u after '%s'\n", mapFields.size() + 1, rowID, value.substr(min, max).c_str());
+                            Log->WriteLogNoTime("FAILED: Unexpected end of string in field '%u' Expected ',' at line %u after '%s'.\n", mapFields.size() + 1, rowID, value.substr(min, max).c_str());
                             return false;
                     }
                     break;
@@ -143,14 +143,14 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
 #ifdef DEBUG
             printf("->>>Ya termino %lu, %lu, totalfields: %lu, mapfields %lu, pero esta en StringFiled y es la ultima linea y field\n", countFileData, _fileData.size(), _totalFields, mapFields.size());
 #endif
-            Log->WriteLogNoTime("FAILED: Unexpected end of file -> Expected \" at the end of line '%u' -> Error started at field '%lu'", rowID, fieldID + 1);
+            Log->WriteLogNoTime("FAILED: Unexpected end of file -> Missing \" at the end of line '%u' -> Error started at field '%lu'", rowID, fieldID + 1);
 
             if (InitialStringRowID)
             {
                 Log->WriteLogNoTime(" in line '%u'", InitialStringRowID);
             }
 
-            Log->WriteLogNoTime("\n");
+            Log->WriteLogNoTime(".\n");
 
             return false;
         }
@@ -189,7 +189,7 @@ bool CSV_Reader::ExtractDataFields(vector<map<unsigned int, string>> &newData)
             if (InitialStringRowID)
                 Log->WriteLogNoTime(" -> Error started from line '%u' and ended in line '%u'", InitialStringRowID, rowID);
 
-            Log->WriteLogNoTime("\n");
+            Log->WriteLogNoTime(".\n");
 
             return false;
         }
