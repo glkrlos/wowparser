@@ -12,8 +12,6 @@
     #include <dirent.h>
 #endif
 
-#define PARSERFILENAME "wowparser4.xml"
-
 using namespace tinyxml2;
 
 class Config_Reader

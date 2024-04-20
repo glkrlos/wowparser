@@ -5,7 +5,7 @@ bool Config_Reader::LoadConfiguarionFile()
     Log->WriteLogAndPrint("-----> Loading Configuration file... ");
 
     XMLDocument XMLdoc;
-    XMLdoc.LoadFile(PARSERFILENAME);
+    XMLdoc.LoadFile(CONFIG_FILENAME);
 
     if (XMLdoc.ErrorID())
     {
