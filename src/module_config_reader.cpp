@@ -1,13 +1,11 @@
 #include "module_config_reader.h"
 
-Config_Reader::Config_Reader()
-{
-    XMLdoc.LoadFile(PARSERFILENAME);
-}
-
 bool Config_Reader::LoadConfiguarionFile()
 {
     Log->WriteLogAndPrint("-----> Loading Configuration file... ");
+
+    XMLDocument XMLdoc;
+    XMLdoc.LoadFile(PARSERFILENAME);
 
     if (XMLdoc.ErrorID())
     {

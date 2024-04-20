@@ -19,7 +19,6 @@ using namespace tinyxml2;
 class Config_Reader
 {
     public:
-        Config_Reader();
         bool LoadConfiguarionFile();
     private:
         static bool IsValidFormat(const string& structure)
