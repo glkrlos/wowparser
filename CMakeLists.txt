@@ -26,8 +26,8 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Os -s -Wall -msse2 -mfpmath=sse -std=c++20 -static -static-libgcc -static-libstdc++")
 
-file(GLOB source_parser ${PROJECT_SOURCE_DIR}/src/**.cpp ${PROJECT_SOURCE_DIR}/src/**.h)
-file(GLOB source_lib ${PROJECT_SOURCE_DIR}/lib/tinyxml2/**.cpp ${PROJECT_SOURCE_DIR}/lib/tinyxml2/**.h)
+file(GLOB source_parser ${PROJECT_SOURCE_DIR}/src/**.cpp)
+file(GLOB source_lib ${PROJECT_SOURCE_DIR}/lib/tinyxml2/**.cpp ${PROJECT_SOURCE_DIR}/lib/md5/**.cpp)
 
 set(SOURCES
         ${source_parser}

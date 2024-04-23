@@ -4,7 +4,7 @@
 #include "pch.h"
 #include "shared.h"
 #include "module_csv_reader.h"
-#include "md5.h"
+#include "../lib/md5/md5.h"
 #include "module_dbc_writer.h"
 #include "module_csv_writer.h"
 #include "module_sql_writer.h"
