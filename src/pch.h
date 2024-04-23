@@ -16,7 +16,7 @@
 #define CONFIG_FILENAME "wowparser4.xml"
 
 #ifdef __linux__
-    #include "linux/getch.h"
+    #include "platform/linux/getch.h"
     #define OS "Linux"
 
     #ifdef __x86_64__

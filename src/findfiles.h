@@ -6,7 +6,7 @@
 #include "module_parser.h"
 
 #ifdef _WIN32
-    #include "win32/dirent.h"
+    #include "platform/win32/dirent.h"
 #else
     #include <dirent.h>
 #endif
