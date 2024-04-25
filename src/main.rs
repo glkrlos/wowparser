@@ -11,7 +11,7 @@ use console::Term;
 use findfiles::instance as FindFiles;
 
 fn print_header() {
-    write_log_and_print!("WoWParser Version {} ({}) in Pre-Alpha Development State for {} {} (Revision: {})\n", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
+    write_log_and_print!("WoWParser Version {} ({}) in Development State for {} {} (Revision: {})\n", staticdata::version(), staticdata::codename(), staticdata::os(), staticdata::arch(), staticdata::revision());
     write_log_and_print!("Hash: {}\tDate: {}\n", staticdata::hash(), staticdata::date());
     write_log_and_print!("\n");
     write_log_and_print!("Tool to Parse World of Warcraft files (DBC DB2 ADB WDB).\n");
