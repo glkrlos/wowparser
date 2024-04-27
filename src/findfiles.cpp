@@ -13,15 +13,15 @@ enumFileType cFindFiles::GetFileTypeByExtension(const string& FileName)
 {
     string _tempExt = FileName.substr(FileName.rfind('.') + 1, FileName.size());
 
-    if (Shared->CompareTexts(_tempExt, "dbc"))
+    if (Shared::CompareTexts(_tempExt, "dbc"))
         return dbcFile;
-    else if (Shared->CompareTexts(_tempExt, "db2"))
+    else if (Shared::CompareTexts(_tempExt, "db2"))
         return db2File;
-    else if (Shared->CompareTexts(_tempExt, "adb"))
+    else if (Shared::CompareTexts(_tempExt, "adb"))
         return adbFile;
-    else if (Shared->CompareTexts(_tempExt, "wdb"))
+    else if (Shared::CompareTexts(_tempExt, "wdb"))
         return wdbFile;
-    else if (Shared->CompareTexts(_tempExt, "csv"))
+    else if (Shared::CompareTexts(_tempExt, "csv"))
         return csvFile;
     else
         return unkFile;
@@ -45,16 +45,16 @@ void cFindFiles::FileToFind(const string& directory, string filename, string str
         if (ent->d_type == DT_REG)
         {
             string lowerCaseOriginalFileName = ent->d_name;
-            Shared->ToLowerCase(lowerCaseOriginalFileName);
-            Shared->ToLowerCase(filename);
-            Shared->ToLowerCase(structure);
-            Shared->ToLowerCase(fileExt);
+            Shared::ToLowerCase(lowerCaseOriginalFileName);
+            Shared::ToLowerCase(filename);
+            Shared::ToLowerCase(structure);
+            Shared::ToLowerCase(fileExt);
 
             if (!fileExt.empty())
             {
                 if (HaveExtension(lowerCaseOriginalFileName))
                 {
-                    if (Shared->CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
+                    if (Shared::CompareTexts(GetFileExtension(lowerCaseOriginalFileName), fileExt))
                     {
                         structXMLFileInfo XMLFileInfo;
                         XMLFileInfo.FileName = dirName;
@@ -82,7 +82,7 @@ void cFindFiles::FileToFind(const string& directory, string filename, string str
                     }
                 }
             }
-            else if (Shared->CompareTexts(lowerCaseOriginalFileName, filename))
+            else if (Shared::CompareTexts(lowerCaseOriginalFileName, filename))
             {
                 structXMLFileInfo XMLFileInfo;
                 XMLFileInfo.FileName = dirName;
@@ -150,10 +150,10 @@ void cFindFiles::PrintAllFileNamesByFileType()
 
                 if (First)
                 {
-                    Log->WriteLog("->%s '%u' %s file%s added", fileName.second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, Shared->GetFileExtensionByFileType(fileName.second.Type), countCurrentFiles > 1 ? "s" : "");
+                    Log->WriteLog("->%s '%u' %s file%s added", fileName.second.Type == unkFile ? "(WARNING)" : "", countCurrentFiles, Shared::GetFileExtensionByFileType(fileName.second.Type), countCurrentFiles > 1 ? "s" : "");
 
                     if (fileName.second.isSearchedByExtension)
-                        Log->WriteLogNoTime(" with extension *.%s%s", fileName.second.Type == unkFile ? GetFileExtension(fileName.first).c_str() : Shared->GetFileExtensionByFileType(fileName.second.Type), fileName.second.isRecursivelySearched ? " in recursive mode" : "");
+                        Log->WriteLogNoTime(" with extension *.%s%s", fileName.second.Type == unkFile ? GetFileExtension(fileName.first).c_str() : Shared::GetFileExtensionByFileType(fileName.second.Type), fileName.second.isRecursivelySearched ? " in recursive mode" : "");
 
                     if (fileName.second.XMLFileID)
                         Log->WriteLogNoTime(" by <file> element '%u'", fileName.second.XMLFileID);

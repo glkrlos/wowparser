@@ -69,7 +69,7 @@ bool SQL_Writer::CreateSQLFile()
                         if (_stringTexts[x] == '\\')
                             outText += '\\';
 
-                        outText.append(Shared->ToStr(_stringTexts[x]));
+                        outText.append(Shared::ToStr(_stringTexts[x]));
                     }
                     outText.append("\"");
                     fprintf(output, "%s", outText.c_str());

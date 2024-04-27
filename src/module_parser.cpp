@@ -50,7 +50,7 @@ bool Parser::Load()
     // Para los archivos binarios, debe tener al menos 20 bytes de datos al inicio
     if (((GetFileType() == csvFile || FileIsASCII()) && _fileSize < 3) || (!FileIsASCII() && _fileSize < 20))
     {
-        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_XMLFileInfo.Type));
+        Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared::GetFileExtensionByFileType(_XMLFileInfo.Type));
         Log->WriteLog("\n");
         return false;
     }
@@ -100,7 +100,7 @@ bool Parser::CheckStructure()
                 continue;
             }
 
-            currentLine.append(Shared->ToStr(static_cast<char>(_wholeFileData[x])));
+            currentLine.append(Shared::ToStr(static_cast<char>(_wholeFileData[x])));
 
             if (isLastChar)
             {
@@ -297,7 +297,7 @@ bool Parser::CheckStructure()
 
                 if (_fileSize < HeaderSize)
                 {
-                    Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared->GetFileExtensionByFileType(_XMLFileInfo.Type));
+                    Log->WriteLogNoTime("FAILED: File size is too small. Are you sure is a '%s' file?\n", Shared::GetFileExtensionByFileType(_XMLFileInfo.Type));
                     Log->WriteLog("\n");
                     return false;
                 }
@@ -687,7 +687,7 @@ bool Parser::PredictFieldTypes()
             float floatValue = GetRecord(currentRecord).GetFloat(currentField);
             if (floatValue > 0)
             {
-                string floatStringValue = Shared->ToStr(floatValue);
+                string floatStringValue = Shared::ToStr(floatValue);
                 int isFloat1 = (int)floatStringValue.find('e');
                 int isFloat2 = (int)floatStringValue.find('#');
                 int isFloat3 =(int) floatStringValue.find("nan");

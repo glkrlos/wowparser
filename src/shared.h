@@ -217,15 +217,10 @@ class SaveFileInfo
         string _stringTexts;
         map<string, vector<unsigned int>> _uniqueStringTexts;
 };
-class cShared
+class Shared
 {
     public:
-        static cShared* Instance()
-        {
-            static cShared instance;
-            return &instance;
-        }
-        template <typename T> string ToStr(T i)
+        template <typename T> static string ToStr(T i)
         {
             ostringstream buffer;
 
@@ -255,6 +250,4 @@ class cShared
         }
 };
 
-#define Shared cShared::Instance()
-// __FUNCSIG__ para imprimir el nombre de la funcion completa y localizar algun fallo si algo no sale bien
 #endif

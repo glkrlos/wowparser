@@ -287,37 +287,37 @@ bool CSV_Reader::SetFieldTypes(const string& FirstLine)
 
     for (auto & fieldName : fieldNames)
     {
-        if (Shared->CompareTexts(fieldName.second, "string"))
+        if (Shared::CompareTexts(fieldName.second, "string"))
         {
             _fieldTypes.push_back(type_STRING);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(fieldName.second, "float"))
+        else if (Shared::CompareTexts(fieldName.second, "float"))
         {
             _fieldTypes.push_back(type_FLOAT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(fieldName.second, "byte"))
+        else if (Shared::CompareTexts(fieldName.second, "byte"))
         {
             _fieldTypes.push_back(type_BYTE);
             _recordSize += 1;
         }
-        else if (Shared->CompareTexts(fieldName.second, "ubyte"))
+        else if (Shared::CompareTexts(fieldName.second, "ubyte"))
         {
             _fieldTypes.push_back(type_UBYTE);
             _recordSize += 1;
         }
-        else if (Shared->CompareTexts(fieldName.second, "int"))
+        else if (Shared::CompareTexts(fieldName.second, "int"))
         {
             _fieldTypes.push_back(type_INT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(fieldName.second, "uint"))
+        else if (Shared::CompareTexts(fieldName.second, "uint"))
         {
             _fieldTypes.push_back(type_UINT);
             _recordSize += 4;
         }
-        else if (Shared->CompareTexts(fieldName.second, "bool"))
+        else if (Shared::CompareTexts(fieldName.second, "bool"))
         {
             _fieldTypes.push_back(type_BOOL);
             _recordSize += 4;

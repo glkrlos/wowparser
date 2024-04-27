@@ -209,35 +209,35 @@ class Parser : public DataAccessor
             if (_FirstTimeGetHeader)
             {
                 _headerMagic = "";
-                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
-                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
-                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
-                _headerMagic.append(Shared->ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared::ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared::ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared::ToStr(HeaderGetChar()));
+                _headerMagic.append(Shared::ToStr(HeaderGetChar()));
 
                 _FirstTimeGetHeader = false;
             }
 
-            if (Shared->CompareTexts(_headerMagic, "WDBC"))
+            if (Shared::CompareTexts(_headerMagic, "WDBC"))
                 return dbcFile;
-            else if (Shared->CompareTexts(_headerMagic, "WCH2"))
+            else if (Shared::CompareTexts(_headerMagic, "WCH2"))
                 return adbFile;
-            else if (Shared->CompareTexts(_headerMagic, "WDB2"))
+            else if (Shared::CompareTexts(_headerMagic, "WDB2"))
                 return db2File;
-            else if (Shared->CompareTexts(_headerMagic, "BDIW"))
+            else if (Shared::CompareTexts(_headerMagic, "BDIW"))
                 return wdbitemcacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "BOMW"))
+            else if (Shared::CompareTexts(_headerMagic, "BOMW"))
                 return wdbcreaturecacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "BOGW"))
+            else if (Shared::CompareTexts(_headerMagic, "BOGW"))
                 return wdbgameobjectcacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "BDNW"))
+            else if (Shared::CompareTexts(_headerMagic, "BDNW"))
                 return wdbitemnamecacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "XTIW"))
+            else if (Shared::CompareTexts(_headerMagic, "XTIW"))
                 return wdbitemtextcacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "CPNW"))
+            else if (Shared::CompareTexts(_headerMagic, "CPNW"))
                 return wdbnpccacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "XTPW"))
+            else if (Shared::CompareTexts(_headerMagic, "XTPW"))
                 return wdbpagetextcacheFile;
-            else if (Shared->CompareTexts(_headerMagic, "TSQW"))
+            else if (Shared::CompareTexts(_headerMagic, "TSQW"))
                 return wdbquestcacheFile;
 
             return unkFile;
@@ -290,7 +290,7 @@ class Parser : public DataAccessor
                     continue;
                 }
 
-                Text.append(Shared->ToStr(c));
+                Text.append(Shared::ToStr(c));
             }
         }
     private:
