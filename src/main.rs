@@ -3,6 +3,7 @@ mod shared;
 mod log;
 mod config_reader;
 mod findfiles;
+mod parser;
 
 use indicatif::{ProgressBar, ProgressStyle};
 use std::thread;
@@ -22,7 +23,6 @@ fn print_header() {
 }
 
 fn pass1_loadconfig() {
-
     let config = config_reader::ConfigReader::new();
 
     if !config.load_configuration_file() {
@@ -45,7 +45,6 @@ fn pass1_loadconfig() {
 }
 
 fn pass2_printfilestolog() {
-
     if FindFiles().list_empty() {
         return;
     }
@@ -56,7 +55,6 @@ fn pass2_printfilestolog() {
 }
 
 fn pass3_checkheadersanddataconsistency() {
-
     if FindFiles().list_empty() {
         return;
     }
@@ -72,7 +70,7 @@ fn pass3_checkheadersanddataconsistency() {
 
     bar.set_style(style);
 
-    for (current_file_name, _current_file_info) in xml_file_info {
+    for (current_file_name, current_file_info) in xml_file_info {
         let new_filename: String;
         if current_file_name.len() > 34 {
             new_filename = format!("...{}", &current_file_name[current_file_name.len() - 31..]);
@@ -81,10 +79,13 @@ fn pass3_checkheadersanddataconsistency() {
         }
         bar.set_message(new_filename);
         thread::sleep(Duration::from_secs(1));
-        // let parser_pointer = Parser::new(&current_file_info);
-        // if parser_pointer.load() {
-        //     parser_pointer.parse_file();
-        // }
+
+        let parser_pointer = parser::Parser::new(current_file_info);
+
+        if parser_pointer.load() {
+            parser_pointer.parse_file();
+        }
+
         bar.inc(1);
     }
 
