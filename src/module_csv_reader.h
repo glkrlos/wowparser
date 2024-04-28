@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
+#include "csv/shared.h"
 
 enum StateCSVFile
 {
@@ -20,12 +21,8 @@ class CSV_Reader : public SaveFileInfo
         bool CheckFieldsOfEachRecordAndSaveAllData();
     private:
         bool ExtractDataFields(vector<map<unsigned int, string>> &);
-        static bool ExtractFields(string, map<unsigned int, string> &);
         bool SetFieldTypes(const string&);
         enumFieldTypes GetFieldType(unsigned int);
-        static const char* GetFieldTypeName(enumFieldTypes);
-
-        static bool CheckFieldValue(unsigned int, enumFieldTypes, string, unsigned int);
     protected:
         map<unsigned int, string> _fileData;
         const char *_fileName;
