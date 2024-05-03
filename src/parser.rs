@@ -1,16 +1,48 @@
 use std::fs::File;
 use std::io::Read;
+use std::marker;
 use crate::shared::{EnumFileType, StructXMLFileInfo, get_file_extension_by_file_type};
 use crate::{log, write_log, write_log_no_time};
 
-pub(crate) struct Parser {
-    file_structure: StructXMLFileInfo
+pub(crate) struct Public;
+
+pub(crate) struct Parser<Private = Public> {
+    file_structure: StructXMLFileInfo,
+    uses: marker::PhantomData<Private>
 }
 
 impl Parser {
     pub fn new(file_structure: StructXMLFileInfo) -> Self {
-        Self { file_structure }
+        Self {
+            file_structure,
+            uses: marker::PhantomData::<Public>
+        }
     }
+}
+
+impl<Private> Parser<Private> {
+    fn get_file_name(&self) -> &str {
+        self.file_structure.file_name.as_str()
+    }
+    fn get_file_type(&self) -> &EnumFileType {
+        &self.file_structure.file_type
+    }
+    fn file_is_ascii(&self, data: &[u8]) -> bool {
+        for &byte in data {
+            if byte == b'\n' || byte == b'\r' {
+                continue
+            }
+
+            if byte == 0 || (byte < 32 && byte != 9 && byte != 10 && byte != 13) {
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
+impl Parser<Public> {
     pub fn load(&self) -> bool {
         let mut file = match File::open(self.get_file_name()) {
             Ok(data) => { data }
@@ -74,29 +106,9 @@ impl Parser {
 
         true
     }
-    fn get_file_type(&self) -> &EnumFileType {
-        &self.file_structure.file_type
-    }
-    fn file_is_ascii(&self, data: &[u8]) -> bool {
-        for &byte in data {
-            if byte == b'\n' || byte == b'\r' {
-                continue
-            }
-
-            if byte == 0 || (byte < 32 && byte != 9 && byte != 10 && byte != 13) {
-                return false;
-            }
-        }
-
-        true
-    }
     pub fn parse_file(&self){
         //print!("{}", self.get_file_name());
         // just for ignoring unused struct
         let _ = self.file_structure;
-    }
-
-    fn get_file_name(&self) -> &str {
-        self.file_structure.file_name.as_str()
     }
 }
