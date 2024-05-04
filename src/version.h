@@ -4,6 +4,7 @@
 #define CODENAME "Huamantla"
 #define VERSION "4.0"
 #define CONFIG_FILENAME "wowparser4.xml"
+#define PROGRAM_STATUS "Under Development"
 
 #ifdef __linux__
 #include "platform/linux/getch.h"
