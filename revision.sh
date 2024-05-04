@@ -3,6 +3,7 @@ REV_HASH=`git describe --match init --dirty=+ --abbrev=12`
 set -- "$REV_HASH"
 IFS='-'; declare -a Array=($*)
 REVISION=${Array[1]}
+((REVISION++))
 HASH=${Array[2]:1}
 DATE=`git show -s --format=%ci`
 OUTPATH="$(dirname "$(readlink -f "$0")")"
