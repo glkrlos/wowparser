@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "shared.h"
+#include "version.h"
 #include "../lib/tinyxml2/tinyxml2.h"
 #include "findfiles.h"
 

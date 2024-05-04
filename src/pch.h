@@ -14,6 +14,5 @@
 using namespace std;
 
 #include "log.h"
-#include "version.h"
 
 #endif

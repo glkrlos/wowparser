@@ -4,6 +4,7 @@
 #include "module_config_reader.h"
 #include "module_parser.h"
 #include "ProgressBar.h"
+#include "version.h"
 
 void print_header()
 {
