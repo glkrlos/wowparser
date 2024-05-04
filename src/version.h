@@ -24,6 +24,9 @@
     #else
         #define ARQUITECTURA "x86"
     #endif
+#elif
+    #define OS "Unsupported OS"
+    #define ARQUITECTURA "Unknown Architecture"
 #endif
 
 #endif //WOWPARSER_VERSION_H
