@@ -81,7 +81,7 @@ fn pass3_checkheadersanddataconsistency() {
         bar.set_message(new_filename);
         thread::sleep(Duration::from_secs(1));
 
-        let parser = Parser::new(current_file_info);
+        let mut parser = Parser::new(current_file_info);
 
         if parser.load() {
             parser.parse_file();
