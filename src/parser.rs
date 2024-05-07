@@ -9,6 +9,9 @@ pub(crate) struct Parser {
     file_size: u32,
     is_ascii: bool,
     first_time_is_ascii: bool,
+    first_time_get_header: bool,
+    header_offset: u32,
+    header_magic: String
 }
 
 impl Parser {
@@ -19,6 +22,9 @@ impl Parser {
             file_size: 0,
             is_ascii: false,
             first_time_is_ascii: true,
+            first_time_get_header: true,
+            header_offset: 0,
+            header_magic: String::new()
         }
     }
     pub fn load(&mut self) -> bool {
@@ -120,42 +126,97 @@ impl Parser {
 
         self.is_ascii
     }
-    fn check_structure(&self) -> bool {
+    fn header_get_uint(&mut self) -> u32 {
+        let mut raw_data: [u8; 4] = [0; 4];
+        let current_offset = self.header_get_offset(4) as usize;
+        raw_data.copy_from_slice(&self.whole_file_data[current_offset..self.header_offset as usize]);
+
+        u32::from_le_bytes(raw_data)
+    }
+    fn header_get_char(&mut self) -> char {
+        let current_offset = self.header_get_offset(1) as usize;
+        char::from(self.whole_file_data[current_offset])
+    }
+    fn header_get_offset(&mut self, size: u32) -> u32 {
+        if (self.header_offset + size) <= self.file_size {
+            self.header_offset += size;
+
+            self.header_offset - size
+        }
+        else {
+            0
+        }
+    }
+    fn get_file_type_by_header(&mut self) -> EnumFileType {
+        if self.first_time_get_header {
+            let mut header_magic = String::new();
+            header_magic.push(self.header_get_char());
+            header_magic.push(self.header_get_char());
+            header_magic.push(self.header_get_char());
+            header_magic.push(self.header_get_char());
+            self.header_magic = header_magic;
+            self.first_time_get_header = false;
+        }
+
+        match self.header_magic.as_str() {
+            "WDBC" => EnumFileType::DbcFile,
+            "WCH2" => EnumFileType::AdbFile,
+            "WDB2" => EnumFileType::Db2File,
+            "BDIW" => EnumFileType::WdbItemCacheFile,
+            "BOMW" => EnumFileType::WdbCreatureCacheFile,
+            "BOGW" => EnumFileType::WdbGameObjectCacheFile,
+            "BDNW" => EnumFileType::WdbItemNameCacheFile,
+            "XTIW" => EnumFileType::WdbItemTextCacheFile,
+            "CPNW" => EnumFileType::WdbNpcCacheFile,
+            "XTPW" => EnumFileType::WdbPageTextCacheFile,
+            "TSQW" => EnumFileType::WdbQuestCacheFile,
+            _ => { EnumFileType::UnkFile }
+        }
+    }
+    fn check_structure(&mut self) -> bool {
         if self.get_file_type() == &EnumFileType::CsvFile || self.is_ascii {
             // todo: implement read csv files
         }
         else {
-            let header = &self.whole_file_data[0..4];
-            println!("Header: {}", String::from_utf8_lossy(header));
+            match self.get_file_type_by_header() {
+                EnumFileType::DbcFile => {
+                    let header_size: u32 = 20;
 
-            let header_size: u32 = 20;
+                    let total_records = self.header_get_uint();
+                    let total_fields = self.header_get_uint();
+                    let record_size = self.header_get_uint();
+                    let string_size = self.header_get_uint();
 
-            let _total_records = &self.whole_file_data[4..8];
-            let total_records = u32::from_le_bytes([_total_records[0], _total_records[1], _total_records[2], _total_records[3]]);
-            println!("Total Records: {}", total_records);
+                    let data_bytes = self.file_size - header_size - string_size;
+                    let string_bytes = self.file_size - header_size - data_bytes;
 
-            let _total_fields = &self.whole_file_data[8..12];
-            let total_fields = u32::from_le_bytes([_total_fields[0], _total_fields[1], _total_fields[2], _total_fields[3]]);
-            println!("Total Fields: {}", total_fields);
+                    if data_bytes != (total_records * record_size) || string_size < 1 || string_bytes != string_size {
+                        write_log_no_time!("FAILED: Structure is damaged.\n");
+                        write_log!("\n");
+                        return false
+                    }
 
-            let _record_size = &self.whole_file_data[12..16];
-            let record_size = u32::from_le_bytes([_record_size[0], _record_size[1], _record_size[2], _record_size[3]]);
-            println!("Record Size: {}", record_size);
+                    if total_records < 1 || total_fields < 1 || record_size < 1 {
+                        write_log_no_time!("FAILED: No records found.\n");
+                        write_log!("\n");
+                        return false;
+                    }
 
-            let _string_size = &self.whole_file_data[16..20];
-            let string_size = u32::from_le_bytes([_string_size[0], _string_size[1], _string_size[2], _string_size[3]]);
-            println!("String Size: {}", string_size);
+                }
+                EnumFileType::AdbFile => {}
+                EnumFileType::Db2File => {}
 
-            let data_bytes = self.file_size - header_size - string_size;
-            let string_bytes = self.file_size - header_size - data_bytes;
+                EnumFileType::WdbCreatureCacheFile |
+                EnumFileType::WdbGameObjectCacheFile |
+                EnumFileType::WdbItemNameCacheFile |
+                EnumFileType::WdbItemTextCacheFile |
+                EnumFileType::WdbNpcCacheFile |
+                EnumFileType::WdbPageTextCacheFile |
+                EnumFileType::WdbQuestCacheFile => {}
 
-            println!("databytes '{}' == (total_records * record_size) '{}'", data_bytes, (total_records * record_size));
-            assert_eq!(data_bytes, total_records * record_size);
-
-            println!("string_bytes '{}' == string_size '{}'", string_bytes, string_size);
-            assert_eq!(string_bytes, string_size);
-
-            println!("Ok, header match file.");
+                EnumFileType::WdbItemCacheFile => {}
+                _ => {}
+            }
         }
 
         true
