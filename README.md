@@ -3,7 +3,8 @@
 Copyright(c) 2023 - Carlos Ramzuel - Tlaxcala, Mexico
 
 ## WoWParser 4.0 (Huamantla) in Development State:
-    * Project fully rebuild in Rust languaje
+    * Project fully rebuild in Rust languaje [master branch](https://github.com/glkrlos/wowparser)
+    * Project fully rebuild in PHP languaje [php branch](https://github.com/glkrlos/wowparser/tree/php)
 
 ## WoWParser 3.1 (Zitacuaro):
     * New Version 3.1.
