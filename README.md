@@ -4,10 +4,10 @@ Copyright(c) 2024 - Carlos Ramzuel - Tlaxcala, Mexico
 
 ## WoWParser 4.0 (Huamantla) in Development State:
 The project will be completely rebuilt in:
- - Rust language at [rust branch](https://github.com/glkrlos/wowparser/tree/rust)
+ - Rust language at [rust branch](https://github.com/glkrlos/wowparser/tree/master)
  - PHP language at [php branch](https://github.com/glkrlos/wowparser/tree/php)
 
-New version for C++ project is now under development on [master](https://github.com/glkrlos/wowparser) branch, with the next changelog:
+New version for C++ project is now under development on [stable_cplus](https://github.com/glkrlos/wowparser/tree/stable_cplus) branch, with the next changelog:
 
 ### New:
 * CSV Parser: Now works with multi-line strings as expected.
