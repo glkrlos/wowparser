@@ -4,13 +4,13 @@ Copyright(c) 2024 - Carlos Ramzuel - Tlaxcala, Mexico
 
 ## WoWParser 4.0 (Huamantla) in Development State:
 The project will be completely rebuilt in:
- - Rust language at [rust branch](https://github.com/glkrlos/wowparser/tree/rust)
+ - Rust language at [master branch](https://github.com/glkrlos/wowparser/tree/master)
  - PHP language at [php branch](https://github.com/glkrlos/wowparser/tree/php)
 
 New version for language C++ still pending for development.
 
 ## Versions up to 3.1 are in the C++ language
- - These versions are in branch [master](https://github.com/glkrlos/wowparser)
+ - These versions are in branch [stable_cplus](https://github.com/glkrlos/wowparser/tree/stable_cplus)
 
 ## How To Use:
 Tests made under Linux Debian 12
